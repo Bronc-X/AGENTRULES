@@ -2,6 +2,7 @@
 
 > Universal workflow rules are inherited from the global rules file.
 > This file contains constraints for pure HTML/JS projects.
+> See: https://github.com/Bronc-X/Lotus
 
 ## Tech Stack
 

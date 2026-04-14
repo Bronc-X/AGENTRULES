@@ -1,10 +1,19 @@
 # Lotus
 
-> The Ultimate "Out-of-the-Box" Universal Mindset Protocol for AI Coding Agents.
+> The Universal Mindset Protocol for AI Coding Agents.
+> Write your engineering "Constitution" once, and deploy it everywhere.
 
-Lotus continuously leverages the **latest, safest, and most stable global agent management mechanisms**. By applying these rules directly to the highest global configurations on your local machine, Lotus governs the behavior of your AI agents across **all** your projects simultaneously. 
+Lotus continuously leverages the **latest, safest, and most stable global agent management mechanisms**. By applying these rules directly to the highest-priority global configurations on your local machine, Lotus governs the behavior of your AI agents across **all** your projects simultaneously—without ever needing to write repetitive prompt instructions or perform tedious per-project setups.
 
-You instantly get professional workflows, zero-silence error handling, and high-standard design paradigms—without ever needing to write repetitive prompt instructions or perform tedious setups in advance. Write your engineering "Constitution" once, and deploy it everywhere.
+## 🧬 First Principles: Why Lotus Works
+
+Stop chasing every flashy AI news headline. The anxiety is unnecessary.
+
+At its core, every LLM—GPT, Claude, Gemini—is fundamentally doing one thing: **vector-based next-token prediction** ("guessing the next word"). Understanding this single fact changes everything:
+
+1. **Accuracy = Vector Precision**: The quality of AI output depends entirely on how precisely the model's internal vectors can match your intent. Lotus solves this by injecting **highly structured, unambiguous rules** that give vectors clear targets to lock onto. Vague prompts produce vague code; Lotus-formatted rules produce surgical code.
+2. **Context Window = The Only Bottleneck**: Every model has a finite context window. The real skill is not "knowing more prompts"—it's **managing what goes into that window**. Lotus uses a Hub-and-Spoke architecture to keep the global rules lean and universal, while project-specific details are layered separately, ensuring you never waste precious context tokens on redundant instructions.
+3. **Persistence > Repetition**: Without Lotus, you re-explain your standards in every new chat session. With Lotus, your rules are **pre-loaded at the OS level** before the conversation even starts. The AI reads your constitution first, every time, automatically.
 
 ## ✨ Why Choose Lotus?
 
@@ -14,6 +23,7 @@ You instantly get professional workflows, zero-silence error handling, and high-
 - ⚡ **Seamless Wake-Up Calls (`@` and `/`)**: Summon specific expert personas and architectural overviews dynamically mid-chat using platform-native triggers.
 - 🗑️ **Anti-Plugin Bloat**: 95% of plugins and skills on the market become stale junk within weeks. Lotus takes the opposite approach—every skill is **hand-curated, battle-tested, and minimally sufficient**. We only ship what survives real production workflows.
 - 🔄 **Continuously Updated, Frontier-Tracked**: Lotus is a **living protocol**, not a static config dump. We actively track bleeding-edge releases from **Claude Code, Codex CLI, and top-tier open-source agent frameworks**, and fold the safest, most proven patterns back into `core/AGENTS.md` so your rules never go stale.
+- 🧘 **Anti-Anxiety by Design**: New frameworks every week? Another "game-changing" plugin? Relax. LLMs are vector-based word predictors. The only things that actually matter are **vector precision** (clear rules) and **context management** (lean instructions). Lotus handles both. You handle building your product.
 
 ## 🚀 Zero-Foundation Quick Start (For Beginners)
 
@@ -95,6 +105,7 @@ Lotus is **not a "set and forget" config**. It is a living, evolving protocol.
 - **Primary tracking targets**: [Claude Code](https://docs.anthropic.com/en/docs/claude-code), [Codex CLI](https://github.com/openai/codex), and battle-tested open-source agent frameworks from top contributors.
 - **What we track**: New global rule injection mechanisms, safer permission models, improved context-window strategies, and proven workflow patterns.
 - **What we discard**: Hype-driven features, unstable APIs, and anything that adds complexity without measurable value.
+- **The first-principles filter**: Before any new pattern is adopted, we ask: *Does this help vectors lock on more accurately? Does this reduce context waste?* If neither, it doesn't go in.
 - **How to stay current**: Simply `git pull` and re-run the installer. Your global rules across all IDEs will be refreshed in seconds.
 
 ```bash
@@ -105,3 +116,9 @@ cd /path/to/Lotus && git pull && ./install.sh --global
 # Windows equivalent
 cd C:\path\to\Lotus; git pull; .\install.ps1 -Global
 ```
+
+## 📌 Persistence: Set Up Once, Apply Forever
+
+Once Lotus is installed globally, **every new project you create automatically inherits your rules**. No copy-pasting. No "remember to add the config file". The rules live at the OS-level global config of each AI tool, so they are always active—whether you're starting a fresh Next.js app, debugging a legacy codebase, or pair-programming on a colleague's machine.
+
+For project-specific overrides (design systems, tech stacks), just use `install.ps1 -Project <template>` to layer on top. The global rules remain untouched.
