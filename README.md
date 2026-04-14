@@ -9,9 +9,9 @@ Lotus continuously leverages the **latest, safest, and most stable global agent 
 
 Stop chasing every flashy AI news headline. The anxiety is unnecessary.
 
-At its core, every LLM—GPT, Claude, Gemini—is fundamentally doing one thing: **vector-based next-token prediction** ("guessing the next word"). Understanding this single fact changes everything:
+At its core, every LLM—GPT, Claude, Gemini—is fundamentally doing one thing: converting your text into **high-dimensional vector embeddings**, processing them through transformer attention layers, and **predicting the most probable next token**. Understanding this single mechanism changes everything:
 
-1. **Accuracy = Vector Precision**: The quality of AI output depends entirely on how precisely the model's internal vectors can match your intent. Lotus solves this by injecting **highly structured, unambiguous rules** that give vectors clear targets to lock onto. Vague prompts produce vague code; Lotus-formatted rules produce surgical code.
+1. **Accuracy = Attention Precision**: The quality of AI output depends on how precisely the model's attention mechanism can lock onto your intent within the vector space. Lotus solves this by injecting **highly structured, unambiguous rules** that give the attention layers clear, high-signal targets. Vague prompts scatter attention; Lotus-formatted rules focus it like a laser.
 2. **Context Window = The Only Bottleneck**: Every model has a finite context window. The real skill is not "knowing more prompts"—it's **managing what goes into that window**. Lotus uses a Hub-and-Spoke architecture to keep the global rules lean and universal, while project-specific details are layered separately, ensuring you never waste precious context tokens on redundant instructions.
 3. **Persistence > Repetition**: Without Lotus, you re-explain your standards in every new chat session. With Lotus, your rules are **pre-loaded at the OS level** before the conversation even starts. The AI reads your constitution first, every time, automatically.
 
@@ -87,6 +87,8 @@ The trigger syntax depends on whether you are using a visual IDE or a command-li
    * **What it does**: Silently performs an `npm install`, runs `npm run build`, and checks for compilation errors independently without ever asking for your permission.
 5. **[`@vibe` / `/vibe`](https://github.com/Bronc-X/Lotus/blob/main/skills/vibe.md)**
    * **What it does**: Vibe Coding mode. Delegates technical aesthetics entirely to the AI, prioritizing visual elegance and silent, rapid iterations without asking boilerplate questions.
+6. **[`@btw` / `/btw`](https://github.com/Bronc-X/Lotus/blob/main/skills/btw.md)**
+   * **What it does**: Side-channel quick question mode. Inspired by Claude Code's native `/btw` command. Ask a quick question mid-task without interrupting your main workflow. The AI answers in 3-5 sentences, modifies zero files, and seamlessly returns to the primary task. Works across all platforms, not just Claude Code.
 
 ## 🏗️ Architecture (Hub-and-Spoke)
 
