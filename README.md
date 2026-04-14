@@ -2,7 +2,9 @@
 
 > The Ultimate "Out-of-the-Box" Universal Mindset Protocol for AI Coding Agents.
 
-Forget writing repetitive prompt instructions. Lotus is a unified Hub-and-Spoke rule repository that instantly injects professional developer workflows, zero-silence error handling, and high-standard design paradigms into all your AI agents globally. Write your engineering "Constitution" once, and deploy it everywhere.
+Lotus continuously leverages the **latest, safest, and most stable global agent management mechanisms**. By applying these rules directly to the highest global configurations on your local machine, Lotus governs the behavior of your AI agents across **all** your projects simultaneously. 
+
+You instantly get professional workflows, zero-silence error handling, and high-standard design paradigms—without ever needing to write repetitive prompt instructions or perform tedious setups in advance. Write your engineering "Constitution" once, and deploy it everywhere.
 
 ## ✨ Why Choose Lotus?
 
@@ -52,10 +54,12 @@ C:\path\to\Lotus\install.ps1 -Project nextjs
 
 ## 🎯 Tool Wake-Up Mechanisms (Skills)
 
-Once Lotus is installed globally, it registers "Skills" in your agents. You can dynamically **wake up** these skills by typing `@` or `/` in your chat window, depending on your AI editor:
+You do not need to memorize complicated prompts; just remember a few simple commands. You can dynamically **wake up** specific expert personas exactly when you need them.
 
-* **In Claude Code / Antigravity / Aider**: Type `@name` (e.g., `@gstack`).
-* **In Cursor / Windsurf**: Type `/name` (e.g., `/gstack`).
+**How to Wake Them Up:**
+The trigger syntax depends on whether you are using a visual IDE or a command-line agent:
+* **For GUI IDEs (Cursor / Windsurf)**: Use the slash command `/name` (e.g., `/gstack`).
+* **For CLI Agents (Claude Code / Antigravity / Aider)**: Use the mention format `@name` (e.g., `@gstack`).
 
 ### Available Wakes:
 
