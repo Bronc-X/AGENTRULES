@@ -55,7 +55,7 @@ At its core, every LLM—GPT, Claude, Gemini—is fundamentally doing one thing:
 
 ## ✨ Why Choose Lotus?
 
-- 🧠 **Mindset Over Scripts**: Lotus teaches your AI *how to think* like a Senior Architect, PM, and QA. It enforces the "[GStack](https://github.com/jxnl/gstack) Workflow" (CEO Review -> Eng Review -> Code -> Global Review. Thanks to [GStack](https://github.com/jxnl/gstack) for the inspiration).
+- 🧠 **Mindset Over Scripts**: Lotus teaches your AI *how to think* like a Senior Architect, PM, and QA. It enforces the "[GStack](https://github.com/garrytan/gstack) Workflow" (CEO Review -> Eng Review -> Code -> Global Review. Thanks to [GStack](https://github.com/garrytan/gstack) for the inspiration).
 - 🌍 **Write Once, Run Everywhere**: A Single Source of Truth (`core/AGENTS.md`) automatically adapts and installs into Claude Code, Antigravity, Cursor, Windsurf, Copilot, and more.
 - 🚧 **Zero Silent Failures**: Built-in quality gates guarantee your generated code includes proper user feedback, loading states, and aesthetic consistency.
 - ⚡ **Seamless Wake-Up Calls (`@` and `/`)**: Summon specific expert personas and architectural overviews dynamically mid-chat using platform-native triggers.
@@ -154,7 +154,7 @@ The trigger syntax depends on whether you are using a visual IDE or a command-li
 
 ### Available Wakes:
 
-#### Lotus Original Skills (Cross-Platform)
+#### Lotus Core Skills (Cross-Platform)
 
 1. **[`@gstack` / `/gstack`](https://github.com/Bronc-X/Lotus/blob/main/skills/gstack.md)**
    * **What it does**: Triggers the elite multi-role developer workflow. The AI will explicitly switch between Product Manager, Architect, Builder, and QA before writing code to ensure system integrity.

@@ -55,7 +55,7 @@ Lotus 持续采用**最新、最安全、最稳定的全局 Agent 管理机制**
 
 ## ✨ 为什么选择 Lotus？
 
-- 🧠 **思维模式，而非脚本**：Lotus 教会你的 AI *如何思考*，像一个资深架构师、产品经理和 QA 一样。它执行"[GStack](https://github.com/jxnl/gstack) 工作流"（CEO 评审 → 架构评审 → 编码 → 全局审查。感谢 [GStack](https://github.com/jxnl/gstack)，它帮助了我很多）。
+- 🧠 **思维模式，而非脚本**：Lotus 教会你的 AI *如何思考*，像一个资深架构师、产品经理和 QA 一样。它执行"[GStack](https://github.com/garrytan/gstack) 工作流"（CEO 评审 → 架构评审 → 编码 → 全局审查。感谢 [GStack](https://github.com/garrytan/gstack)，它帮助了我很多）。
 - 🌍 **一次编写，处处运行**：一个单一的真理源（`core/AGENTS.md`）自动适配并安装到 Claude Code、Antigravity、Cursor、Windsurf、Copilot 等所有平台。
 - 🚧 **零静默失败**：内置质量门禁保证你生成的代码包含正确的用户反馈、加载状态和美学一致性。
 - ⚡ **无缝唤醒调用（`@` 和 `/`）**：在对话中随时使用平台原生触发器唤醒特定的专家角色和架构评审。
@@ -154,7 +154,7 @@ cd ~/Projects/MyNewApp
 
 ### 可用唤醒列表：
 
-#### Lotus 自研技能（跨所有平台可用）
+#### Lotus 核心技能（跨所有平台可用）
 
 1. **[`@gstack` / `/gstack`](https://github.com/Bronc-X/Lotus/blob/main/skills/gstack.md)**
    * **功能**：触发精英级多角色开发者工作流。AI 会在编写代码前，在产品经理、架构师、构建者和 QA 之间显式切换角色，确保系统完整性。
