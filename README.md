@@ -5,7 +5,19 @@
 > Now, you have Lotus. Write your engineering "Constitution" once, and deploy it everywhere.
 > Lotus: the smart Docker for managing your Agents globally.
 
-Lotus continuously leverages the **latest, safest, and most stable global agent management mechanisms**. By applying these rules directly to the highest-priority global configurations on your local machine (compatible with all major AI tools), Lotus governs the behavior of your AI agents across **all** your projects simultaneously — without ever needing to write repetitive prompt instructions or perform tedious per-project setups.
+Lotus continuously leverages the **latest, safest, and most stable global agent management mechanisms**. By applying these rules to your local AI tools' global configurations, Lotus governs the behavior of your AI agents across **all** your projects simultaneously — without ever needing to write repetitive prompt instructions or perform tedious per-project setups.
+
+**Platform Compatibility:**
+
+| Platform | Auto-Inject Global? | Notes |
+|---|---|---|
+| Claude Code | ✅ Fully automatic | `~/.claude/CLAUDE.md` auto-loaded |
+| Antigravity / Gemini CLI | ✅ Fully automatic | `~/.gemini/GEMINI.md` auto-loaded |
+| Codex CLI | ✅ Fully automatic | `~/.codex/AGENTS.md` auto-loaded |
+| OpenCode | ✅ Fully automatic | `~/.config/opencode/AGENTS.md` |
+| Aider | ✅ Fully automatic | `~/.aider.conf.yml` |
+| Windsurf | ⚠️ Manual paste | Open Windsurf → Customizations → Rules → Click "+ Global" and paste |
+| Cursor | ⚠️ Manual paste | Open Cursor Settings → General → Rules for AI → Paste content |
 
 ## 🧬 First Principles: Why Lotus Works
 
@@ -41,13 +53,22 @@ If you are starting a new project or setting up a brand-new computer, simply **c
 
 *(Note: Change `nextjs` to `vite` or `html` depending on your project type).*
 
-### Scenario B: Global-Only Install (Just apply Lotus rules to all IDEs, no new project)
+### What about future new projects?
 
-> "Please execute the following steps locally:
-> 1. Clone `https://github.com/Bronc-X/Lotus.git` into a temporary directory.
-> 2. Determine my OS. Run the global install (Windows: `install.ps1 -Global`, Mac/Linux: `install.sh --global`).
-> 3. Once finished, delete the temporary cloned repository.
-> 4. Tell me the installation result."
+Once globally installed, Lotus core rules (workflows, quality gates) are **already active** in all your AI tools — **no wake-up needed**.
+
+If you want to add **project-level templates** (design systems, tech stack constraints) to a new project, just run once inside the project folder:
+
+```powershell
+# Windows
+C:\Dev\Lotus\install.ps1 -Project nextjs
+```
+```bash
+# macOS / Linux
+~/Dev/Lotus/install.sh --project nextjs
+```
+
+That's it. Global rules are always on; project templates layer on top as needed.
 
 ## 🔌 Manual Installation
 
@@ -135,9 +156,9 @@ The following commands are originally exclusive to the Claude Code CLI. Lotus di
 8. **[`@loop` / `/loop`](https://github.com/Bronc-X/Lotus/blob/main/skills/loop.md)**
    * **When to use**: You have recurring check tasks (e.g., poll deployment status every 5 minutes, monitor PR changes).
    * **What it does**: Sets up an in-session recurring task. Provide an interval and an instruction (e.g., `/loop 5m check deployment status`), and the AI acts like a little alarm clock, auto-executing on schedule. The loop is session-scoped — close the terminal and it stops. No system-level daemon, completely safe and controllable. In Claude Code, use `/loop <interval> <instruction>`; on other platforms, trigger `@loop` and the AI will simulate periodic reminders using platform-native capabilities.
-9. **[`@agents` / `/agents`](https://github.com/Bronc-X/Lotus/blob/main/skills/agents.md)**
+9. **[`@subagent` / `/subagent`](https://github.com/Bronc-X/Lotus/blob/main/skills/subagent.md)**
    * **When to use**: Your task is too complex for one AI to handle, or you want AI to work on multiple things in parallel.
-   * **What it does**: Create and manage **Subagents**. Each subagent has its own context window, system prompt, and tool permissions. You can have one subagent dedicated to searching the codebase, another running tests, while the main agent focuses on core logic — zero interference. This is the ultimate solution for "context window overflow": isolate noise into subprocess agents, keep the main thread clean. In Claude Code, use `/agents` to manage; on other platforms, trigger `@agents` and the AI will guide you through task decomposition and context isolation using multi-turn conversation patterns.
+   * **What it does**: Create and manage **Subagents**. Each subagent has its own context window, system prompt, and tool permissions. You can have one subagent dedicated to searching the codebase, another running tests, while the main agent focuses on core logic — zero interference. This is the ultimate solution for "context window overflow": isolate noise into subprocess agents, keep the main thread clean. In Claude Code, use `/agents` to manage; on other platforms, trigger `@subagent` and the AI will guide you through task decomposition and context isolation.
 
 ## 🏗️ Architecture (Hub-and-Spoke)
 

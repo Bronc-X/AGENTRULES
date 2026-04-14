@@ -5,7 +5,19 @@
 > 现在，你拥有了Lotus，只需编写一次你的工程"宪法"，即可部署到所有平台。
 > Lotus，全局管理Agent的智能docker。
 
-Lotus 持续采用**最新、最安全、最稳定的全局 Agent 管理机制**。通过将规则直接注入到你本地机器上各 AI 工具（适用于全部主流工具）的最高优先级全局配置位中，Lotus 同时管控**所有**项目中 AI 助手的行为——无需重复编写 prompt 指令，也无需为每个项目做繁琐的前期配置。
+Lotus 持续采用**最新、最安全、最稳定的全局 Agent 管理机制**。通过将规则注入到你本地机器上各 AI 工具的全局配置中，Lotus 同时管控**所有**项目中 AI 助手的行为——无需重复编写 prompt 指令，也无需为每个项目做繁琐的前期配置。
+
+**平台兼容性说明：**
+
+| 平台 | 全局自动注入 | 备注 |
+|---|---|---|
+| Claude Code | ✅ 完全自动 | `~/.claude/CLAUDE.md` 自动加载 |
+| Antigravity / Gemini CLI | ✅ 完全自动 | `~/.gemini/GEMINI.md` 自动加载 |
+| Codex CLI | ✅ 完全自动 | `~/.codex/AGENTS.md` 自动加载 |
+| OpenCode | ✅ 完全自动 | `~/.config/opencode/AGENTS.md` |
+| Aider | ✅ 完全自动 | `~/.aider.conf.yml` |
+| Windsurf | ⚠️ 需手动粘贴 | 打开 Windsurf → 自定义 → 规则 → 点击「+ Global」粘贴内容 |
+| Cursor | ⚠️ 需手动粘贴 | 打开 Cursor Settings → General → Rules for AI → 粘贴内容 |
 
 ## 🧬 第一性原理：为什么 Lotus 有效
 
@@ -41,13 +53,22 @@ Lotus 持续采用**最新、最安全、最稳定的全局 Agent 管理机制**
 
 *（注意：根据你的项目类型，将 `nextjs` 替换为 `vite` 或 `html`。）*
 
-### 场景 B：只做全局安装（不创建新项目，只想让所有 IDE 都加载 Lotus 规则）
+### 以后新建项目怎么用 Lotus？
 
-> "请在本地执行以下步骤：
-> 1. 将 `https://github.com/Bronc-X/Lotus.git` 克隆到系统的一个临时目录中。
-> 2. 判断我的操作系统。运行全局安装（Windows: `install.ps1 -Global`，Mac/Linux: `install.sh --global`）。
-> 3. 完成后，删除刚才克隆的临时仓库。
-> 4. 告诉我安装结果。"
+全局安装完成后，Lotus 的核心规则（工作流、质量门禁等）已经自动驻留在你所有 AI 工具的全局配置中了，**不需要每次唤醒**。
+
+但如果你需要为新项目添加**项目级模板**（设计系统、技术栈约束），只需在新项目目录里运行一次：
+
+```powershell
+# Windows
+C:\Dev\Lotus\install.ps1 -Project nextjs
+```
+```bash
+# macOS / Linux
+~/Dev/Lotus/install.sh --project nextjs
+```
+
+就这样。全局规则始终生效，项目模板按需叠加。
 
 ## 🔌 手动安装
 
@@ -135,9 +156,9 @@ cd ~/Projects/MyNewApp
 8. **[`@loop` / `/loop`](https://github.com/Bronc-X/Lotus/blob/main/skills/loop.md)**
    * **什么时候用**：你有一些需要定期、反复执行的检查任务（比如每 5 分钟看一下部署状态、持续监控 PR 变化）。
    * **功能**：设置一个会话内的定时循环任务。你给出间隔时间和一个指令（例如 `/loop 5m 检查部署状态`），AI 就会像一个小闹钟一样定期自动执行。这个循环是会话内的——关掉终端就停了，不会变成一个系统级的后台守护进程，非常安全可控。在 Claude Code 中直接使用 `/loop <间隔> <指令>`；在其他平台触发 `@loop` 后 AI 会用平台原生能力模拟类似的定期提醒与执行。
-9. **[`@agents` / `/agents`](https://github.com/Bronc-X/Lotus/blob/main/skills/agents.md)**
+9. **[`@subagent` / `/subagent`](https://github.com/Bronc-X/Lotus/blob/main/skills/subagent.md)**
    * **什么时候用**：你的任务太复杂了，一个 AI 顾不过来；或者你想让 AI 并行处理多件事。
-   * **功能**：创建和管理**子 Agent（Subagent）**。每个子 Agent 都有自己独立的上下文窗口、独立的系统提示、独立的工具权限。你可以让一个子 Agent 专门负责搜索代码库、另一个专门跑测试、主 Agent 只负责写核心逻辑——互不干扰。这是解决"上下文窗口挤爆"的终极方案：把噪音隔离到子进程里，主线保持干净。在 Claude Code 中使用 `/agents` 管理；在其他平台触发 `@agents` 会引导 AI 用多轮对话模拟类似的任务拆分与隔离模式。
+   * **功能**：创建和管理**子 Agent（Subagent）**。每个子 Agent 都有自己独立的上下文窗口、独立的系统提示、独立的工具权限。你可以让一个子 Agent 专门负责搜索代码库、另一个专门跑测试、主 Agent 只负责写核心逻辑——互不干扰。这是解决"上下文窗口挤爆"的终极方案：把噪音隔离到子进程里，主线保持干净。在 Claude Code 中使用 `/agents` 管理；在其他平台触发 `@subagent` 会引导 AI 用多轮对话模拟类似的任务拆分与隔离模式。
 
 ## 🏗️ 架构（Hub-and-Spoke 中心辐射模型）
 
