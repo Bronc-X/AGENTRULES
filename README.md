@@ -12,6 +12,8 @@ You instantly get professional workflows, zero-silence error handling, and high-
 - 🌍 **Write Once, Run Everywhere**: A Single Source of Truth (`core/AGENTS.md`) automatically adapts and installs into Claude Code, Antigravity, Cursor, Windsurf, Copilot, and more.
 - 🚧 **Zero Silent Failures**: Built-in quality gates guarantee your generated code includes proper user feedback, loading states, and aesthetic consistency.
 - ⚡ **Seamless Wake-Up Calls (`@` and `/`)**: Summon specific expert personas and architectural overviews dynamically mid-chat using platform-native triggers.
+- 🗑️ **Anti-Plugin Bloat**: 95% of plugins and skills on the market become stale junk within weeks. Lotus takes the opposite approach—every skill is **hand-curated, battle-tested, and minimally sufficient**. We only ship what survives real production workflows.
+- 🔄 **Continuously Updated, Frontier-Tracked**: Lotus is a **living protocol**, not a static config dump. We actively track bleeding-edge releases from **Claude Code, Codex CLI, and top-tier open-source agent frameworks**, and fold the safest, most proven patterns back into `core/AGENTS.md` so your rules never go stale.
 
 ## 🚀 Zero-Foundation Quick Start (For Beginners)
 
@@ -56,6 +58,8 @@ C:\path\to\Lotus\install.ps1 -Project nextjs
 
 You do not need to memorize complicated prompts; just remember a few simple commands. You can dynamically **wake up** specific expert personas exactly when you need them.
 
+> 💡 **Why so few?** We deliberately keep the skill count small. Every skill here has survived months of real-world iteration across dozens of production projects. If a skill doesn't consistently deliver value, it gets **removed**, not "deprecated". Quality over quantity, always.
+
 **How to Wake Them Up:**
 The trigger syntax depends on whether you are using a visual IDE or a command-line agent:
 * **For GUI IDEs (Cursor / Windsurf)**: Use the slash command `/name` (e.g., `/gstack`).
@@ -82,4 +86,22 @@ Lotus/
 ├── skills/              ← 🔶 Wake-up Skills (@gstack, @feynman, etc.)
 ├── templates/           ← 🔶 Tech stacks (Next.js, Vite) & Design languages
 └── install scripts      ← 🤖 Auto-generates platform-specific IDE adapters
+```
+
+## 🔄 Update Philosophy
+
+Lotus is **not a "set and forget" config**. It is a living, evolving protocol.
+
+- **Primary tracking targets**: [Claude Code](https://docs.anthropic.com/en/docs/claude-code), [Codex CLI](https://github.com/openai/codex), and battle-tested open-source agent frameworks from top contributors.
+- **What we track**: New global rule injection mechanisms, safer permission models, improved context-window strategies, and proven workflow patterns.
+- **What we discard**: Hype-driven features, unstable APIs, and anything that adds complexity without measurable value.
+- **How to stay current**: Simply `git pull` and re-run the installer. Your global rules across all IDEs will be refreshed in seconds.
+
+```bash
+# Stay up to date in one command
+cd /path/to/Lotus && git pull && ./install.sh --global
+```
+```powershell
+# Windows equivalent
+cd C:\path\to\Lotus; git pull; .\install.ps1 -Global
 ```
