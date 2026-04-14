@@ -2,7 +2,7 @@
 
 > 本文件是所有项目共享的通用工作流规则与质量标准。
 > 项目特定约束（技术栈、设计语言、AI 引擎等）请写在项目根目录的 `AGENTS.md` 或 `.agents/rules/` 中。
-> 本文件由 [AGENTRULES](https://github.com/Bronc-X/AGENTRULES) 仓库维护，兼容 Claude Code / Codex / Antigravity / Gemini CLI / OpenCode / Cursor / Windsurf / Copilot / Aider。
+> 本文件由 [Lotus](https://github.com/Bronc-X/Lotus) 仓库维护，兼容 Claude Code / Codex / Antigravity / Gemini CLI / OpenCode / Cursor / Windsurf / Copilot / Aider。
 
 ## 核心原则
 

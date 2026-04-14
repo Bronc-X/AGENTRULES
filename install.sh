@@ -75,7 +75,7 @@ if [ -n "$PROJECT" ]; then
 fi
 
 if [ "$GLOBAL" -eq 0 ] && [ -z "$PROJECT" ]; then
-    echo -e "\033[0;36mAGENTRULES Installer\033[0m"
+    echo -e "\033[0;36mLotus Installer\033[0m"
     echo "--------------------"
     echo "Usage:"
     echo "  ./install.sh --global              (Install global rules to all IDE/CLI folders)"

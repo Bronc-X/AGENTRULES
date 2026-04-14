@@ -2,7 +2,7 @@
 
 > Universal workflow rules and quality gates are inherited from the global rules file.
 > This file contains only project-specific constraints.
-> See: https://github.com/Bronc-X/AGENTRULES
+> See: https://github.com/Bronc-X/Lotus
 
 ## Tech Stack
 

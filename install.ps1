@@ -80,7 +80,7 @@ if ($Project) {
 }
 
 if (-not $Global -and -not $Project) {
-    Write-Host "AGENTRULES Installer" -ForegroundColor Cyan
+    Write-Host "Lotus Installer" -ForegroundColor Cyan
     Write-Host "--------------------"
     Write-Host "Usage:"
     Write-Host "  .\install.ps1 -Global              (Install global rules to all IDE/CLI folders)"
