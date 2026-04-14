@@ -23,21 +23,18 @@ Lotus continuously leverages the **latest, safest, and most stable global agent 
 <summary>📋 Windsurf Manual Setup (click to expand)</summary>
 
 1. Open Windsurf
-2. Click the **Customizations icon** (book icon) in the top-right
-3. Navigate to the **Rules** tab
+2. Click the **Customizations icon** in the top-right
+3. Navigate to **Rules**
 4. Click the **"+ Global"** button
 5. Copy and paste the full contents of `core/AGENTS.md`
 6. Save — Cascade will now auto-load these rules for every session
-
-> ⚠️ Windsurf has a **6,000 character limit** for global rules. If the content exceeds this, keep only the core principles and intent routing sections.
-
 </details>
 
 <details>
 <summary>📋 Cursor Manual Setup (click to expand)</summary>
 
 1. Open Cursor
-2. Click the **gear icon** in the top-right → open **Cursor Settings**
+2. Open **Cursor Settings**
 3. Navigate to **General** → find the **"Rules for AI"** input box
 4. Copy and paste the full contents of `core/AGENTS.md`
 5. Save — all AI conversations in every project will now carry these rules

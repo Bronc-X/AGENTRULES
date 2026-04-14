@@ -23,21 +23,18 @@ Lotus 持续采用**最新、最安全、最稳定的全局 Agent 管理机制**
 <summary>📋 Windsurf 手动配置步骤（点击展开）</summary>
 
 1. 打开 Windsurf
-2. 点击右上角的 **自定义图标**（书本图标）
-3. 在弹出面板中找到 **Rules（规则）** 选项卡
+2. 点击右上角的 **自定义图标**
+3. 在弹出面板中找到 **Rules（规则）** 
 4. 点击 **「+ Global」** 按钮
 5. 将 `core/AGENTS.md` 的完整内容复制粘贴进去
 6. 保存即可，此后每次使用 Cascade 都会自动加载
-
-> ⚠️ Windsurf 全局规则有 **6,000 字符上限**。如果内容超限，只保留核心原则和意图路由部分即可。
-
 </details>
 
 <details>
 <summary>📋 Cursor 手动配置步骤（点击展开）</summary>
 
 1. 打开 Cursor
-2. 点击右上角的**齿轮图标** → 进入 **Cursor Settings**
+2.  进入 **Cursor Settings**
 3. 在左侧找到 **General** → 找到 **「Rules for AI」** 输入框
 4. 将 `core/AGENTS.md` 的完整内容复制粘贴进去
 5. 保存即可，此后每个项目的 AI 对话都会自动携带这些规则
