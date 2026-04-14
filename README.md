@@ -1,9 +1,11 @@
 # Lotus
 
-> The Universal Mindset Protocol for AI Coding Agents.
-> Write your engineering "Constitution" once, and deploy it everywhere.
+> Global Agent Rules — Lotus.
+> Before, every new project meant repetitive prompt imports, skill setups, and wasted time — forgetting that *building* is the only reason to open your editor.
+> Now, you have Lotus. Write your engineering "Constitution" once, and deploy it everywhere.
+> Lotus: the smart Docker for managing your Agents globally.
 
-Lotus continuously leverages the **latest, safest, and most stable global agent management mechanisms**. By applying these rules directly to the highest-priority global configurations on your local machine, Lotus governs the behavior of your AI agents across **all** your projects simultaneously—without ever needing to write repetitive prompt instructions or perform tedious per-project setups.
+Lotus continuously leverages the **latest, safest, and most stable global agent management mechanisms**. By applying these rules directly to the highest-priority global configurations on your local machine (compatible with all major AI tools), Lotus governs the behavior of your AI agents across **all** your projects simultaneously — without ever needing to write repetitive prompt instructions or perform tedious per-project setups.
 
 ## 🧬 First Principles: Why Lotus Works
 
@@ -17,7 +19,7 @@ At its core, every LLM—GPT, Claude, Gemini—is fundamentally doing one thing:
 
 ## ✨ Why Choose Lotus?
 
-- 🧠 **Mindset Over Scripts**: Lotus teaches your AI *how to think* like a Senior Architect, PM, and QA. It enforces the "GStack Workflow" (CEO Review -> Eng Review -> Code -> Global Review).
+- 🧠 **Mindset Over Scripts**: Lotus teaches your AI *how to think* like a Senior Architect, PM, and QA. It enforces the "[GStack](https://github.com/jxnl/gstack) Workflow" (CEO Review -> Eng Review -> Code -> Global Review. Thanks to [GStack](https://github.com/jxnl/gstack) for the inspiration).
 - 🌍 **Write Once, Run Everywhere**: A Single Source of Truth (`core/AGENTS.md`) automatically adapts and installs into Claude Code, Antigravity, Cursor, Windsurf, Copilot, and more.
 - 🚧 **Zero Silent Failures**: Built-in quality gates guarantee your generated code includes proper user feedback, loading states, and aesthetic consistency.
 - ⚡ **Seamless Wake-Up Calls (`@` and `/`)**: Summon specific expert personas and architectural overviews dynamically mid-chat using platform-native triggers.
@@ -38,6 +40,14 @@ If you are starting a new project or setting up a brand-new computer, simply **c
 > 5. Carefully read the newly generated `AGENTS.md` and `.agents/rules/` in my current directory to understand my coding standards and design language. Let me know when you are ready."
 
 *(Note: Change `nextjs` to `vite` or `html` depending on your project type).*
+
+### Scenario B: Global-Only Install (Just apply Lotus rules to all IDEs, no new project)
+
+> "Please execute the following steps locally:
+> 1. Clone `https://github.com/Bronc-X/Lotus.git` into a temporary directory.
+> 2. Determine my OS. Run the global install (Windows: `install.ps1 -Global`, Mac/Linux: `install.sh --global`).
+> 3. Once finished, delete the temporary cloned repository.
+> 4. Tell me the installation result."
 
 ## 🔌 Manual Installation
 
@@ -99,18 +109,35 @@ The trigger syntax depends on whether you are using a visual IDE or a command-li
 
 ### Available Wakes:
 
+#### Lotus Original Skills (Cross-Platform)
+
 1. **[`@gstack` / `/gstack`](https://github.com/Bronc-X/Lotus/blob/main/skills/gstack.md)**
    * **What it does**: Triggers the elite multi-role developer workflow. The AI will explicitly switch between Product Manager, Architect, Builder, and QA before writing code to ensure system integrity.
 2. **[`@feynman` / `/feynman`](https://github.com/Bronc-X/Lotus/blob/main/skills/feynman.md)**
-   * **What it does**: Forces the AI to use the Feynman Technique. It will break down and explain complex bugs or physical gear mechanisms using absolute layman terms before attempting to apply a fix.
+   * **What it does**: Forces the AI to use the Feynman Technique. It will break down and explain complex bugs or mechanisms using absolute layman terms before attempting a fix.
 3. **[`@polanyi-tacit` / `/polanyi-tacit`](https://github.com/Bronc-X/Lotus/blob/main/skills/polanyi-tacit.md)**
    * **What it does**: Wakes up a deeply analytical mode. The AI deliberately looks for architectural compromises, "defensive" code blocks, and unspoken organizational debt hidden behind the scenes.
 4. **[`@auto-build` / `/auto-build`](https://github.com/Bronc-X/Lotus/blob/main/skills/auto-build.md)**
-   * **What it does**: Silently performs an `npm install`, runs `npm run build`, and checks for compilation errors independently without ever asking for your permission.
-5. **[`@vibe` / `/vibe`](https://github.com/Bronc-X/Lotus/blob/main/skills/vibe.md)**
-   * **What it does**: Vibe Coding mode. Delegates technical aesthetics entirely to the AI, prioritizing visual elegance and silent, rapid iterations without asking boilerplate questions.
-6. **[`@btw` / `/btw`](https://github.com/Bronc-X/Lotus/blob/main/skills/btw.md)**
-   * **What it does**: Side-channel quick question mode. Inspired by Claude Code's native `/btw` command. Ask a quick question mid-task without interrupting your main workflow. The AI answers in 3-5 sentences, modifies zero files, and seamlessly returns to the primary task. Works across all platforms, not just Claude Code.
+   * **What it does**: Silently performs `npm install`, runs `npm run build`, and checks for compilation errors without asking for your permission.
+5. **[`@btw` / `/btw`](https://github.com/Bronc-X/Lotus/blob/main/skills/btw.md)**
+   * **What it does**: Side-channel quick question mode. Inspired by Claude Code's native `/btw` command. Ask a quick question mid-task without interrupting your main workflow. The AI answers in 3-5 sentences, modifies zero files, and seamlessly returns to the primary task. Works across all platforms.
+
+#### Adapted from Claude Code Native Commands (Lotus ports to other platforms)
+
+The following commands are originally exclusive to the Claude Code CLI. Lotus distills their **core behavioral logic** into skill files so users on other platforms can get a similar experience.
+
+6. **[`@powerup` / `/powerup`](https://github.com/Bronc-X/Lotus/blob/main/skills/powerup.md)**
+   * **When to use**: You're new to AI coding, or feel you're only using 10% of your AI's capabilities.
+   * **What it does**: Think of it as the "Duolingo" for Claude Code — **10 structured lessons**, each ~2 minutes, covering everything from "how to talk to your codebase" and "how to undo AI changes", to advanced topics like "background tasks", "making AI remember your preferences", "creating sub-agents", and "remote control from your phone". Every lesson is a highlight reel curated by Anthropic. Instead of scattered tutorials, just power through all 10 levels. In Claude Code, type `/powerup`; on other platforms, trigger `@powerup` for an equivalent text-based walkthrough.
+7. **[`@insights` / `/insights`](https://github.com/Bronc-X/Lotus/blob/main/skills/insights.md)**
+   * **When to use**: You've been using AI coding for a while and want to see what habits you can optimize.
+   * **What it does**: Generates an interactive HTML report of your **past 30 days** of AI coding habits — your most-used commands, repetitive patterns, friction points, and areas where you get stuck in debugging loops. It even recommends custom commands and Skills to eliminate those bottlenecks. **This is looking back at your journey — incredibly rewarding!** In Claude Code, type `/insights`; on other platforms, trigger `@insights` for AI to perform a similar retrospective review of your project's conversation history.
+8. **[`@loop` / `/loop`](https://github.com/Bronc-X/Lotus/blob/main/skills/loop.md)**
+   * **When to use**: You have recurring check tasks (e.g., poll deployment status every 5 minutes, monitor PR changes).
+   * **What it does**: Sets up an in-session recurring task. Provide an interval and an instruction (e.g., `/loop 5m check deployment status`), and the AI acts like a little alarm clock, auto-executing on schedule. The loop is session-scoped — close the terminal and it stops. No system-level daemon, completely safe and controllable. In Claude Code, use `/loop <interval> <instruction>`; on other platforms, trigger `@loop` and the AI will simulate periodic reminders using platform-native capabilities.
+9. **[`@agents` / `/agents`](https://github.com/Bronc-X/Lotus/blob/main/skills/agents.md)**
+   * **When to use**: Your task is too complex for one AI to handle, or you want AI to work on multiple things in parallel.
+   * **What it does**: Create and manage **Subagents**. Each subagent has its own context window, system prompt, and tool permissions. You can have one subagent dedicated to searching the codebase, another running tests, while the main agent focuses on core logic — zero interference. This is the ultimate solution for "context window overflow": isolate noise into subprocess agents, keep the main thread clean. In Claude Code, use `/agents` to manage; on other platforms, trigger `@agents` and the AI will guide you through task decomposition and context isolation using multi-turn conversation patterns.
 
 ## 🏗️ Architecture (Hub-and-Spoke)
 
