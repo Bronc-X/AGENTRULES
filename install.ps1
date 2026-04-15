@@ -7,6 +7,11 @@ $RepoRoot = $PSScriptRoot
 $CoreAgents = Join-Path $RepoRoot "core\AGENTS.md"
 $SkillsDir = Join-Path $RepoRoot "skills"
 
+# Skills that rely on "staying in current conversation" and are incompatible
+# with Codex App's architecture (each skill invocation = new task context).
+# These skills work via AGENTS.md rule-level recognition instead.
+$CodexExcludedSkills = @("btw", "loop")
+
 # Backup helper: creates a .bak copy if the target file already exists
 function Backup-IfExists {
     param ([string]$FilePath)
@@ -15,6 +20,78 @@ function Backup-IfExists {
         Copy-Item $FilePath $BackupPath -Force
         Write-Host "    ⚠️  Backed up existing: $FilePath → $BackupPath" -ForegroundColor Yellow
     }
+}
+
+# Convert a Lotus skill .md file into a Codex-compatible SKILL.md directory.
+# Codex expects: ~/.codex/skills/<name>/SKILL.md with YAML frontmatter containing
+# name, description, and allowed-tools fields.
+function Convert-ToCodexSkill {
+    param (
+        [string]$SourceFile,
+        [string]$TargetDir
+    )
+
+    $content = Get-Content $SourceFile -Raw -Encoding UTF8
+
+    # Parse frontmatter to extract name
+    $skillName = ""
+    $description = ""
+    if ($content -match '(?s)^---\r?\n(.*?)\r?\n---') {
+        $frontmatter = $Matches[1]
+        if ($frontmatter -match 'name:\s*(.+)') {
+            $skillName = $Matches[1].Trim()
+        }
+        if ($frontmatter -match 'description:\s*(.+)') {
+            $description = $Matches[1].Trim()
+        }
+    }
+
+    # Fallback: derive name from filename if not in frontmatter
+    if (-not $skillName) {
+        $skillName = [System.IO.Path]::GetFileNameWithoutExtension($SourceFile)
+    }
+    if (-not $description) {
+        $description = "Lotus skill: $skillName"
+    }
+
+    # Determine allowed-tools based on skill type
+    $allowedTools = switch ($skillName) {
+        "auto-build" { "Bash, Read" }
+        "btw"        { "Read, AskUserQuestion" }
+        "feynman"    { "Read, AskUserQuestion" }
+        "polanyi-tacit" { "Read, AskUserQuestion" }
+        "powerup"    { "Read, AskUserQuestion" }
+        "insights"   { "Read, Bash, Grep, Glob" }
+        "loop"       { "Bash, Read, AskUserQuestion" }
+        "subagent"   { "Bash, Read, Write, Edit, Grep, Glob, AskUserQuestion" }
+        "gstack"     { "Bash, Read, Write, Edit, Grep, Glob, AskUserQuestion" }
+        default      { "Read, AskUserQuestion" }
+    }
+
+    # Build Codex-compatible SKILL.md content
+    # Rewrite frontmatter with allowed-tools, keep body unchanged
+    $body = $content -replace '(?s)^---\r?\n.*?\r?\n---\r?\n?', ''
+
+    $codexFrontmatter = @"
+---
+name: $skillName
+description: |
+  $description
+allowed-tools:
+$(($allowedTools -split ', ' | ForEach-Object { "  - $_" }) -join "`n")
+---
+"@
+
+    $codexContent = "$codexFrontmatter`n$body"
+
+    # Create skill directory and write SKILL.md
+    $skillDir = Join-Path $TargetDir $skillName
+    if (-not (Test-Path $skillDir)) {
+        New-Item -ItemType Directory -Path $skillDir -Force | Out-Null
+    }
+    # Write without BOM — Codex App's YAML parser rejects BOM-prefixed files
+    $utf8NoBom = New-Object System.Text.UTF8Encoding $false
+    [System.IO.File]::WriteAllText((Join-Path $skillDir "SKILL.md"), $codexContent, $utf8NoBom)
 }
 
 if ($Global) {
@@ -56,14 +133,57 @@ if ($Global) {
     Copy-Item $CoreAgents (Join-Path $WindsurfDir "global.md") -Force
     Write-Host "  ✅ Windsurf Cascade configured"
     
-    # 5. Codex CLI
+    # 5. Codex CLI — Rules + Skills (auto-convert to Codex SKILL.md format)
+    #    Skills that require "in-context" behavior (btw, loop, subagent, insights)
+    #    are excluded — they work via AGENTS.md rules instead of /commands.
     $CodexDir = Join-Path $HOME ".codex"
     if (-not (Test-Path $CodexDir)) { New-Item -ItemType Directory -Path $CodexDir -Force | Out-Null }
     Backup-IfExists (Join-Path $CodexDir "AGENTS.md")
     Copy-Item $CoreAgents (Join-Path $CodexDir "AGENTS.md") -Force
-    Write-Host "  ✅ Codex CLI configured"
     
-    # 6. Aider (merge, not overwrite)
+    $CodexSkills = Join-Path $CodexDir "skills"
+    if (-not (Test-Path $CodexSkills)) { New-Item -ItemType Directory -Path $CodexSkills -Force | Out-Null }
+    
+    # Clean up previously deployed incompatible skills
+    foreach ($excluded in $CodexExcludedSkills) {
+        $excludedDir = Join-Path $CodexSkills $excluded
+        if (Test-Path $excludedDir) {
+            Remove-Item $excludedDir -Recurse -Force
+            Write-Host "    🗑️  Removed incompatible skill: $excluded"
+        }
+    }
+    
+    # Convert compatible Lotus skills to Codex directory format
+    Get-ChildItem (Join-Path $SkillsDir "*.md") | ForEach-Object {
+        $baseName = [System.IO.Path]::GetFileNameWithoutExtension($_.Name)
+        if ($CodexExcludedSkills -contains $baseName) {
+            Write-Host "    ⏭️  Skipped (in-context only): $baseName"
+        } else {
+            Convert-ToCodexSkill -SourceFile $_.FullName -TargetDir $CodexSkills
+            Write-Host "    📦 Converted skill: $baseName"
+        }
+    }
+    Write-Host "  ✅ Codex CLI configured (rules + compatible skills)"
+    
+    # 6. Cursor (Global Rules)
+    $CursorDir = Join-Path $HOME ".cursor\rules"
+    if (-not (Test-Path $CursorDir)) { New-Item -ItemType Directory -Path $CursorDir -Force | Out-Null }
+    $CursorFile = Join-Path $CursorDir "lotus.mdc"
+    Backup-IfExists $CursorFile
+    # Cursor .mdc format: wrap content in a rule block
+    $cursorContent = @"
+---
+description: Lotus GStack Engineering Protocol - Global rules and workflow standards
+globs:
+alwaysApply: true
+---
+
+$(Get-Content $CoreAgents -Raw -Encoding UTF8)
+"@
+    $cursorContent | Out-File $CursorFile -Encoding UTF8 -Force
+    Write-Host "  ✅ Cursor configured"
+    
+    # 7. Aider (merge, not overwrite)
     $AiderFile = Join-Path $HOME ".aider.conf.yml"
     Backup-IfExists $AiderFile
     @"

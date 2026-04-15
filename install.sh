@@ -4,6 +4,11 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CORE_AGENTS="$REPO_ROOT/core/AGENTS.md"
 SKILLS_DIR="$REPO_ROOT/skills"
 
+# Skills that rely on "staying in current conversation" and are incompatible
+# with Codex App's architecture (each skill invocation = new task context).
+# These skills work via AGENTS.md rule-level recognition instead.
+CODEX_EXCLUDED_SKILLS=("btw" "loop")
+
 GLOBAL=0
 PROJECT=""
 
@@ -22,6 +27,72 @@ backup_if_exists() {
         cp "$1" "$1.bak"
         echo "    ⚠️  Backed up existing: $1 → $1.bak"
     fi
+}
+
+# Convert a Lotus skill .md file into a Codex-compatible SKILL.md directory.
+# Codex expects: ~/.codex/skills/<name>/SKILL.md with YAML frontmatter containing
+# name, description, and allowed-tools fields.
+convert_to_codex_skill() {
+    local source_file="$1"
+    local target_dir="$2"
+
+    local content
+    content=$(cat "$source_file")
+
+    # Parse frontmatter to extract name and description
+    local skill_name=""
+    local description=""
+
+    if echo "$content" | head -1 | grep -q "^---"; then
+        local frontmatter
+        frontmatter=$(echo "$content" | sed -n '/^---$/,/^---$/p' | sed '1d;$d')
+        skill_name=$(echo "$frontmatter" | grep '^name:' | sed 's/^name:[[:space:]]*//')
+        description=$(echo "$frontmatter" | grep '^description:' | sed 's/^description:[[:space:]]*//')
+    fi
+
+    # Fallback: derive name from filename if not in frontmatter
+    if [ -z "$skill_name" ]; then
+        skill_name=$(basename "$source_file" .md)
+    fi
+    if [ -z "$description" ]; then
+        description="Lotus skill: $skill_name"
+    fi
+
+    # Determine allowed-tools based on skill type
+    local allowed_tools
+    case "$skill_name" in
+        auto-build)     allowed_tools="Bash\n  - Read" ;;
+        btw)            allowed_tools="Read\n  - AskUserQuestion" ;;
+        feynman)        allowed_tools="Read\n  - AskUserQuestion" ;;
+        polanyi-tacit)  allowed_tools="Read\n  - AskUserQuestion" ;;
+        powerup)        allowed_tools="Read\n  - AskUserQuestion" ;;
+        insights)       allowed_tools="Read\n  - Bash\n  - Grep\n  - Glob" ;;
+        loop)           allowed_tools="Bash\n  - Read\n  - AskUserQuestion" ;;
+        subagent)       allowed_tools="Bash\n  - Read\n  - Write\n  - Edit\n  - Grep\n  - Glob\n  - AskUserQuestion" ;;
+        gstack)         allowed_tools="Bash\n  - Read\n  - Write\n  - Edit\n  - Grep\n  - Glob\n  - AskUserQuestion" ;;
+        *)              allowed_tools="Read\n  - AskUserQuestion" ;;
+    esac
+
+    # Extract body (everything after frontmatter)
+    local body
+    body=$(echo "$content" | sed '1{/^---$/!q}; 1,/^---$/d')
+
+    # Build Codex-compatible SKILL.md content
+    local skill_dir="$target_dir/$skill_name"
+    mkdir -p "$skill_dir"
+
+    cat > "$skill_dir/SKILL.md" <<CODEX_EOF
+---
+name: $skill_name
+description: |
+  $description
+allowed-tools:
+  - $(echo -e "$allowed_tools")
+---
+$body
+CODEX_EOF
+
+    echo "    📦 Converted skill: $skill_name"
 }
 
 if [ "$GLOBAL" -eq 1 ]; then
@@ -53,13 +124,56 @@ if [ "$GLOBAL" -eq 1 ]; then
     cp "$CORE_AGENTS" ~/.windsurf/rules/global.md
     echo "  ✅ Windsurf Cascade configured"
 
-    # 5. Codex CLI
-    mkdir -p ~/.codex
+    # 5. Codex CLI — Rules + Skills (auto-convert to Codex SKILL.md format)
+    #    Skills that require "in-context" behavior (btw, loop, subagent, insights)
+    #    are excluded — they work via AGENTS.md rules instead of /commands.
+    mkdir -p ~/.codex/skills
     backup_if_exists ~/.codex/AGENTS.md
     cp "$CORE_AGENTS" ~/.codex/AGENTS.md
-    echo "  ✅ Codex CLI configured"
 
-    # 6. Aider
+    # Clean up previously deployed incompatible skills
+    for excluded in "${CODEX_EXCLUDED_SKILLS[@]}"; do
+        if [ -d "$HOME/.codex/skills/$excluded" ]; then
+            rm -rf "$HOME/.codex/skills/$excluded"
+            echo "    🗑️  Removed incompatible skill: $excluded"
+        fi
+    done
+
+    # Convert compatible Lotus skills to Codex directory format
+    for skill_file in "$SKILLS_DIR"/*.md; do
+        skill_name=$(basename "$skill_file" .md)
+        # Check if skill is in excluded list
+        is_excluded=false
+        for excluded in "${CODEX_EXCLUDED_SKILLS[@]}"; do
+            if [ "$skill_name" = "$excluded" ]; then
+                is_excluded=true
+                break
+            fi
+        done
+        if [ "$is_excluded" = true ]; then
+            echo "    ⏭️  Skipped (in-context only): $skill_name"
+        else
+            convert_to_codex_skill "$skill_file" ~/.codex/skills
+        fi
+    done
+    echo "  ✅ Codex CLI configured (rules + compatible skills)"
+
+    # 6. Cursor (Global Rules)
+    mkdir -p ~/.cursor/rules
+    CURSOR_FILE=~/.cursor/rules/lotus.mdc
+    backup_if_exists "$CURSOR_FILE"
+    cat > "$CURSOR_FILE" <<CURSOR_EOF
+---
+description: Lotus GStack Engineering Protocol - Global rules and workflow standards
+globs:
+alwaysApply: true
+---
+
+$(cat "$CORE_AGENTS")
+CURSOR_EOF
+    echo "  ✅ Cursor configured"
+
+    # 7. Aider
     backup_if_exists ~/.aider.conf.yml
     cat <<EOF > ~/.aider.conf.yml
 read:

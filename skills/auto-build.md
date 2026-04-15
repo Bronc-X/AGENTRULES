@@ -1,4 +1,5 @@
 ---
+name: auto-build
 description: 自动安装依赖与构建 (Auto Install & Build)
 ---
 // turbo-all
