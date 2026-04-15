@@ -158,31 +158,37 @@ The trigger syntax depends on whether you are using a visual IDE or a command-li
 
 1. **[`@gstack` / `/gstack`](https://github.com/Bronc-X/Lotus/blob/main/skills/gstack.md)**
    * **What it does**: Triggers the elite multi-role developer workflow. The AI will explicitly switch between Product Manager, Architect, Builder, and QA before writing code to ensure system integrity.
-2. **[`@feynman` / `/feynman`](https://github.com/Bronc-X/Lotus/blob/main/skills/feynman.md)**
+2. **[`@test-driven-development` / `/test-driven-development`](https://github.com/Bronc-X/Lotus/blob/main/skills/test-driven-development.md)**
+   * **What it does**: Forces strict Red-Green-Refactor constraints. The AI is forbidden from writing business logic until it writes a failing test. The ultimate anti-hallucination tool.
+3. **[`@frontend-design` / `/frontend-design`](https://github.com/Bronc-X/Lotus/blob/main/skills/frontend-design.md)**
+   * **What it does**: Vercel Labs-grade UI/UX boundaries. Blocks generic "AI aesthetic" layouts, forces explicit design stances (e.g. Brutalist, Editorial), and applies the Design Feasibility & Impact Index (DFII) before writing CSS/React.
+4. **[`@debugging-strategies` / `/debugging-strategies`](https://github.com/Bronc-X/Lotus/blob/main/skills/debugging-strategies.md)**
+   * **What it does**: Replaces raw guessing with a scientific debugging loop. Forces the AI to state hypotheses, write probing code to disprove them, and only apply fixes once the root cause is proven.
+5. **[`@security-auditor` / `/security-auditor`](https://github.com/Bronc-X/Lotus/blob/main/skills/security-auditor.md)**
+   * **What it does**: Deep DevSecOps review. Scans for OWASP Top 10 vulnerabilities, auth leaks, prototype pollution, and weak crypto. Run this before opening a PR.
+6. **[`@feynman` / `/feynman`](https://github.com/Bronc-X/Lotus/blob/main/skills/feynman.md)**
    * **What it does**: Forces the AI to use the Feynman Technique. It will break down and explain complex bugs or mechanisms using absolute layman terms before attempting a fix.
-3. **[`@polanyi-tacit` / `/polanyi-tacit`](https://github.com/Bronc-X/Lotus/blob/main/skills/polanyi-tacit.md)**
+7. **[`@polanyi-tacit` / `/polanyi-tacit`](https://github.com/Bronc-X/Lotus/blob/main/skills/polanyi-tacit.md)**
    * **What it does**: Wakes up a deeply analytical mode. The AI deliberately looks for architectural compromises, "defensive" code blocks, and unspoken organizational debt hidden behind the scenes.
-4. **[`@auto-build` / `/auto-build`](https://github.com/Bronc-X/Lotus/blob/main/skills/auto-build.md)**
+8. **[`@auto-build` / `/auto-build`](https://github.com/Bronc-X/Lotus/blob/main/skills/auto-build.md)**
    * **What it does**: Silently performs `npm install`, runs `npm run build`, and checks for compilation errors without asking for your permission.
-5. **[`@btw` / `/btw`](https://github.com/Bronc-X/Lotus/blob/main/skills/btw.md)**
-   * **What it does**: Side-channel quick question mode. Inspired by Claude Code's native `/btw` command. Ask a quick question mid-task without interrupting your main workflow. The AI answers in 3-5 sentences, modifies zero files, and seamlessly returns to the primary task. Works across all platforms.
+9. **[`@btw` / `/btw`](https://github.com/Bronc-X/Lotus/blob/main/skills/btw.md)**
+   * **What it does**: Side-channel quick question mode. Ask a quick question mid-task without interrupting your main workflow. The AI answers in 3-5 sentences, modifies zero files, and seamlessly returns to the primary task.
 
 #### Adapted from Claude Code Native Commands (Lotus ports to other platforms)
 
-The following commands are originally exclusive to the Claude Code CLI. Lotus distills their **core behavioral logic** into skill files so users on other platforms can get a similar experience.
-
-6. **[`@powerup` / `/powerup`](https://github.com/Bronc-X/Lotus/blob/main/skills/powerup.md)**
+10. **[`@powerup` / `/powerup`](https://github.com/Bronc-X/Lotus/blob/main/skills/powerup.md)**
    * **When to use**: You're new to AI coding, or feel you're only using 10% of your AI's capabilities.
-   * **What it does**: Think of it as the "Duolingo" for Claude Code — **10 structured lessons**, each ~2 minutes, covering everything from "how to talk to your codebase" and "how to undo AI changes", to advanced topics like "background tasks", "making AI remember your preferences", "creating sub-agents", and "remote control from your phone". Every lesson is a highlight reel curated by Anthropic. Instead of scattered tutorials, just power through all 10 levels. In Claude Code, type `/powerup`; on other platforms, trigger `@powerup` for an equivalent text-based walkthrough.
-7. **[`@insights` / `/insights`](https://github.com/Bronc-X/Lotus/blob/main/skills/insights.md)**
-   * **When to use**: You've been using AI coding for a while and want to see what habits you can optimize.
-   * **What it does**: Generates an interactive HTML report of your **past 30 days** of AI coding habits — your most-used commands, repetitive patterns, friction points, and areas where you get stuck in debugging loops. It even recommends custom commands and Skills to eliminate those bottlenecks. **This is looking back at your journey — incredibly rewarding!** In Claude Code, type `/insights`; on other platforms, trigger `@insights` for AI to perform a similar retrospective review of your project's conversation history.
-8. **[`@loop` / `/loop`](https://github.com/Bronc-X/Lotus/blob/main/skills/loop.md)**
-   * **When to use**: You have recurring check tasks (e.g., poll deployment status every 5 minutes, monitor PR changes).
-   * **What it does**: Sets up an in-session recurring task. Provide an interval and an instruction (e.g., `/loop 5m check deployment status`), and the AI acts like a little alarm clock, auto-executing on schedule. The loop is session-scoped — close the terminal and it stops. No system-level daemon, completely safe and controllable. In Claude Code, use `/loop <interval> <instruction>`; on other platforms, trigger `@loop` and the AI will simulate periodic reminders using platform-native capabilities.
-9. **[`@subagent` / `/subagent`](https://github.com/Bronc-X/Lotus/blob/main/skills/subagent.md)**
-   * **When to use**: Your task is too complex for one AI to handle, or you want AI to work on multiple things in parallel.
-   * **What it does**: Create and manage **Subagents**. Each subagent has its own context window, system prompt, and tool permissions. You can have one subagent dedicated to searching the codebase, another running tests, while the main agent focuses on core logic — zero interference. This is the ultimate solution for "context window overflow": isolate noise into subprocess agents, keep the main thread clean. In Claude Code, use `/agents` to manage; on other platforms, trigger `@subagent` and the AI will guide you through task decomposition and context isolation.
+   * **What it does**: Think of it as the "Duolingo" for Claude Code — **10 structured lessons** covering everything from advanced prompt caching to background tasks.
+11. **[`@insights` / `/insights`](https://github.com/Bronc-X/Lotus/blob/main/skills/insights.md)**
+   * **When to use**: You want to see what habits you can optimize.
+   * **What it does**: Generates a retrospective HTML report of your past month's coding habits, friction points, and debugging loops.
+12. **[`@loop` / `/loop`](https://github.com/Bronc-X/Lotus/blob/main/skills/loop.md)**
+   * **When to use**: You have recurring check tasks (e.g., poll deployment status every 5 minutes).
+   * **What it does**: Sets up an in-session recurring task alarm clock. Session-scoped, safe, and controllable.
+13. **[`@subagent` / `/subagent`](https://github.com/Bronc-X/Lotus/blob/main/skills/subagent.md)**
+   * **When to use**: Complex tasks needing parallel execution.
+   * **What it does**: Manage independent Subagents each with their own context window to prevent main-thread context overflow.
 
 ## 🏗️ Architecture (Hub-and-Spoke)
 
