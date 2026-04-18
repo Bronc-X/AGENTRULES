@@ -7,6 +7,8 @@
 
 Lotus continuously leverages the **latest, safest, and most stable global agent management mechanisms**. By applying these rules to your local AI tools' global configurations, Lotus governs the behavior of your AI agents across **all** your projects simultaneously — without ever needing to write repetitive prompt instructions or perform tedious per-project setups.
 
+> Updates have been shipping quickly. If you want release notices and installer changes as they land, click [Watch](https://github.com/Bronc-X/Lotus/subscription) on GitHub.
+
 Lotus now treats **official [garrytan/gstack](https://github.com/garrytan/gstack)** as the source of truth for the gstack runtime. Global install does two things in one shot:
 
 1. Inject Lotus global rules into each agent's global config.
@@ -85,6 +87,12 @@ If you are starting a new project or setting up a brand-new computer, simply **c
 ### What about future new projects?
 
 Once globally installed, Lotus core rules (workflows, quality gates) are **already active** in all your AI tools — **no wake-up needed**.
+
+The full global flow is automated once you run the installer and confirm any overwrite prompt:
+
+1. Lotus writes the host-global rules into each supported app's global config path
+2. Lotus installs or updates official gstack under `~/.gstack/repos/gstack`
+3. Lotus syncs the host-global skills into the correct `~/.xxxx/skills` directories
 
 For Codex, that means Lotus writes to `~/.codex/AGENTS.md`, and Codex automatically loads those rules in every local repository you open. This is an inheritance mechanism, not a file sync, so you will **not** see a new `AGENTS.md` appear in each project unless you also run a project template install.
 

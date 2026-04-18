@@ -17,6 +17,23 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [1.1.1] - 2026-04-19
+
+### Added
+
+- GitHub Actions release workflow that creates a GitHub Release automatically when a `v*.*.*` tag is pushed
+- README guidance asking users to click Watch on GitHub to follow frequent updates and release notices
+
+### Changed
+
+- Global install now asks for confirmation before overwriting existing host-level global rule/config files, then backs them up to `.bak` before replacing them
+- README now reflects the current global-install behavior more clearly, including automated global setup expectations and current host coverage
+
+### Fixed
+
+- Global install no longer reports success when official gstack setup failed to fully install runtime skills
+- Cursor global gstack skills are now synced from the official upstream-generated `.cursor/skills` output into the real host global skills directory
+
 ## [1.1.0] - 2026-04-18
 
 ### Added
