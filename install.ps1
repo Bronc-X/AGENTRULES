@@ -1,6 +1,7 @@
 param (
     [switch]$Global,
-    [string]$Project
+    [string]$Project,
+    [switch]$Force
 )
 
 $RepoRoot = $PSScriptRoot
@@ -68,6 +69,31 @@ function Assert-ManagedGstackInstall {
             "Lotus global rules live in AGENTS/CLAUDE files, but slash skills must exist in each host's global skills directory."
         ) -join "`n"
         throw $message
+    }
+}
+
+function Confirm-GlobalRuleOverwrite {
+    param ([string[]]$Targets)
+
+    $existing = @($Targets | Where-Object { Test-Path $_ })
+    if ($existing.Count -eq 0) {
+        return
+    }
+
+    if ($Force -or $env:LOTUS_ASSUME_YES -eq "1") {
+        Write-Host "  Overwrite confirmation skipped (-Force / LOTUS_ASSUME_YES=1)." -ForegroundColor Yellow
+        return
+    }
+
+    if (-not [Environment]::UserInteractive) {
+        throw "Existing global rule/config files would be overwritten, but no interactive confirmation is available. Re-run with -Force or LOTUS_ASSUME_YES=1."
+    }
+
+    Write-Host "Existing global rule/config files detected. Lotus will back them up to .bak and then overwrite them:" -ForegroundColor Yellow
+    $existing | ForEach-Object { Write-Host "  - $_" -ForegroundColor Yellow }
+    $answer = Read-Host "Continue and overwrite these global files? [y/N]"
+    if ($answer -notmatch '^(?i:y(?:es)?)$') {
+        throw "Cancelled. No global rules were overwritten."
     }
 }
 
@@ -155,10 +181,28 @@ $(($allowedTools -split ', ' | ForEach-Object { "  - $_" }) -join "`n")
 if ($Global) {
     Write-Host "Installing Global Rules & Skills..." -ForegroundColor Cyan
 
+    $GeminiRuleFile = Join-Path $HOME ".gemini\GEMINI.md"
+    $ClaudeRuleFile = Join-Path $HOME ".claude\CLAUDE.md"
+    $OpenCodeRuleFile = Join-Path $HOME ".config\opencode\AGENTS.md"
+    $WindsurfRuleFile = Join-Path $HOME ".windsurf\rules\global.md"
+    $CodexRuleFile = Join-Path $HOME ".codex\AGENTS.md"
+    $CursorRuleFile = Join-Path $HOME ".cursor\rules\lotus.mdc"
+    $AiderFile = Join-Path $HOME ".aider.conf.yml"
+
+    Confirm-GlobalRuleOverwrite @(
+        $GeminiRuleFile,
+        $ClaudeRuleFile,
+        $OpenCodeRuleFile,
+        $WindsurfRuleFile,
+        $CodexRuleFile,
+        $CursorRuleFile,
+        $AiderFile
+    )
+
     $GeminiDir = Join-Path $HOME ".gemini"
     if (-not (Test-Path $GeminiDir)) { New-Item -ItemType Directory -Path $GeminiDir -Force | Out-Null }
-    Backup-IfExists (Join-Path $GeminiDir "GEMINI.md")
-    Copy-Item $CoreAgents (Join-Path $GeminiDir "GEMINI.md") -Force
+    Backup-IfExists $GeminiRuleFile
+    Copy-Item $CoreAgents $GeminiRuleFile -Force
 
     $GeminiSkills = Join-Path $GeminiDir "antigravity\skills"
     if (-not (Test-Path $GeminiSkills)) { New-Item -ItemType Directory -Path $GeminiSkills -Force | Out-Null }
@@ -167,8 +211,8 @@ if ($Global) {
 
     $ClaudeDir = Join-Path $HOME ".claude"
     if (-not (Test-Path $ClaudeDir)) { New-Item -ItemType Directory -Path $ClaudeDir -Force | Out-Null }
-    Backup-IfExists (Join-Path $ClaudeDir "CLAUDE.md")
-    Copy-Item $CoreAgents (Join-Path $ClaudeDir "CLAUDE.md") -Force
+    Backup-IfExists $ClaudeRuleFile
+    Copy-Item $CoreAgents $ClaudeRuleFile -Force
 
     $ClaudeSkills = Join-Path $ClaudeDir "skills"
     if (-not (Test-Path $ClaudeSkills)) { New-Item -ItemType Directory -Path $ClaudeSkills -Force | Out-Null }
@@ -177,20 +221,20 @@ if ($Global) {
 
     $OpenCodeDir = Join-Path $HOME ".config\opencode"
     if (-not (Test-Path $OpenCodeDir)) { New-Item -ItemType Directory -Path $OpenCodeDir -Force | Out-Null }
-    Backup-IfExists (Join-Path $OpenCodeDir "AGENTS.md")
-    Copy-Item $CoreAgents (Join-Path $OpenCodeDir "AGENTS.md") -Force
+    Backup-IfExists $OpenCodeRuleFile
+    Copy-Item $CoreAgents $OpenCodeRuleFile -Force
     Write-Host "  OpenCode CLI configured"
 
     $WindsurfDir = Join-Path $HOME ".windsurf\rules"
     if (-not (Test-Path $WindsurfDir)) { New-Item -ItemType Directory -Path $WindsurfDir -Force | Out-Null }
-    Backup-IfExists (Join-Path $WindsurfDir "global.md")
-    Copy-Item $CoreAgents (Join-Path $WindsurfDir "global.md") -Force
+    Backup-IfExists $WindsurfRuleFile
+    Copy-Item $CoreAgents $WindsurfRuleFile -Force
     Write-Host "  Windsurf Cascade configured"
 
     $CodexDir = Join-Path $HOME ".codex"
     if (-not (Test-Path $CodexDir)) { New-Item -ItemType Directory -Path $CodexDir -Force | Out-Null }
-    Backup-IfExists (Join-Path $CodexDir "AGENTS.md")
-    Copy-Item $CoreAgents (Join-Path $CodexDir "AGENTS.md") -Force
+    Backup-IfExists $CodexRuleFile
+    Copy-Item $CoreAgents $CodexRuleFile -Force
 
     $CodexSkills = Join-Path $CodexDir "skills"
     if (-not (Test-Path $CodexSkills)) { New-Item -ItemType Directory -Path $CodexSkills -Force | Out-Null }
@@ -216,8 +260,7 @@ if ($Global) {
 
     $CursorDir = Join-Path $HOME ".cursor\rules"
     if (-not (Test-Path $CursorDir)) { New-Item -ItemType Directory -Path $CursorDir -Force | Out-Null }
-    $CursorFile = Join-Path $CursorDir "lotus.mdc"
-    Backup-IfExists $CursorFile
+    Backup-IfExists $CursorRuleFile
     $cursorContent = @"
 ---
 description: Lotus GStack Engineering Protocol - Global rules and workflow standards
@@ -227,10 +270,9 @@ alwaysApply: true
 
 $(Get-Content $CoreAgents -Raw -Encoding UTF8)
 "@
-    $cursorContent | Out-File $CursorFile -Encoding UTF8 -Force
+    $cursorContent | Out-File $CursorRuleFile -Encoding UTF8 -Force
     Write-Host "  Cursor configured"
 
-    $AiderFile = Join-Path $HOME ".aider.conf.yml"
     Backup-IfExists $AiderFile
     @"
 read:
@@ -290,6 +332,7 @@ if (-not $Global -and -not $Project) {
     Write-Host "--------------------"
     Write-Host "Usage:"
     Write-Host "  .\install.ps1 -Global              (Install global rules to all IDE/CLI folders)"
+    Write-Host "  .\install.ps1 -Global -Force       (Overwrite existing global configs without prompting)"
     Write-Host "  .\install.ps1 -Project <name>      (Apply template to current directory)"
     Write-Host ""
     Write-Host "Available templates: nextjs, vite, html"

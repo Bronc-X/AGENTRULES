@@ -130,6 +130,8 @@ For Codex specifically, the global install target is `~/.codex/AGENTS.md`. Local
 
 > ⚠️ **Safe by design**: If you already have existing config files (e.g., `CLAUDE.md`, `GEMINI.md`, `.aider.conf.yml`), the installer will automatically create `.bak` backups before overwriting. You can always restore them.
 
+If Lotus detects an existing global rule/config file, it now asks for confirmation before overwriting it. For unattended automation, pass `--yes` on `install.sh` or `-Force` on `install.ps1`.
+
 **Windows (PowerShell):**
 ```powershell
 C:\Dev\Lotus\install.ps1 -Global

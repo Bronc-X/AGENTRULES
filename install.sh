@@ -13,11 +13,13 @@ MANAGED_OFFICIAL_SKILLS=("gstack")
 
 GLOBAL=0
 PROJECT=""
+ASSUME_YES=0
 
 while [[ "$#" -gt 0 ]]; do
     case $1 in
         --global) GLOBAL=1 ;;
         --project) PROJECT="$2"; shift ;;
+        --yes|-y) ASSUME_YES=1 ;;
         *) echo "Unknown parameter passed: $1"; exit 1 ;;
     esac
     shift
@@ -66,6 +68,47 @@ verify_managed_gstack_install() {
         echo "Lotus global rules live in AGENTS/CLAUDE files, but slash skills must exist in each host's global skills directory." >&2
         return 1
     fi
+}
+
+confirm_global_rule_overwrite() {
+    local existing=()
+
+    for candidate in "$@"; do
+        if [ -f "$candidate" ]; then
+            existing+=("$candidate")
+        fi
+    done
+
+    if [ "${#existing[@]}" -eq 0 ]; then
+        return 0
+    fi
+
+    if [ "$ASSUME_YES" -eq 1 ] || [ "${LOTUS_ASSUME_YES:-0}" = "1" ]; then
+        echo "  Overwrite confirmation skipped (--yes / LOTUS_ASSUME_YES=1)."
+        return 0
+    fi
+
+    if [ ! -t 0 ]; then
+        echo "Existing global rule/config files would be overwritten, but no interactive confirmation is available." >&2
+        echo "Re-run with --yes (or LOTUS_ASSUME_YES=1) if you want Lotus to overwrite them automatically." >&2
+        return 1
+    fi
+
+    echo "Existing global rule/config files detected. Lotus will back them up to .bak and then overwrite them:"
+    for file_path in "${existing[@]}"; do
+        echo "  - $file_path"
+    done
+    echo
+    read -r -p "Continue and overwrite these global files? [y/N] " response
+    case "$response" in
+        y|Y|yes|YES)
+            return 0
+            ;;
+        *)
+            echo "Cancelled. No global rules were overwritten."
+            return 1
+            ;;
+    esac
 }
 
 copy_lotus_skills() {
@@ -152,31 +195,50 @@ CODEX_EOF
 if [ "$GLOBAL" -eq 1 ]; then
     echo -e "\033[0;36mInstalling Global Rules & Skills...\033[0m"
 
+    GEMINI_RULE_FILE="$HOME/.gemini/GEMINI.md"
+    CLAUDE_RULE_FILE="$HOME/.claude/CLAUDE.md"
+    OPENCODE_RULE_FILE="$HOME/.config/opencode/AGENTS.md"
+    WINDSURF_RULE_FILE="$HOME/.windsurf/rules/global.md"
+    CODEX_RULE_FILE="$HOME/.codex/AGENTS.md"
+    CURSOR_RULE_FILE="$HOME/.cursor/rules/lotus.mdc"
+    AIDER_RULE_FILE="$HOME/.aider.conf.yml"
+
+    if ! confirm_global_rule_overwrite \
+        "$GEMINI_RULE_FILE" \
+        "$CLAUDE_RULE_FILE" \
+        "$OPENCODE_RULE_FILE" \
+        "$WINDSURF_RULE_FILE" \
+        "$CODEX_RULE_FILE" \
+        "$CURSOR_RULE_FILE" \
+        "$AIDER_RULE_FILE"; then
+        exit 1
+    fi
+
     mkdir -p ~/.gemini/antigravity/skills
-    backup_if_exists ~/.gemini/GEMINI.md
-    cp "$CORE_AGENTS" ~/.gemini/GEMINI.md
+    backup_if_exists "$GEMINI_RULE_FILE"
+    cp "$CORE_AGENTS" "$GEMINI_RULE_FILE"
     copy_lotus_skills ~/.gemini/antigravity/skills "${MANAGED_OFFICIAL_SKILLS[@]}"
     echo "  Antigravity & Gemini CLI configured"
 
     mkdir -p ~/.claude/skills
-    backup_if_exists ~/.claude/CLAUDE.md
-    cp "$CORE_AGENTS" ~/.claude/CLAUDE.md
+    backup_if_exists "$CLAUDE_RULE_FILE"
+    cp "$CORE_AGENTS" "$CLAUDE_RULE_FILE"
     copy_lotus_skills ~/.claude/skills "${MANAGED_OFFICIAL_SKILLS[@]}"
     echo "  Claude Code configured"
 
     mkdir -p ~/.config/opencode
-    backup_if_exists ~/.config/opencode/AGENTS.md
-    cp "$CORE_AGENTS" ~/.config/opencode/AGENTS.md
+    backup_if_exists "$OPENCODE_RULE_FILE"
+    cp "$CORE_AGENTS" "$OPENCODE_RULE_FILE"
     echo "  OpenCode CLI configured"
 
     mkdir -p ~/.windsurf/rules
-    backup_if_exists ~/.windsurf/rules/global.md
-    cp "$CORE_AGENTS" ~/.windsurf/rules/global.md
+    backup_if_exists "$WINDSURF_RULE_FILE"
+    cp "$CORE_AGENTS" "$WINDSURF_RULE_FILE"
     echo "  Windsurf Cascade configured"
 
     mkdir -p ~/.codex/skills
-    backup_if_exists ~/.codex/AGENTS.md
-    cp "$CORE_AGENTS" ~/.codex/AGENTS.md
+    backup_if_exists "$CODEX_RULE_FILE"
+    cp "$CORE_AGENTS" "$CODEX_RULE_FILE"
 
     for excluded in "${CODEX_EXCLUDED_SKILLS[@]}" "${MANAGED_OFFICIAL_SKILLS[@]}"; do
         if [ -d "$HOME/.codex/skills/$excluded" ]; then
@@ -203,9 +265,8 @@ if [ "$GLOBAL" -eq 1 ]; then
     echo "  Codex CLI configured (rules + Lotus-only compatible skills)"
 
     mkdir -p ~/.cursor/rules
-    CURSOR_FILE=~/.cursor/rules/lotus.mdc
-    backup_if_exists "$CURSOR_FILE"
-    cat > "$CURSOR_FILE" <<CURSOR_EOF
+    backup_if_exists "$CURSOR_RULE_FILE"
+    cat > "$CURSOR_RULE_FILE" <<CURSOR_EOF
 ---
 description: Lotus GStack Engineering Protocol - Global rules and workflow standards
 globs:
@@ -216,8 +277,8 @@ $(cat "$CORE_AGENTS")
 CURSOR_EOF
     echo "  Cursor configured"
 
-    backup_if_exists ~/.aider.conf.yml
-    cat <<EOF > ~/.aider.conf.yml
+    backup_if_exists "$AIDER_RULE_FILE"
+    cat <<EOF > "$AIDER_RULE_FILE"
 read:
   - CONVENTIONS.md
   - AGENTS.md
@@ -270,6 +331,7 @@ if [ "$GLOBAL" -eq 0 ] && [ -z "$PROJECT" ]; then
     echo "--------------------"
     echo "Usage:"
     echo "  ./install.sh --global              (Install global rules to all IDE/CLI folders)"
+    echo "  ./install.sh --global --yes        (Overwrite existing global configs without prompting)"
     echo "  ./install.sh --project <name>      (Apply template to current directory)"
     echo ""
     echo "Available templates: nextjs, vite, html"
