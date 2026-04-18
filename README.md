@@ -88,7 +88,7 @@ Once globally installed, Lotus core rules (workflows, quality gates) are **alrea
 
 For Codex, that means Lotus writes to `~/.codex/AGENTS.md`, and Codex automatically loads those rules in every local repository you open. This is an inheritance mechanism, not a file sync, so you will **not** see a new `AGENTS.md` appear in each project unless you also run a project template install.
 
-For Claude, Codex, and OpenCode, Lotus also manages the official gstack runtime at `~/.gstack/repos/gstack`. That runtime is global, updateable, and no longer copied from a stale Lotus snapshot.
+For Claude, Codex, Cursor, and OpenCode, Lotus also manages the official gstack runtime at `~/.gstack/repos/gstack`. That runtime is global, updateable, and no longer copied from a stale Lotus snapshot.
 
 If you want to add **project-level templates** (design systems, tech stack constraints) to a new project, just run once inside the project folder:
 
@@ -122,7 +122,7 @@ git clone https://github.com/Bronc-X/Lotus.git ~/Dev/Lotus
 
 This injects Lotus rules into the global config of every supported AI tool on your machine.
 
-It also installs the **official gstack upstream** into `~/.gstack/repos/gstack`, runs upstream setup for Claude/Codex/OpenCode, and enables gstack auto-update so the skill runtime stays current.
+It also installs the **official gstack upstream** into `~/.gstack/repos/gstack`, runs upstream setup for Claude/Codex/OpenCode, syncs the generated Cursor skills into `~/.cursor/skills`, and enables gstack auto-update so the skill runtime stays current.
 
 For Codex specifically, the global install target is `~/.codex/AGENTS.md`. Local project folders remain untouched after this step. If you want a visible project-level `AGENTS.md` plus `.agents/rules/`, run Step 2 inside that project as well.
 
@@ -138,6 +138,28 @@ C:\Dev\Lotus\install.ps1 -Global
 ```bash
 ~/Dev/Lotus/install.sh --global
 ```
+
+### Troubleshooting: why `/skill` may still not appear
+
+`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, and similar global rule files do not store slash skills themselves. They only provide routing and behavior instructions.
+
+Slash skills must also exist in each host's own global skills directory:
+
+- Codex: `~/.codex/skills`
+- Claude Code: `~/.claude/skills`
+- Cursor: `~/.cursor/skills`
+- OpenCode: `~/.config/opencode/skills`
+
+So "global rules installed" and "`/skill` is available" are related, but they are not the same thing.
+
+If `/review`, `/qa`, or other gstack skills do not show up after install:
+
+1. Re-run `install.ps1 -Global` or `install.sh --global`
+2. Confirm `~/.gstack/repos/gstack` exists
+3. Confirm the host-specific skills folder above contains `gstack-*` skills
+4. Restart the IDE/app so it re-scans global skills
+
+Lotus now fails the install if official gstack setup does not complete, instead of silently claiming success.
 
 ### Step 2: New Project Initialization (Optional)
 

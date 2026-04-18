@@ -23,11 +23,48 @@ while [[ "$#" -gt 0 ]]; do
     shift
 done
 
-# Backup helper: creates a .bak copy if the target file already exists
 backup_if_exists() {
     if [ -f "$1" ]; then
         cp "$1" "$1.bak"
-        echo "    ⚠️  Backed up existing: $1 → $1.bak"
+        echo "    Backed up existing: $1 -> $1.bak"
+    fi
+}
+
+path_exists_any() {
+    for candidate in "$@"; do
+        if [ -e "$candidate" ]; then
+            return 0
+        fi
+    done
+    return 1
+}
+
+verify_managed_gstack_install() {
+    local missing=()
+
+    if [ ! -d "$HOME/.gstack/repos/gstack/.git" ]; then
+        missing+=("official gstack repo (~/.gstack/repos/gstack)")
+    fi
+    if ! path_exists_any "$HOME/.claude/skills/gstack"; then
+        missing+=("Claude runtime (~/.claude/skills/gstack)")
+    fi
+    if ! path_exists_any "$HOME/.codex/skills/gstack-review/SKILL.md" "$HOME/.codex/skills/review/SKILL.md"; then
+        missing+=("Codex skill (~/.codex/skills/gstack-review or review)")
+    fi
+    if ! path_exists_any "$HOME/.config/opencode/skills/gstack-review/SKILL.md" "$HOME/.config/opencode/skills/review/SKILL.md"; then
+        missing+=("OpenCode skill (~/.config/opencode/skills/gstack-review or review)")
+    fi
+    if ! path_exists_any "$HOME/.cursor/skills/gstack-review/SKILL.md" "$HOME/.cursor/skills/review/SKILL.md"; then
+        missing+=("Cursor skill (~/.cursor/skills/gstack-review or review)")
+    fi
+
+    if [ "${#missing[@]}" -gt 0 ]; then
+        echo "Official gstack install is incomplete. Missing:" >&2
+        for item in "${missing[@]}"; do
+            echo "  - $item" >&2
+        done
+        echo "Lotus global rules live in AGENTS/CLAUDE files, but slash skills must exist in each host's global skills directory." >&2
+        return 1
     fi
 }
 
@@ -61,18 +98,16 @@ convert_to_codex_skill() {
     local content
     content=$(cat "$source_file")
 
-    # Parse frontmatter to extract name and description
     local skill_name=""
     local description=""
 
     if echo "$content" | head -1 | grep -q "^---"; then
         local frontmatter
         frontmatter=$(echo "$content" | sed -n '/^---$/,/^---$/p' | sed '1d;$d')
-        skill_name=$(echo "$frontmatter" | grep '^name:' | sed 's/^name:[[:space:]]*//')
-        description=$(echo "$frontmatter" | grep '^description:' | sed 's/^description:[[:space:]]*//')
+        skill_name=$(echo "$frontmatter" | grep '^name:' | sed 's/^name:[[:space:]]*//' || true)
+        description=$(echo "$frontmatter" | grep '^description:' | sed 's/^description:[[:space:]]*//' || true)
     fi
 
-    # Fallback: derive name from filename if not in frontmatter
     if [ -z "$skill_name" ]; then
         skill_name=$(basename "$source_file" .md)
     fi
@@ -80,7 +115,6 @@ convert_to_codex_skill() {
         description="Lotus skill: $skill_name"
     fi
 
-    # Determine allowed-tools based on skill type
     local allowed_tools
     case "$skill_name" in
         auto-build)     allowed_tools="Bash\n  - Read" ;;
@@ -95,11 +129,9 @@ convert_to_codex_skill() {
         *)              allowed_tools="Read\n  - AskUserQuestion" ;;
     esac
 
-    # Extract body (everything after frontmatter)
     local body
     body=$(echo "$content" | sed '1{/^---$/!q}; 1,/^---$/d')
 
-    # Build Codex-compatible SKILL.md content
     local skill_dir="$target_dir/$skill_name"
     mkdir -p "$skill_dir"
 
@@ -114,57 +146,47 @@ allowed-tools:
 $body
 CODEX_EOF
 
-    echo "    📦 Converted skill: $skill_name"
+    echo "    Converted skill: $skill_name"
 }
 
 if [ "$GLOBAL" -eq 1 ]; then
     echo -e "\033[0;36mInstalling Global Rules & Skills...\033[0m"
 
-    # 1. Antigravity / Gemini CLI
     mkdir -p ~/.gemini/antigravity/skills
     backup_if_exists ~/.gemini/GEMINI.md
     cp "$CORE_AGENTS" ~/.gemini/GEMINI.md
     copy_lotus_skills ~/.gemini/antigravity/skills "${MANAGED_OFFICIAL_SKILLS[@]}"
-    echo "  ✅ Antigravity & Gemini CLI configured"
+    echo "  Antigravity & Gemini CLI configured"
 
-    # 2. Claude Code
     mkdir -p ~/.claude/skills
     backup_if_exists ~/.claude/CLAUDE.md
     cp "$CORE_AGENTS" ~/.claude/CLAUDE.md
     copy_lotus_skills ~/.claude/skills "${MANAGED_OFFICIAL_SKILLS[@]}"
-    echo "  ✅ Claude Code configured"
+    echo "  Claude Code configured"
 
-    # 3. OpenCode
     mkdir -p ~/.config/opencode
     backup_if_exists ~/.config/opencode/AGENTS.md
     cp "$CORE_AGENTS" ~/.config/opencode/AGENTS.md
-    echo "  ✅ OpenCode CLI configured"
+    echo "  OpenCode CLI configured"
 
-    # 4. Windsurf
     mkdir -p ~/.windsurf/rules
     backup_if_exists ~/.windsurf/rules/global.md
     cp "$CORE_AGENTS" ~/.windsurf/rules/global.md
-    echo "  ✅ Windsurf Cascade configured"
+    echo "  Windsurf Cascade configured"
 
-    # 5. Codex CLI — Rules + Lotus-only compatible skills.
-    #    Official gstack skills are installed by the managed upstream setup below.
-    #    In-context-only Lotus skills are excluded — they work via AGENTS.md rules.
     mkdir -p ~/.codex/skills
     backup_if_exists ~/.codex/AGENTS.md
     cp "$CORE_AGENTS" ~/.codex/AGENTS.md
 
-    # Clean up previously deployed incompatible skills
     for excluded in "${CODEX_EXCLUDED_SKILLS[@]}" "${MANAGED_OFFICIAL_SKILLS[@]}"; do
         if [ -d "$HOME/.codex/skills/$excluded" ]; then
             rm -rf "$HOME/.codex/skills/$excluded"
-            echo "    🗑️  Removed incompatible skill: $excluded"
+            echo "    Removed incompatible skill: $excluded"
         fi
     done
 
-    # Convert compatible Lotus skills to Codex directory format
     for skill_file in "$SKILLS_DIR"/*.md; do
         skill_name=$(basename "$skill_file" .md)
-        # Check if skill is in excluded list
         is_excluded=false
         for excluded in "${CODEX_EXCLUDED_SKILLS[@]}" "${MANAGED_OFFICIAL_SKILLS[@]}"; do
             if [ "$skill_name" = "$excluded" ]; then
@@ -173,14 +195,13 @@ if [ "$GLOBAL" -eq 1 ]; then
             fi
         done
         if [ "$is_excluded" = true ]; then
-            echo "    ⏭️  Skipped (managed elsewhere or in-context only): $skill_name"
+            echo "    Skipped (managed elsewhere or in-context only): $skill_name"
         else
             convert_to_codex_skill "$skill_file" ~/.codex/skills
         fi
     done
-    echo "  ✅ Codex CLI configured (rules + Lotus-only compatible skills)"
+    echo "  Codex CLI configured (rules + Lotus-only compatible skills)"
 
-    # 6. Cursor (Global Rules)
     mkdir -p ~/.cursor/rules
     CURSOR_FILE=~/.cursor/rules/lotus.mdc
     backup_if_exists "$CURSOR_FILE"
@@ -193,20 +214,23 @@ alwaysApply: true
 
 $(cat "$CORE_AGENTS")
 CURSOR_EOF
-    echo "  ✅ Cursor configured"
+    echo "  Cursor configured"
 
-    # 7. Aider
     backup_if_exists ~/.aider.conf.yml
     cat <<EOF > ~/.aider.conf.yml
 read:
   - CONVENTIONS.md
   - AGENTS.md
 EOF
-    echo "  ✅ Aider AI configured"
+    echo "  Aider AI configured"
 
-    echo "  ↻ Installing official gstack upstream..."
-    bash "$MANAGED_GSTACK_INSTALLER"
-    echo "  ✅ Official gstack configured for Claude/Codex/OpenCode"
+    echo "  Installing official gstack upstream..."
+    if ! bash "$MANAGED_GSTACK_INSTALLER"; then
+        echo "Official gstack installation failed. Lotus rules were written, but slash skills were not fully installed." >&2
+        exit 1
+    fi
+    verify_managed_gstack_install
+    echo "  Official gstack configured for Claude/Codex/OpenCode/Cursor"
 
     echo ""
     echo -e "\033[0;32mGlobal installation completed successfully!\033[0m"
@@ -217,6 +241,7 @@ EOF
     echo "  - --global does not create AGENTS.md inside each project folder."
     echo "  - Run ./install.sh --project nextjs|vite|html inside a project when you want local AGENTS.md and .agents/rules/ files."
     echo "  - Official gstack is managed at ~/.gstack/repos/gstack and kept auto-updatable."
+    echo "  - Slash skills live in host-specific global skills folders such as ~/.codex/skills, ~/.claude/skills, ~/.cursor/skills, and ~/.config/opencode/skills."
 fi
 
 if [ -n "$PROJECT" ]; then
@@ -230,12 +255,12 @@ if [ -n "$PROJECT" ]; then
 
     cp -R "$TEMPLATE_DIR"/* .
     cp -R "$TEMPLATE_DIR"/.[!.]* . 2>/dev/null || true
-    
+
     CONVENTIONS_FILE="$REPO_ROOT/core/CONVENTIONS.md"
     if [ -f "$CONVENTIONS_FILE" ]; then
         cp "$CONVENTIONS_FILE" .
     fi
-    
+
     echo -e "\033[0;32mProject template '$PROJECT' applied to current directory.\033[0m"
     echo -e "\033[0;33mRemember to adjust the design system and tech stack files in .agents/rules/.\033[0m"
 fi
