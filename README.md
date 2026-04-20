@@ -7,6 +7,8 @@
 
 Lotus continuously leverages the **latest, safest, and most stable global agent management mechanisms**. By applying these rules to your local AI tools' global configurations, Lotus governs the behavior of your AI agents across **all** your projects simultaneously — without ever needing to write repetitive prompt instructions or perform tedious per-project setups.
 
+Lotus now leads with a tighter anti-hallucination core: **Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution**. The installer and global automation stay the same, but the default behavior becomes sharper: less guessing, less report-writing theater, less touching unrelated files, more verifiable outcomes.
+
 > Updates have been shipping quickly. If you want release notices and installer changes as they land, click [Watch](https://github.com/Bronc-X/Lotus/subscription) on GitHub.
 
 Lotus now treats **official [garrytan/gstack](https://github.com/garrytan/gstack)** as the source of truth for the gstack runtime. Global install does two things in one shot:
@@ -60,9 +62,18 @@ At its core, every LLM—GPT, Claude, Gemini—is fundamentally doing one thing:
 2. **Context Window = The Only Bottleneck**: Every model has a finite context window. The real skill is not "knowing more prompts"—it's **managing what goes into that window**. Lotus uses a Hub-and-Spoke architecture to keep the global rules lean and universal, while project-specific details are layered separately, ensuring you never waste precious context tokens on redundant instructions.
 3. **Persistence > Repetition**: Without Lotus, you re-explain your standards in every new chat session. With Lotus, your rules are **pre-loaded at the OS level** before the conversation even starts. The AI reads your constitution first, every time, automatically.
 
+### Lotus Four Rails
+
+These four rails sit at the top of `core/AGENTS.md` and shape how the agent behaves before any workflow-specific rule kicks in:
+
+1. **Think Before Coding**: Surface assumptions, ambiguities, and tradeoffs before implementation.
+2. **Simplicity First**: Solve the problem with the minimum code that actually works. No speculative abstractions.
+3. **Surgical Changes**: Touch only the files and lines that the task really requires.
+4. **Goal-Driven Execution**: Turn vague work into verifiable success criteria, then implement and verify against them.
+
 ## ✨ Why Choose Lotus?
 
-- 🧠 **Mindset Over Scripts**: Lotus teaches your AI *how to think* like a Senior Architect, PM, and QA. It enforces the "[GStack](https://github.com/garrytan/gstack) Workflow" (CEO Review -> Eng Review -> Code -> Global Review. Thanks to [GStack](https://github.com/garrytan/gstack) for the inspiration).
+- 🧠 **Mindset Over Scripts**: Lotus teaches your AI *how to think* before it teaches it what command to run. The top-level rules now explicitly bias toward clarifying assumptions, keeping solutions simple, making surgical diffs, and defining success in testable terms.
 - 🌍 **Write Once, Run Everywhere**: A Single Source of Truth (`core/AGENTS.md`) automatically adapts and installs into Claude Code, Antigravity, Cursor, Windsurf, Copilot, and more.
 - 🚧 **Zero Silent Failures**: Built-in quality gates guarantee your generated code includes proper user feedback, loading states, and aesthetic consistency.
 - ⚡ **Seamless Wake-Up Calls (`@` and `/`)**: Summon specific expert personas and architectural overviews dynamically mid-chat using platform-native triggers.
@@ -80,7 +91,9 @@ If you are starting a new project or setting up a brand-new computer, simply **c
 > 2. Determine my OS. Run the installer inside the temporary repo to apply the `nextjs` template to my current directory (Windows: `install.ps1 -Project nextjs`, Mac/Linux: `install.sh --project nextjs`).
 > 3. To make sure you retain our workflows globally on this new machine, also run the global install flag (Windows: `install.ps1 -Global`, Mac/Linux: `install.sh --global`).
 > 4. Once finished, delete the temporary cloned repository.
-> 5. Carefully read the newly generated `AGENTS.md` and `.agents/rules/` in my current directory to understand my coding standards and design language. Let me know when you are ready."
+> 5. Carefully read the newly generated `AGENTS.md` and `.agents/rules/` in my current directory to understand my coding standards and design language.
+> 6. Tell me whether the host app needs a full restart or a fresh session so the host-global rules and top-level skills are actually reloaded from disk.
+> 7. Let me know when you are ready."
 
 *(Note: Change `nextjs` to `vite` or `html` depending on your project type).*
 
@@ -115,6 +128,41 @@ C:\Dev\Lotus\install.ps1 -Project nextjs
 
 That's it. Global rules are always on; project templates layer on top as needed.
 
+### Post-Install Verification Prompt
+
+After global install, open a **fresh host session** and send this exact prompt to your agent if you want it to verify that Lotus is truly active at the host-global level:
+
+> "Please verify that Lotus is active in this host, not just cloned on disk.
+> 1. Detect which host you are running in.
+> 2. Read the host-global rules file for this host and confirm Lotus is installed there:
+>    - Codex: `~/.codex/AGENTS.md`
+>    - Claude Code: `~/.claude/CLAUDE.md`
+>    - OpenCode: `~/.config/opencode/AGENTS.md`
+>    - Gemini / Antigravity: `~/.gemini/GEMINI.md`
+>    - Cursor: the installed Lotus global rules file for Cursor, if this host supports reading it directly
+> 3. Confirm the top-level Lotus execution rails are present near the top of that file:
+>    - Think Before Coding
+>    - Simplicity First
+>    - Surgical Changes
+>    - Goal-Driven Execution
+> 4. Check the host-global skills directory for this host and confirm these official gstack skills exist at the top level:
+>    - `gstack`
+>    - `gstack-office-hours`
+>    - `gstack-plan-eng-review`
+>    - `gstack-review`
+>    - `gstack-investigate`
+>    - `gstack-qa`
+>    - `gstack-ship`
+> 5. Tell me whether this current session already loaded those global rules and skills, or whether I still need to fully restart the host app and open a new session before they become active.
+> 6. If anything is missing, tell me the exact missing path and the exact Lotus install command I should rerun."
+
+Important: this prompt only **verifies** top-level activation. It does **not** make the rules top-level by itself. True top-level activation happens when:
+
+1. Lotus global install writes the host-global rules file and host-global skills
+2. The host app opens a fresh session that loads those files
+
+In other words, if the app session started before `install.ps1 -Global` or `install.sh --global` finished, no prompt can retroactively turn that old session into a true host-global session. Open a fresh session.
+
 ## 🔌 Manual Installation
 
 ### Step 0: Clone Lotus to a permanent home
@@ -137,6 +185,15 @@ This injects Lotus rules into the global config of every supported AI tool on yo
 It also installs the **official gstack upstream** into `~/.gstack/repos/gstack`, runs upstream setup for Claude/Codex/OpenCode, force-syncs the generated Codex/OpenCode/Cursor gstack skills into the real host global skills directories, and enables gstack auto-update so the skill runtime stays current.
 
 Cloning Lotus without running this step will not install rules, will not install slash skills, and will not turn on upstream gstack auto-updates.
+
+The **four Lotus rails** also become top-level rules through this step, not through a later prompt:
+
+- Think Before Coding
+- Simplicity First
+- Surgical Changes
+- Goal-Driven Execution
+
+If this host actually loaded the installed global rules file, those four rails are already above any project-specific prompt you type later.
 
 For Codex specifically, the global install target is `~/.codex/AGENTS.md`. Local project folders remain untouched after this step. If you want a visible project-level `AGENTS.md` plus `.agents/rules/`, run Step 2 inside that project as well.
 

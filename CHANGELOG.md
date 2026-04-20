@@ -17,6 +17,21 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [1.1.5] - 2026-04-21
+
+### Changed
+
+- README now includes an explicit post-install verification prompt users can send to an agent to check that host-global rules and top-level gstack skills are truly active
+- README now makes the activation boundary explicit: the four Lotus rails become top-level rules through global install plus a fresh host session, not through a later chat prompt
+
+## [1.1.4] - 2026-04-21
+
+### Changed
+
+- `core/AGENTS.md` now leads with four explicit execution rails: Think Before Coding, Simplicity First, Surgical Changes, and Goal-Driven Execution
+- README now explains Lotus as an anti-hallucination rules layer in addition to an automation/install system
+- Next.js template wording now clarifies backend-owned mock services instead of the vague "Mock engine" phrasing
+
 ## [1.1.3] - 2026-04-19
 
 ### Changed

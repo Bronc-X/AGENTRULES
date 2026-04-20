@@ -21,8 +21,9 @@
 - Cards: `bg-[#F3F1ED]` or white, never pure black
 - Animation: only `opacity`/`y`/`x` + spring via Framer Motion
 
-## AI Engine
+## Backend Integration Mode
 
-- All AI interactions go through a Mock engine
-- No external API calls (OpenAI/Gemini/Notion etc.)
-- Mock engine returns high-fidelity business data
+- Frontend should call your own backend or route handlers, not third-party AI vendors directly
+- During scaffolding or early product development, use a backend-owned mock service before wiring a real provider
+- Mock responses must keep the same schema and business shape you expect from the eventual real backend
+- No direct browser-side calls to OpenAI, Gemini, Notion, or similar external services
