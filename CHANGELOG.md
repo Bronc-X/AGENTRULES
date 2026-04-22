@@ -17,6 +17,17 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [1.1.6] - 2026-04-22
+
+### Changed
+
+- Lotus global install now rewrites official top-level `gstack` skill descriptions to Chinese after upstream generation, so Codex/OpenCode/Cursor slash menus show localized explanations on both fresh installs and upgrades
+
+### Fixed
+
+- Global install now clears the stale Claude-managed `~/.claude/skills/gstack` checkout before rerunning upstream setup, preventing upgrade failures caused by non-idempotent official `gstack` host installs
+- Added missing Chinese localization coverage for `gstack-checkpoint` and `gstack-connect-chrome`, so all current top-level official `gstack` skills land with localized descriptions
+
 ## [1.1.5] - 2026-04-21
 
 ### Changed
