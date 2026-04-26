@@ -51,7 +51,9 @@ Lotus 持续采用**最新、最安全、最稳定的全局 Agent 管理机制**
 > 2. 判断我的操作系统。运行临时仓库中的安装脚本，将 `nextjs` 模板应用到我当前目录（Windows: `install.ps1 -Project nextjs`，Mac/Linux: `install.sh --project nextjs`）。
 > 3. 为确保在这台新机器上全局保留我们的工作流，也运行全局安装标志（Windows: `install.ps1 -Global`，Mac/Linux: `install.sh --global`）。
 > 4. 完成后，删除刚才克隆的临时仓库。
-> 5. 仔细阅读当前目录中新生成的 `AGENTS.md` 和 `.agents/rules/`，了解我的编码标准和设计语言。准备好了告诉我。"
+> 5. 仔细阅读当前目录中新生成的 `AGENTS.md` 和 `.agents/rules/`，了解我的编码标准和设计语言。
+> 6. 告诉我当前宿主是否需要完整重启，或者至少新开一个 fresh session，才能重新从磁盘加载 host-global rules 和顶层 skills。
+> 7. 准备好了告诉我。"
 
 *（注意：根据你的项目类型，将 `nextjs` 替换为 `vite` 或 `html`。）*
 
@@ -59,9 +61,19 @@ Lotus 持续采用**最新、最安全、最稳定的全局 Agent 管理机制**
 
 全局安装完成后，Lotus 的核心规则（工作流、质量门禁等）已经自动驻留在这台机器受托管的 Claude / Codex 全局配置中了，**不需要每次唤醒**。
 
+完整的全局生效链路，在你运行安装器并确认覆盖提示后会自动完成：
+
+1. Lotus 把受托管宿主的全局规则写入 Claude / Codex 的全局配置路径
+2. Lotus 安装或更新官方 gstack 到 `~/.gstack/repos/gstack`
+3. Lotus 将宿主级全局 skills 同步到 `~/.claude/skills` 和 `~/.codex/skills`
+
+只执行 `git clone Lotus` **不会**让任何宿主自动加载规则或 skills。clone 下来的只是安装器和模板。真正的全局行为，是从你运行 `install.ps1 -Global` 或 `install.sh --global` 开始的。
+
 对 Codex 来说，这表示 Lotus 会写入 `~/.codex/AGENTS.md`，然后由 Codex 在你打开任意本地仓库时自动继承这些规则。这里是“继承加载”，不是“把文件同步到每个项目目录”，所以如果你只执行了全局安装，项目根目录里**不会**自动出现新的 `AGENTS.md`。
 
 对 Claude 和 Codex 来说，Lotus 还会把官方 gstack 运行时托管在 `~/.gstack/repos/gstack`。它是全局的、可更新的，不再依赖 Lotus 仓库里那份静态快照。
+
+全局安装成功后，Lotus 还会打开上游 gstack 的自动更新开关。实际含义是：**用户机器上的官方 gstack 运行时**可以在后续新 session 中跟随上游自动更新。这**不代表** Lotus 这个仓库本身会在 clone 后自动更新。
 
 但如果你需要为新项目添加**项目级模板**（设计系统、技术栈约束），只需在新项目目录里运行一次：
 
@@ -75,6 +87,42 @@ C:\Dev\Lotus\install.ps1 -Project nextjs
 ```
 
 就这样。全局规则始终生效，项目模板按需叠加。
+
+### 安装后验证 Prompt
+
+全局安装完成后，如果你想确认 Lotus 真正以宿主级全局规则生效了，请先打开一个**新的宿主 session**，然后把下面这段 prompt 原样发给你的 AI：
+
+> "请验证 Lotus 现在是真的在这个宿主里生效了，而不只是被 clone 到磁盘上。
+> 1. 识别你当前运行在哪个宿主里。
+> 2. 读取这个宿主的全局规则文件，并确认 Lotus 已安装在那里：
+>    - Codex: `~/.codex/AGENTS.md`
+>    - Claude Code: `~/.claude/CLAUDE.md`
+> 3. 确认该文件靠前位置包含 Lotus 的四条顶层执行护栏：
+>    - Think Before Coding
+>    - Simplicity First
+>    - Surgical Changes
+>    - Goal-Driven Execution
+> 4. 检查这个宿主的全局 skills 目录，并确认这些默认暴露的官方 gstack 顶层 skills 存在：
+>    - `gstack`
+>    - `gstack-office-hours`
+>    - `gstack-plan-ceo-review`
+>    - `gstack-plan-design-review`
+>    - `gstack-plan-eng-review`
+>    - `gstack-design-review`
+>    - `gstack-review`
+>    - `gstack-investigate`
+>    - `gstack-browse`
+>    - `gstack-qa`
+>    - `gstack-ship`
+> 5. 告诉我这个当前 session 是否已经加载了这些全局规则和 skills；如果还没有，请明确告诉我是否必须完整重启宿主或新开 session。
+> 6. 如果缺了任何东西，请告诉我缺失的精确路径，以及我该重新执行的 Lotus 安装命令。"
+
+重要：这段 prompt 的作用只是**验证**顶层激活状态，它本身**不会**把规则“补成”宿主级全局规则。真正的顶层激活依赖两件事：
+
+1. Lotus 全局安装已经把宿主级全局规则文件和宿主级 skills 写到正确位置
+2. 宿主应用打开了一个会重新加载这些文件的 fresh session
+
+换句话说，如果当前 app session 早于 `install.ps1 -Global` 或 `install.sh --global` 启动，那么再好的 prompt 也不能把这个旧 session 追溯性变成真正的 host-global session。请直接新开一个 session。
 
 ## 🔌 手动安装
 
@@ -112,6 +160,30 @@ C:\Dev\Lotus\install.ps1 -Global
 ~/Dev/Lotus/install.sh --global
 ```
 
+### 排障：为什么安装后 `/skill` 还是不出现
+
+`AGENTS.md`、`CLAUDE.md` 这类全局规则文件本身**不存 slash skill**。它们只负责行为约束和路由说明。
+
+真正的 slash skills 还必须存在于每个宿主自己的全局 skills 目录里：
+
+- Codex: `~/.codex/skills`
+- Claude Code: `~/.claude/skills`
+
+所以，“全局规则装好了”和“`/skill` 现在就能调出来”是相关的，但**不是同一件事**。
+
+如果安装后 `/review`、`/qa` 或其他 gstack skills 仍然没有出现，请按下面顺序检查：
+
+1. 重新运行 `install.ps1 -Global` 或 `install.sh --global`
+2. 确认 `~/.gstack/repos/gstack` 存在
+3. 确认上面的宿主 skills 目录里，确实有你选择的 gstack profile 对应的顶层 skills
+4. 重启 IDE / 宿主应用，让它重新扫描全局 skills
+
+看不到某个**隐藏的**官方 gstack skill 出现在 `/` 菜单里，并**不等于** Lotus 把这个能力删掉了。它通常只是没有被暴露到宿主顶层手动菜单；当任务语义明确命中时，它仍可能保留在上游仓库里供 AGENTS 路由使用。
+
+现在 Lotus 也不会再在官方 gstack setup 失败时“假装安装成功”了。如果上游 gstack 没装完整，安装器会直接失败。
+
+另外，Lotus 现在也会在全局安装完成后主动自愈半升级状态：它会强制刷新真实全局 skills 目录里的 `gstack` 和 `gstack-*` 条目，避免旧目录或半更新目录残留。
+
 ### 第 2 步：新项目初始化（可选）
 
 在你新建的空白项目文件夹中，注入你首选的技术栈模板：
@@ -139,6 +211,8 @@ cd ~/Projects/MyNewApp
 触发语法取决于你使用的是可视化 IDE 还是命令行代理：
 * **可视化 IDE（Cursor / Windsurf）**：使用斜杠命令 `/name`（例如 `/gstack`）。
 * **命令行代理（Claude Code / Antigravity / Aider）**：使用 @ 提及格式 `@name`（例如 `@gstack`）。
+
+> ⚠️ **Codex 特别说明**：Codex App 里每次 `/` 调用都会新开一个任务上下文，所以 `btw`、`loop` 这类依赖“留在当前会话里”的能力不会作为 Codex 的 slash skills 安装。它们不是安装失败，而是产品边界。要用这类能力，请直接在当前对话里输入 `btw，...` 这类自然语言触发，而不要期待它们出现在 `/` 菜单中。
 
 ### 可用唤醒列表：
 
