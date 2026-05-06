@@ -238,6 +238,7 @@ function Convert-ToCodexSkill {
         "polanyi-tacit" { "Read, AskUserQuestion" }
         "powerup" { "Read, AskUserQuestion" }
         "insights" { "Read, Bash, Grep, Glob" }
+        "image-2" { "Read, Write, Edit, Grep, Glob, Bash, AskUserQuestion" }
         "loop" { "Bash, Read, AskUserQuestion" }
         "subagent" { "Bash, Read, Write, Edit, Grep, Glob, AskUserQuestion" }
         "web-to-design-md" { "Read, Write, Edit, Grep, Glob, AskUserQuestion, WebSearch" }

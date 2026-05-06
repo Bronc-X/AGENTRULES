@@ -249,13 +249,14 @@ macOS / Linux：
 
 ## 常用 Lotus 自带 skills
 
-这些是 Lotus 仓库自身提供的跨平台 skills。官方 gstack skills 由 `garrytan/gstack` 提供。全局安装或更新 Lotus 后，下面这些 skill 会写入受托管宿主的全局 skills 目录；重启宿主后即可用 `/skill-name` 调用，例如 `/taste-skill`。
+这些是 Lotus 仓库自身提供的跨平台 skills。官方 gstack skills 由 `garrytan/gstack` 提供。全局安装或更新 Lotus 后，下面这些 skill 会写入受托管宿主的全局 skills 目录；重启宿主后即可用 `/skill-name` 调用，例如 `/taste-skill`、`/image-2`。
 
 | Skill | 用途 |
 |---|---|
 | `test-driven-development` | 严格红绿重构，先写失败测试再写实现 |
 | `frontend-design` | 前端审美与交互质量约束 |
 | `taste-skill` | Taste Skill 前端审美与实现质量约束，强化布局、字体、动效、间距和组件完成度，来源于 `Leonxlnx/taste-skill` |
+| `image-2` | GPT Image 2 生图与改图入口，用于图片生成、图片编辑、风格迁移、换背景、透明素材和批量视觉资产 |
 | `web-to-design-md` | 从参考网页、品牌资料、需求文档生成结构化 `design.md` |
 | `debugging-strategies` | 系统性排错，先定位根因再修复 |
 | `security-auditor` | 安全审查，覆盖鉴权、注入、依赖风险等 |
