@@ -1,171 +1,159 @@
 # Lotus
 
-> Global Agent Rules — Lotus.
-> Before, every new project meant repetitive prompt imports, skill setups, and wasted time — forgetting that *building* is the only reason to open your editor.
-> Now, you have Lotus. Write your engineering "Constitution" once, and deploy it everywhere.
-> Lotus: the smart Docker for managing your Agents globally.
+Lotus 是一套全局 Agent 工程规则与安装器。它的目标很简单：把你希望 AI 编码助手长期遵守的工作方式，安装到受托管宿主的全局配置中，让新项目自动继承这些规则。
 
-Lotus continuously leverages the **latest, safest, and most stable global agent management mechanisms**. By applying these rules to your local AI tools' global configurations, Lotus governs the behavior of your AI agents across **all** your projects simultaneously — without ever needing to write repetitive prompt instructions or perform tedious per-project setups.
+Lotus 当前托管两类内容：
 
-Lotus now leads with a tighter anti-hallucination core: **Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution**. The installer and global automation stay the same, but the default behavior becomes sharper: less guessing, less report-writing theater, less touching unrelated files, more verifiable outcomes.
+1. Lotus 全局规则：写入 Claude Code 与 Codex 的全局规则文件。
+2. 官方 gstack 运行时：从 [garrytan/gstack](https://github.com/garrytan/gstack) 安装并同步默认顶层 skills。
 
-> Updates have been shipping quickly. If you want release notices and installer changes as they land, click [Watch](https://github.com/Bronc-X/Lotus/subscription) on GitHub.
+Lotus 仓库不再内置 gstack 快照。凡是 gstack 能力，官方上游 `garrytan/gstack` 是唯一真源。
 
-Lotus now treats **official [garrytan/gstack](https://github.com/garrytan/gstack)** as the source of truth for the gstack runtime. Global install does two things in one shot:
+## 管理范围
 
-1. Inject Lotus global rules into the managed Claude Code and Codex global config paths.
-2. Clone or update official gstack into `~/.gstack/repos/gstack`, run upstream setup for Claude/Codex, and enable auto-updates.
+| 宿主 | 全局安装命令 | Lotus 写入位置 | 说明 |
+|---|---|---|---|
+| Claude Code | `install.ps1 -Global` / `install.sh --global` | `~/.claude/CLAUDE.md`、`~/.claude/skills` | 受托管 |
+| Codex CLI / Codex App | `install.ps1 -Global` / `install.sh --global` | `~/.codex/AGENTS.md`、`~/.codex/skills` | 受托管 |
 
-**Managed Global Install Scope:**
+其他宿主不由 Lotus 安装器自动写入全局路径。如果该宿主支持手动全局规则，请直接导入 [core/AGENTS.md](core/AGENTS.md)。
 
-| Platform | `install.ps1 -Global` / `install.sh --global` | Notes |
-|---|---|---|
-| Claude Code | ✅ Managed | `~/.claude/CLAUDE.md` + official gstack runtime |
-| Codex CLI | ✅ Managed | `~/.codex/AGENTS.md` + official gstack runtime |
+## Lotus 四条执行护栏
 
-For any other host, Lotus does not manage the global path for you. If that host supports manual global rules, use [`core/AGENTS.md`](C:/Users/Administrator/Desktop/Toni/Lotus/core/AGENTS.md) as the single source of truth and import it with the host's own workflow.
+全局规则文件顶部会注入四条最高优先级护栏：
 
-## 🧬 First Principles: Why Lotus Works
+1. Think Before Coding：先确认目标、边界、假设、成功标准，再写代码。
+2. Simplicity First：只写解决当前问题所需的最小代码，不提前抽象。
+3. Surgical Changes：只改和当前目标直接相关的文件、函数和行。
+4. Goal-Driven Execution：把任务改写成可验证目标，再实现并验证。
 
-Stop chasing every flashy AI news headline. The anxiety is unnecessary.
+这些不是提示词装饰，而是每次会话开始时宿主自动读取的全局规则。安装完成后，需要重启宿主或开启新会话，旧会话不会自动获得新的全局规则。
 
-At its core, every LLM—GPT, Claude, Gemini—is fundamentally doing one thing: converting your text into **high-dimensional vector embeddings**, processing them through transformer attention layers, and **predicting the most probable next token**. Understanding this single mechanism changes everything:
+## 零基础快速安装提示词
 
-1. **Accuracy = Attention Precision**: The quality of AI output depends on how precisely the model's attention mechanism can lock onto your intent within the vector space. Lotus solves this by injecting **highly structured, unambiguous rules** that give the attention layers clear, high-signal targets. Vague prompts scatter attention; Lotus-formatted rules focus it like a laser.
-2. **Context Window = The Only Bottleneck**: Every model has a finite context window. The real skill is not "knowing more prompts"—it's **managing what goes into that window**. Lotus uses a Hub-and-Spoke architecture to keep the global rules lean and universal, while project-specific details are layered separately, ensuring you never waste precious context tokens on redundant instructions.
-3. **Persistence > Repetition**: Without Lotus, you re-explain your standards in every new chat session. With Lotus, your rules are **pre-loaded at the OS level** before the conversation even starts. The AI reads your constitution first, every time, automatically.
+如果你不熟悉命令行，可以把下面整段提示词复制给你的 AI 编码助手。它应该在你的本地机器执行这些步骤。
 
-### Lotus Four Rails
+```text
+这是一个全新项目目录。请在本地执行以下初始化步骤：
 
-These four rails sit at the top of `core/AGENTS.md` and shape how the agent behaves before any workflow-specific rule kicks in:
-
-1. **Think Before Coding**: Surface assumptions, ambiguities, and tradeoffs before implementation.
-2. **Simplicity First**: Solve the problem with the minimum code that actually works. No speculative abstractions.
-3. **Surgical Changes**: Touch only the files and lines that the task really requires.
-4. **Goal-Driven Execution**: Turn vague work into verifiable success criteria, then implement and verify against them.
-
-## ✨ Why Choose Lotus?
-
-- 🧠 **Mindset Over Scripts**: Lotus teaches your AI *how to think* before it teaches it what command to run. The top-level rules now explicitly bias toward clarifying assumptions, keeping solutions simple, making surgical diffs, and defining success in testable terms.
-- 🌍 **Write Once, Reuse Everywhere**: A Single Source of Truth (`core/AGENTS.md`) powers the managed Claude/Codex installer and stays portable for manual use in other hosts.
-- 🚧 **Zero Silent Failures**: Built-in quality gates guarantee your generated code includes proper user feedback, loading states, and aesthetic consistency.
-- ⚡ **Seamless Wake-Up Calls (`@` and `/`)**: Summon specific expert personas and architectural overviews dynamically mid-chat using platform-native triggers.
-- 🗑️ **Anti-Plugin Bloat**: 95% of plugins and skills on the market become stale junk within weeks. Lotus takes the opposite approach—every skill is **hand-curated, battle-tested, and minimally sufficient**. We only ship what survives real production workflows.
-- 🔄 **Continuously Updated, Frontier-Tracked**: Lotus is a **living protocol**, not a static config dump. We actively track bleeding-edge releases from **Claude Code, Codex CLI, and top-tier open-source agent frameworks**, and fold the safest, most proven patterns back into `core/AGENTS.md` so your rules never go stale.
-- 🧘 **Anti-Anxiety by Design**: New frameworks every week? Another "game-changing" plugin? Relax. LLMs are vector-based word predictors. The only things that actually matter are **vector precision** (clear rules) and **context management** (lean instructions). Lotus handles both. You handle building your product.
-
-## 🚀 Zero-Foundation Quick Start (For Beginners)
-
-Never used terminal commands? No problem.
-If you are starting a new project or setting up a brand-new computer, simply **copy and paste the following prompt** directly into your AI assistant (e.g., Cursor, Claude, Antigravity) and it will handle the entire installation for you!
-
-> "This is a brand new project. Please execute the following initialization steps locally:
-> 1. Clone `https://github.com/Bronc-X/Lotus.git` into a temporary directory in the system.
-> 2. Determine my OS. Run the installer inside the temporary repo to apply the `nextjs` template to my current directory (Windows: `install.ps1 -Project nextjs`, Mac/Linux: `install.sh --project nextjs`).
-> 3. To make sure you retain our workflows globally on this new machine, also run the global install flag (Windows: `install.ps1 -Global`, Mac/Linux: `install.sh --global`).
-> 4. Once finished, delete the temporary cloned repository.
-> 5. Carefully read the newly generated `AGENTS.md` and `.agents/rules/` in my current directory to understand my coding standards and design language.
-> 6. Tell me whether the host app needs a full restart or a fresh session so the host-global rules and top-level skills are actually reloaded from disk.
-> 7. Let me know when you are ready."
-
-*(Note: Change `nextjs` to `vite` or `html` depending on your project type).*
-
-### What about future new projects?
-
-Once globally installed, Lotus core rules (workflows, quality gates) are **already active** in the managed Claude/Codex hosts on that machine — **no wake-up needed**.
-
-The full global flow is automated once you run the installer and confirm any overwrite prompt:
-
-1. Lotus writes the managed host-global rules into the Claude/Codex global config paths
-2. Lotus installs or updates official gstack under `~/.gstack/repos/gstack`
-3. Lotus syncs the host-global skills into `~/.claude/skills` and `~/.codex/skills`
-
-`git clone Lotus` by itself does **not** make any host app pick up the rules or skills. The clone only gives you the installer and templates. The global behavior starts after you run `install.ps1 -Global` or `install.sh --global`.
-
-For Codex, that means Lotus writes to `~/.codex/AGENTS.md`, and Codex automatically loads those rules in every local repository you open. This is an inheritance mechanism, not a file sync, so you will **not** see a new `AGENTS.md` appear in each project unless you also run a project template install.
-
-For Claude and Codex, Lotus also manages the official gstack runtime at `~/.gstack/repos/gstack`. That runtime is global, updateable, and no longer copied from a stale Lotus snapshot.
-
-After a successful global install, Lotus enables the upstream gstack auto-update flags. In practice, that means the **official gstack runtime on the user's machine** can follow upstream updates automatically on new sessions. This does **not** mean the Lotus repository itself auto-updates after clone.
-
-If you want to add **project-level templates** (design systems, tech stack constraints) to a new project, just run once inside the project folder:
-
-```powershell
-# Windows
-C:\Dev\Lotus\install.ps1 -Project nextjs
-```
-```bash
-# macOS / Linux
-~/Dev/Lotus/install.sh --project nextjs
+1. 将 https://github.com/Bronc-X/Lotus.git 克隆到系统临时目录。
+2. 判断当前操作系统。
+3. 在临时 Lotus 仓库中运行项目模板安装，把 nextjs 模板应用到我当前目录：
+   - Windows: install.ps1 -Project nextjs
+   - macOS/Linux: install.sh --project nextjs
+4. 为了让这台机器以后所有受托管宿主都继承 Lotus 规则，再运行全局安装：
+   - Windows: install.ps1 -Global
+   - macOS/Linux: install.sh --global
+5. 完成后删除刚才克隆的临时 Lotus 仓库。
+6. 仔细阅读当前目录中新生成的 AGENTS.md 和 .agents/rules/，确认你理解本项目的编码标准、技术栈约束和设计语言。
+7. 告诉我当前宿主是否需要完全重启或开启新会话，才能加载刚写入的全局规则和全局 skills。
+8. 最后告诉我安装是否成功；如果失败，给出失败命令、错误原文和下一步修复建议。
 ```
 
-That's it. Global rules are always on; project templates layer on top as needed.
+如果项目不是 Next.js，把 `nextjs` 改成 `vite` 或 `html`。
 
-### Post-Install Verification Prompt
+## 手动安装
 
-After global install, open a **fresh host session** and send this exact prompt to your agent if you want it to verify that Lotus is truly active at the host-global level:
+### 第 0 步：克隆 Lotus
 
-> "Please verify that Lotus is active in this host, not just cloned on disk.
-> 1. Detect which host you are running in.
-> 2. Read the host-global rules file for this host and confirm Lotus is installed there:
->    - Codex: `~/.codex/AGENTS.md`
->    - Claude Code: `~/.claude/CLAUDE.md`
-> 3. Confirm the top-level Lotus execution rails are present near the top of that file:
->    - Think Before Coding
->    - Simplicity First
->    - Surgical Changes
->    - Goal-Driven Execution
-> 4. Check the host-global skills directory for this host and confirm these default top-level official gstack skills exist:
->    - `gstack`
->    - `gstack-office-hours`
->    - `gstack-plan-ceo-review`
->    - `gstack-plan-design-review`
->    - `gstack-plan-eng-review`
->    - `gstack-design-review`
->    - `gstack-review`
->    - `gstack-investigate`
->    - `gstack-browse`
->    - `gstack-qa`
->    - `gstack-ship`
-> 5. Tell me whether this current session already loaded those global rules and skills, or whether I still need to fully restart the host app and open a new session before they become active.
-> 6. If anything is missing, tell me the exact missing path and the exact Lotus install command I should rerun."
+选择一个长期保存 Lotus 的目录。以后更新 Lotus 时就在这里执行 `git pull`。
 
-Important: this prompt only **verifies** top-level activation. It does **not** make the rules top-level by itself. True top-level activation happens when:
+Windows PowerShell：
 
-1. Lotus global install writes the host-global rules file and host-global skills
-2. The host app opens a fresh session that loads those files
-
-In other words, if the app session started before `install.ps1 -Global` or `install.sh --global` finished, no prompt can retroactively turn that old session into a true host-global session. Open a fresh session.
-
-## 🔌 Manual Installation
-
-### Step 0: Clone Lotus to a permanent home
-
-Pick a directory where Lotus will live permanently (you'll `git pull` here for updates):
-
-**Windows (PowerShell):**
 ```powershell
 git clone https://github.com/Bronc-X/Lotus.git C:\Dev\Lotus
 ```
-**macOS / Linux:**
+
+macOS / Linux：
+
 ```bash
 git clone https://github.com/Bronc-X/Lotus.git ~/Dev/Lotus
 ```
 
-### Step 1: Global Installation (Configure the managed hosts)
+### 第 1 步：全局安装
 
-This injects Lotus rules into the managed Claude Code and Codex global configs on your machine.
+Windows PowerShell：
 
-It also installs the **official gstack upstream** into `~/.gstack/repos/gstack`, runs upstream setup for Claude/Codex, force-syncs the generated gstack skills into the real managed host global skills directories, and enables gstack auto-update so the skill runtime stays current.
+```powershell
+C:\Dev\Lotus\install.ps1 -Global
+```
 
-Cloning Lotus without running this step will not install rules, will not install slash skills, and will not turn on upstream gstack auto-updates.
+macOS / Linux：
 
-Lotus now separates **top-level exposure** from **background routing**:
+```bash
+~/Dev/Lotus/install.sh --global
+```
 
-- Top-level exposed skills are the small official gstack set users can manually pick from the host `/` menu
-- Hidden official gstack skills still stay in `~/.gstack/repos/gstack/.agents/skills` and can still be routed by `AGENTS.md` when the task semantics clearly match
+这一步会：
 
-The default top-level official gstack profile is `core`, which exposes:
+1. 写入 Claude Code 全局规则：`~/.claude/CLAUDE.md`
+2. 写入 Codex 全局规则：`~/.codex/AGENTS.md`
+3. 安装 Lotus 自带 skills。
+4. 安装或更新官方 gstack 到 `~/.gstack/repos/gstack`。
+5. 同步默认顶层 gstack skills 到 `~/.claude/skills` 和 `~/.codex/skills`。
+
+如果已存在全局规则文件，安装器会先创建 `.bak` 备份，再覆盖。无人值守安装可以使用：
+
+Windows：
+
+```powershell
+C:\Dev\Lotus\install.ps1 -Global -Force
+```
+
+macOS / Linux：
+
+```bash
+~/Dev/Lotus/install.sh --global --yes
+```
+
+### 第 2 步：项目模板安装，可选
+
+如果你希望当前项目目录里也出现项目级规则文件，例如 `AGENTS.md` 和 `.agents/rules/`，在项目目录执行：
+
+Windows PowerShell：
+
+```powershell
+cd C:\Users\YourName\Projects\MyNewApp
+C:\Dev\Lotus\install.ps1 -Project nextjs
+```
+
+macOS / Linux：
+
+```bash
+cd ~/Projects/MyNewApp
+~/Dev/Lotus/install.sh --project nextjs
+```
+
+可用模板：
+
+- `nextjs`
+- `vite`
+- `html`
+
+全局安装不会在每个项目目录自动生成 `AGENTS.md`。Codex 会自动继承 `~/.codex/AGENTS.md`，Claude Code 会自动继承 `~/.claude/CLAUDE.md`。项目级模板是额外叠加层，只在你主动运行 `-Project` / `--project` 时写入当前项目。
+
+## Windows 依赖说明
+
+官方 gstack 完整运行时依赖：
+
+- `git`
+- `bash`
+- `bun`
+- Windows 下还需要 `node`
+
+Windows 上的 `bash` 通常来自 [Git for Windows](https://git-scm.com/download/win)。
+
+如果机器没有 Git Bash，`install.ps1 -Global` 仍会安装默认 11 个顶层 gstack bootstrap skills，保证 `/gstack-*` 菜单入口不缺失。安装 Git for Windows 后，重新运行：
+
+```powershell
+C:\Dev\Lotus\install.ps1 -Global
+```
+
+重新运行后，bootstrap 入口会被完整官方 gstack 运行时替换，并恢复官方自动更新能力。
+
+## 默认暴露的 gstack 顶层 skills
+
+默认 `core` profile 会暴露 11 个顶层 gstack skills：
 
 - `gstack`
 - `gstack-office-hours`
@@ -179,190 +167,159 @@ The default top-level official gstack profile is `core`, which exposes:
 - `gstack-qa`
 - `gstack-ship`
 
-Optional profiles:
+可选 profile：
 
-- `core`: the curated default set above
-- `design`: `core` plus `design-consultation`, `design-shotgun`, and `design-html`
-- `review`: `core` plus `qa-only`, `health`, `cso`, `devex-review`, and `benchmark`
-- `deploy`: `core` plus `setup-deploy`, `land-and-deploy`, `canary`, `document-release`, and `open-gstack-browser`
-- `full`: expose the full current official gstack top-level set
+| Profile | 暴露内容 |
+|---|---|
+| `core` | 默认 11 个顶层 skills |
+| `design` | `core` 加设计相关 skills |
+| `review` | `core` 加 QA / review / health 相关 skills |
+| `deploy` | `core` 加发布部署相关 skills |
+| `full` | 暴露当前官方 gstack 全量顶层 skills |
 
-The **four Lotus rails** also become top-level rules through this step, not through a later prompt:
+切换 profile：
 
-- Think Before Coding
-- Simplicity First
-- Surgical Changes
-- Goal-Driven Execution
+Windows：
 
-If this host actually loaded the installed global rules file, those four rails are already above any project-specific prompt you type later.
-
-For Codex specifically, the global install target is `~/.codex/AGENTS.md`. Local project folders remain untouched after this step. If you want a visible project-level `AGENTS.md` plus `.agents/rules/`, run Step 2 inside that project as well.
-
-**Requirements for official gstack runtime:** `git`, `bash`, `bun`, and `node` on Windows.
-
-> ⚠️ **Safe by design**: If you already have existing managed config files (for example `CLAUDE.md` or `AGENTS.md`), the installer will automatically create `.bak` backups before overwriting. You can always restore them.
-
-If Lotus detects an existing global rule/config file, it now asks for confirmation before overwriting it. For unattended automation, pass `--yes` on `install.sh` or `-Force` on `install.ps1`.
-
-**Windows (PowerShell):**
-```powershell
-C:\Dev\Lotus\install.ps1 -Global
-```
-**macOS / Linux:**
-```bash
-~/Dev/Lotus/install.sh --global
-```
-
-If you want a different official gstack top-level exposure profile:
-
-**Windows (PowerShell):**
 ```powershell
 C:\Dev\Lotus\install.ps1 -Global -GstackProfile design
 ```
-**macOS / Linux:**
+
+macOS / Linux：
+
 ```bash
 ~/Dev/Lotus/install.sh --global --gstack-profile design
 ```
 
-### Troubleshooting: why `/skill` may still not appear
+## 安装后验证提示词
 
-`AGENTS.md`, `CLAUDE.md`, and similar global rule files do not store slash skills themselves. They only provide routing and behavior instructions.
+全局安装后，请打开一个新的宿主会话，把下面提示词复制给 AI 助手：
 
-Slash skills must also exist in each host's own global skills directory:
+```text
+请验证 Lotus 是否已经在当前宿主全局生效，而不是只存在于磁盘上的 Lotus 仓库中。
+
+请按以下步骤检查：
+
+1. 判断你当前运行在哪个宿主中，例如 Codex、Claude Code 或其他宿主。
+2. 读取当前宿主对应的全局规则文件：
+   - Codex: ~/.codex/AGENTS.md
+   - Claude Code: ~/.claude/CLAUDE.md
+3. 确认文件顶部附近存在 Lotus 四条执行护栏：
+   - Think Before Coding
+   - Simplicity First
+   - Surgical Changes
+   - Goal-Driven Execution
+4. 检查当前宿主的全局 skills 目录，并确认默认 11 个 gstack 顶层 skills 存在：
+   - gstack
+   - gstack-office-hours
+   - gstack-plan-ceo-review
+   - gstack-plan-design-review
+   - gstack-plan-eng-review
+   - gstack-design-review
+   - gstack-review
+   - gstack-investigate
+   - gstack-browse
+   - gstack-qa
+   - gstack-ship
+5. 告诉我当前会话是否已经加载这些全局规则和 skills。
+6. 如果没有加载，告诉我是否需要完全重启宿主或开启新会话。
+7. 如果有缺失，请给出缺失路径、缺失项名称、复现依据和应重新运行的安装命令。
+```
+
+这段提示词只负责验证，不能让旧会话“临时变成”真正的全局会话。真正生效需要满足两个条件：
+
+1. 安装器已经写入宿主全局规则文件和全局 skills。
+2. 宿主开启了一个会读取这些文件的新会话。
+
+## `/skill` 不显示时怎么排查
+
+`AGENTS.md` 和 `CLAUDE.md` 只保存规则和路由说明，不保存 slash skill 本体。slash skills 还必须存在于宿主自己的全局 skills 目录：
 
 - Codex: `~/.codex/skills`
 - Claude Code: `~/.claude/skills`
 
-So "global rules installed" and "`/skill` is available" are related, but they are not the same thing.
+如果 `/review`、`/qa` 或其他 gstack skills 没出现：
 
-If `/review`, `/qa`, or other gstack skills do not show up after install:
+1. 重新运行 `install.ps1 -Global` 或 `install.sh --global`。
+2. 确认 `~/.gstack/repos/gstack` 存在。
+3. 确认宿主全局 skills 目录中存在对应目录。
+4. 完全重启 IDE / App，让宿主重新扫描全局 skills。
 
-1. Re-run `install.ps1 -Global` or `install.sh --global`
-2. Confirm `~/.gstack/repos/gstack` exists
-3. Confirm the host-specific skills folder above contains the top-level skills for your chosen gstack profile
-4. Restart the IDE/app so it re-scans global skills
+如果 Windows 没有 Git Bash，安装器会写入 bootstrap skills。bootstrap skills 是真实菜单入口，但只负责提示如何补齐完整官方 gstack runtime。
 
-Not seeing a hidden official gstack skill in the `/` menu does **not** mean Lotus removed that capability. It only means Lotus did not expose it at the host top level for manual picking. The official skill can still remain available in the upstream repo for AGENTS-based background routing.
+## 常用 Lotus 自带 skills
 
-Lotus now fails the install if official gstack setup does not complete, instead of silently claiming success.
+这些是 Lotus 仓库自身提供的跨平台 skills。官方 gstack skills 由 `garrytan/gstack` 提供。全局安装或更新 Lotus 后，下面这些 skill 会写入受托管宿主的全局 skills 目录；重启宿主后即可用 `/skill-name` 调用，例如 `/taste-skill`。
 
-Lotus also self-heals partial upgrades now: after upstream setup finishes, it force-refreshes the host `gstack` and `gstack-*` entries in the real global skills folders so stale or half-updated skill directories do not survive across upgrades.
+| Skill | 用途 |
+|---|---|
+| `test-driven-development` | 严格红绿重构，先写失败测试再写实现 |
+| `frontend-design` | 前端审美与交互质量约束 |
+| `taste-skill` | Taste Skill 前端审美与实现质量约束，强化布局、字体、动效、间距和组件完成度，来源于 `Leonxlnx/taste-skill` |
+| `web-to-design-md` | 从参考网页、品牌资料、需求文档生成结构化 `design.md` |
+| `debugging-strategies` | 系统性排错，先定位根因再修复 |
+| `security-auditor` | 安全审查，覆盖鉴权、注入、依赖风险等 |
+| `feynman` | 用费曼学习法解释复杂机制 |
+| `polanyi-tacit` | 分析代码背后的隐性业务和组织约束 |
+| `auto-build` | 自动执行依赖安装与构建验证 |
+| `powerup` | AI 编程能力速成练习 |
+| `insights` | 使用习惯回顾与优化建议 |
+| `subagent` | 子 Agent 管理与并行任务编排 |
 
-### Step 2: New Project Initialization (Optional)
-
-Inside your empty new project folder, inject your preferred technology stack template:
-
-**Windows (PowerShell):**
-```powershell
-cd C:\Users\YourName\Projects\MyNewApp
-C:\Dev\Lotus\install.ps1 -Project nextjs
-```
-**macOS / Linux:**
-```bash
-cd ~/Projects/MyNewApp
-~/Dev/Lotus/install.sh --project nextjs
-```
-
-*(Available templates: `nextjs`, `vite`, `html`)*
-
-## 🎯 Tool Wake-Up Mechanisms (Skills)
-
-You do not need to memorize complicated prompts; just remember a few simple commands. You can dynamically **wake up** specific expert personas exactly when you need them.
-
-> 💡 **Why so few?** We deliberately keep the skill count small. Every skill here has survived months of real-world iteration across dozens of production projects. If a skill doesn't consistently deliver value, it gets **removed**, not "deprecated". Quality over quantity, always.
-
-**How to Wake Them Up:**
-The trigger syntax depends on whether you are using a visual IDE or a command-line agent:
-* **For GUI IDEs (Cursor / Windsurf)**: Use the slash command `/name` (e.g., `/gstack`).
-* **For CLI Agents (Claude Code / Antigravity / Aider)**: Use the mention format `@name` (e.g., `@gstack`).
-
-### Available Wakes:
-
-#### Lotus Core Skills (Cross-Platform)
-
-1. **[`@gstack` / `/gstack`](https://github.com/garrytan/gstack)**
-   * **What it does**: Lotus now delegates this to the official gstack upstream runtime it installs globally. Use the upstream workflow and specialist skills such as `/office-hours`, `/plan-eng-review`, `/review`, `/investigate`, `/qa`, and `/ship`.
-2. **[`@test-driven-development` / `/test-driven-development`](https://github.com/Bronc-X/Lotus/blob/main/skills/test-driven-development.md)**
-   * **What it does**: Forces strict Red-Green-Refactor constraints. The AI is forbidden from writing business logic until it writes a failing test. The ultimate anti-hallucination tool.
-3. **[`@frontend-design` / `/frontend-design`](https://github.com/Bronc-X/Lotus/blob/main/skills/frontend-design.md)**
-   * **What it does**: Vercel Labs-grade UI/UX boundaries. Blocks generic "AI aesthetic" layouts, forces explicit design stances (e.g. Brutalist, Editorial), and applies the Design Feasibility & Impact Index (DFII) before writing CSS/React.
-4. **[`@web-to-design-md` / `/web-to-design-md`](https://github.com/Bronc-X/Lotus/blob/main/skills/web-to-design-md.md)**
-   * **What it does**: Fuses website reference extraction with a design-consultant workflow. Turns URLs, existing `design.md`, brand docs, requirement docs, or screenshots into a structured `design.md`, and can optionally produce a visual HTML preview before you hand implementation to `@frontend-design`.
-5. **[`@debugging-strategies` / `/debugging-strategies`](https://github.com/Bronc-X/Lotus/blob/main/skills/debugging-strategies.md)**
-   * **What it does**: Replaces raw guessing with a scientific debugging loop. Forces the AI to state hypotheses, write probing code to disprove them, and only apply fixes once the root cause is proven.
-6. **[`@security-auditor` / `/security-auditor`](https://github.com/Bronc-X/Lotus/blob/main/skills/security-auditor.md)**
-   * **What it does**: Deep DevSecOps review. Scans for OWASP Top 10 vulnerabilities, auth leaks, prototype pollution, and weak crypto. Run this before opening a PR.
-7. **[`@feynman` / `/feynman`](https://github.com/Bronc-X/Lotus/blob/main/skills/feynman.md)**
-   * **What it does**: Forces the AI to use the Feynman Technique. It will break down and explain complex bugs or mechanisms using absolute layman terms before attempting a fix.
-8. **[`@polanyi-tacit` / `/polanyi-tacit`](https://github.com/Bronc-X/Lotus/blob/main/skills/polanyi-tacit.md)**
-   * **What it does**: Wakes up a deeply analytical mode. The AI deliberately looks for architectural compromises, "defensive" code blocks, and unspoken organizational debt hidden behind the scenes.
-9. **[`@auto-build` / `/auto-build`](https://github.com/Bronc-X/Lotus/blob/main/skills/auto-build.md)**
-   * **What it does**: Silently performs `npm install`, runs `npm run build`, and checks for compilation errors without asking for your permission.
-10. **[`@btw` / `/btw`](https://github.com/Bronc-X/Lotus/blob/main/skills/btw.md)**
-   * **What it does**: Side-channel quick question mode. Ask a quick question mid-task without interrupting your main workflow. The AI answers in 3-5 sentences, modifies zero files, and seamlessly returns to the primary task.
-
-#### Adapted from Claude Code Native Commands (Lotus ports to other platforms)
-
-11. **[`@powerup` / `/powerup`](https://github.com/Bronc-X/Lotus/blob/main/skills/powerup.md)**
-   * **When to use**: You're new to AI coding, or feel you're only using 10% of your AI's capabilities.
-   * **What it does**: Think of it as the "Duolingo" for Claude Code — **10 structured lessons** covering everything from advanced prompt caching to background tasks.
-12. **[`@insights` / `/insights`](https://github.com/Bronc-X/Lotus/blob/main/skills/insights.md)**
-   * **When to use**: You want to see what habits you can optimize.
-   * **What it does**: Generates a retrospective HTML report of your past month's coding habits, friction points, and debugging loops.
-13. **[`@loop` / `/loop`](https://github.com/Bronc-X/Lotus/blob/main/skills/loop.md)**
-   * **When to use**: You have recurring check tasks (e.g., poll deployment status every 5 minutes).
-   * **What it does**: Sets up an in-session recurring task alarm clock. Session-scoped, safe, and controllable.
-14. **[`@subagent` / `/subagent`](https://github.com/Bronc-X/Lotus/blob/main/skills/subagent.md)**
-   * **When to use**: Complex tasks needing parallel execution.
-   * **What it does**: Manage independent Subagents each with their own context window to prevent main-thread context overflow.
-
-## 🏗️ Architecture (Hub-and-Spoke)
+## 仓库结构
 
 ```text
 Lotus/
-├── core/                ← 🔶 Core Truth (Universal workflows, quality gates)
-├── skills/              ← 🔶 Wake-up Skills (@gstack, @feynman, etc.)
-├── templates/           ← 🔶 Tech stacks (Next.js, Vite) & Design languages
-└── install scripts      ← 🤖 Auto-generates platform-specific IDE adapters
+├── core/                 # 全局规则真源
+├── skills/               # Lotus 自带 skills
+├── templates/            # 项目级模板
+├── scripts/              # gstack 托管安装脚本
+├── install.ps1           # Windows 安装器
+└── install.sh            # macOS / Linux 安装器
 ```
 
-## 🛡️ Safety
+## 安全与可回滚
 
-Lotus touches your global IDE config files. We take this seriously:
+- 覆盖前备份：安装器覆盖 `CLAUDE.md` 或 `AGENTS.md` 前会创建 `.bak`。
+- 项目不被隐式修改：`-Global` / `--global` 只写全局路径，不写当前项目目录。
+- 项目模板显式写入：只有运行 `-Project` / `--project` 才会写当前目录。
+- 可卸载：删除对应全局规则文件和 skills 目录，或恢复 `.bak` 即可。
 
-- **Auto-Backup**: Before overwriting any existing managed file (such as `CLAUDE.md` or `AGENTS.md`), the installer automatically creates a `.bak` backup in the same directory. Nothing is silently lost.
-- **Read-Only Rules**: Lotus only writes static Markdown files to config directories. It does **not** install executables, daemons, browser extensions, or background processes.
-- **No Network Calls**: The install scripts run entirely offline. No telemetry, no analytics, no outbound requests. The only network operation is `git clone` / `git pull`, which you control.
-- **Fully Reversible**: To completely uninstall Lotus, simply delete the injected files (for example `~/.claude/CLAUDE.md` or `~/.codex/AGENTS.md`) or restore from the `.bak` backups. There is no registry, no system service, nothing hidden.
+## 更新
 
-## 🔄 Update Philosophy
+进入 Lotus 长期目录后执行：
 
-Lotus is **not a "set and forget" config**. It is a living, evolving protocol.
+Windows：
 
-- **Primary tracking targets**: [Claude Code](https://docs.anthropic.com/en/docs/claude-code), [Codex CLI](https://github.com/openai/codex), and battle-tested open-source agent frameworks from top contributors.
-- **What we track**: New global rule injection mechanisms, safer permission models, improved context-window strategies, and proven workflow patterns.
-- **What we discard**: Hype-driven features, unstable APIs, and anything that adds complexity without measurable value.
-- **The first-principles filter**: Before any new pattern is adopted, we ask: *Does this help vectors lock on more accurately? Does this reduce context waste?* If neither, it doesn't go in.
-- **How to stay current**: Simply `git pull` and re-run the installer. Your managed Claude/Codex global rules will be refreshed in seconds.
-- **How upstream gstack is watched**: Lotus now tracks `garrytan/gstack` separately. A scheduled GitHub Actions workflow checks upstream `main`, updates `.github/upstream/gstack.json`, and opens a PR for human review when upstream changes. It does not auto-merge or auto-release Lotus.
+```powershell
+cd C:\Dev\Lotus
+git pull
+.\install.ps1 -Global
+```
+
+macOS / Linux：
 
 ```bash
-# Stay up to date in one command
-cd /path/to/Lotus && git pull && ./install.sh --global
-```
-```powershell
-# Windows equivalent
-cd C:\path\to\Lotus; git pull; .\install.ps1 -Global
+cd ~/Dev/Lotus
+git pull
+./install.sh --global
 ```
 
-## 📌 Persistence: Set Up Once, Apply Forever
+这会刷新 Lotus 全局规则、Lotus 自带 skills、官方 gstack runtime 和默认顶层 gstack skills。项目级文件不会被自动覆盖。
 
-Once Lotus is installed globally, **every new project you create automatically inherits your rules** on the managed hosts. No copy-pasting. No "remember to add the config file". The rules live at the OS-level global config of Claude Code and Codex, so they are always active—whether you're starting a fresh Next.js app, debugging a legacy codebase, or pair-programming on a colleague's machine.
+## GitHub Actions 报 `Watch Upstream GStack` 失败
 
-On Codex, inheritance means the app reads `~/.codex/AGENTS.md` automatically when you open a local repo. It does **not** mean Lotus copies `AGENTS.md` into every repo on disk.
+Lotus 使用 GitHub Actions 定时检查 `garrytan/gstack` 上游是否更新。如果 Actions 没有创建 PR 的权限，GitHub 会报：
 
-For Claude and Codex, the official gstack runtime is also global. Lotus keeps it in `~/.gstack/repos/gstack` and re-runs upstream setup on every global install, so "permanent" means both rules and runtime survive across repos and machine restarts.
+```text
+GitHub Actions is not permitted to create or approve pull requests.
+```
 
-If upstream gstack ships a new version later, the runtime can auto-upgrade on the user's machine only if Lotus global install has already been run and upstream auto-upgrade remains enabled in `~/.gstack/config.yaml`.
+修复方式：
 
-For project-specific overrides (design systems, tech stacks), just use `install.ps1 -Project <template>` to layer on top. The global rules remain untouched.
+1. 打开 GitHub 仓库设置。
+2. 进入 `Settings -> Actions -> General -> Workflow permissions`。
+3. 选择 `Read and write permissions`。
+4. 勾选 `Allow GitHub Actions to create and approve pull requests`。
+
+当前 workflow 已做容错：如果权限没开，会写入 workflow summary，不再因为无法创建 PR 而持续刷失败通知。

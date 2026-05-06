@@ -229,6 +229,7 @@ convert_to_codex_skill() {
         loop)           allowed_tools="Bash\n  - Read\n  - AskUserQuestion" ;;
         subagent)       allowed_tools="Bash\n  - Read\n  - Write\n  - Edit\n  - Grep\n  - Glob\n  - AskUserQuestion" ;;
         web-to-design-md) allowed_tools="Read\n  - Write\n  - Edit\n  - Grep\n  - Glob\n  - AskUserQuestion\n  - WebSearch" ;;
+        taste-skill)    allowed_tools="Read\n  - Write\n  - Edit\n  - Grep\n  - Glob\n  - Bash\n  - AskUserQuestion" ;;
         gstack)         allowed_tools="Bash\n  - Read\n  - Write\n  - Edit\n  - Grep\n  - Glob\n  - AskUserQuestion" ;;
         *)              allowed_tools="Read\n  - AskUserQuestion" ;;
     esac

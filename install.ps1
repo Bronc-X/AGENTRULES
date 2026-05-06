@@ -16,6 +16,21 @@ $ManagedGstackInstaller = Join-Path $RepoRoot "scripts\install-managed-gstack.sh
 # These skills work via AGENTS.md rule-level recognition instead.
 $CodexExcludedSkills = @("btw", "loop")
 $ManagedOfficialSkills = @("gstack")
+$OfficialGstackInstalled = $false
+$GstackBootstrapInstalled = $false
+$CoreExposedGstackSkills = @(
+    "gstack",
+    "gstack-office-hours",
+    "gstack-plan-ceo-review",
+    "gstack-plan-design-review",
+    "gstack-plan-eng-review",
+    "gstack-design-review",
+    "gstack-review",
+    "gstack-investigate",
+    "gstack-browse",
+    "gstack-qa",
+    "gstack-ship"
+)
 
 function Backup-IfExists {
     param ([string]$FilePath)
@@ -49,9 +64,15 @@ function Add-MissingSkillIfAbsent {
 }
 
 function Assert-ManagedGstackInstall {
+    param ([switch]$AllowArchiveInstall)
+
     $missing = New-Object System.Collections.Generic.List[string]
 
-    if (-not (Test-Path (Join-Path $HOME ".gstack\repos\gstack\.git"))) {
+    $gstackRepoDir = Join-Path $HOME ".gstack\repos\gstack"
+    $hasGitCheckout = Test-Path (Join-Path $gstackRepoDir ".git")
+    $hasArchiveCheckout = (Test-Path (Join-Path $gstackRepoDir "VERSION")) -and (Test-Path (Join-Path $gstackRepoDir "package.json"))
+
+    if (-not $hasGitCheckout -and -not ($AllowArchiveInstall -and $hasArchiveCheckout)) {
         $missing.Add("official gstack repo (~/.gstack/repos/gstack)")
     }
 
@@ -220,6 +241,7 @@ function Convert-ToCodexSkill {
         "loop" { "Bash, Read, AskUserQuestion" }
         "subagent" { "Bash, Read, Write, Edit, Grep, Glob, AskUserQuestion" }
         "web-to-design-md" { "Read, Write, Edit, Grep, Glob, AskUserQuestion, WebSearch" }
+        "taste-skill" { "Read, Write, Edit, Grep, Glob, Bash, AskUserQuestion" }
         "gstack" { "Bash, Read, Write, Edit, Grep, Glob, AskUserQuestion" }
         default { "Read, AskUserQuestion" }
     }
@@ -245,6 +267,130 @@ $(($allowedTools -split ', ' | ForEach-Object { "  - $_" }) -join "`n")
 
     $utf8NoBom = New-Object System.Text.UTF8Encoding $false
     [System.IO.File]::WriteAllText((Join-Path $skillDir "SKILL.md"), $codexContent, $utf8NoBom)
+}
+
+function Get-ClaudeGstackSkillName {
+    param ([string]$SkillName)
+
+    if ($SkillName -eq "gstack") {
+        return "gstack"
+    }
+
+    return ($SkillName -replace '^gstack-', '')
+}
+
+function Copy-DirectoryClean {
+    param (
+        [string]$Source,
+        [string]$Destination
+    )
+
+    if (Test-Path $Destination) {
+        Remove-Item $Destination -Recurse -Force
+    }
+    New-Item -ItemType Directory -Path ([System.IO.Path]::GetDirectoryName($Destination)) -Force | Out-Null
+    Copy-Item $Source $Destination -Recurse -Force
+}
+
+function Sync-GstackSkillsFromGeneratedDocs {
+    param (
+        [string]$GstackDir,
+        [string]$ClaudeSkills,
+        [string]$CodexSkills
+    )
+
+    $agentsSkills = Join-Path $GstackDir ".agents\skills"
+    if (-not (Test-Path $agentsSkills)) {
+        throw "Generated gstack skills not found at $agentsSkills."
+    }
+
+    New-Item -ItemType Directory -Path $ClaudeSkills -Force | Out-Null
+    New-Item -ItemType Directory -Path $CodexSkills -Force | Out-Null
+
+    foreach ($skillName in $CoreExposedGstackSkills) {
+        $sourceSkillDir = Join-Path $agentsSkills $skillName
+        $sourceSkillFile = Join-Path $sourceSkillDir "SKILL.md"
+        if (-not (Test-Path $sourceSkillFile)) {
+            throw "Expected generated gstack skill is missing: $sourceSkillFile"
+        }
+
+        $codexTarget = Join-Path $CodexSkills $skillName
+        Copy-DirectoryClean -Source $sourceSkillDir -Destination $codexTarget
+
+        $claudeSkillName = Get-ClaudeGstackSkillName $skillName
+        $claudeTarget = Join-Path $ClaudeSkills $claudeSkillName
+        New-Item -ItemType Directory -Path $claudeTarget -Force | Out-Null
+        Copy-Item $sourceSkillFile (Join-Path $claudeTarget "SKILL.md") -Force
+    }
+
+    Write-Host "  Synced official gstack top-level skills without Git/Bash"
+}
+
+function New-GstackBootstrapSkillContent {
+    param (
+        [string]$SkillName,
+        [string]$DisplayName
+    )
+
+    return @"
+---
+name: $SkillName
+description: |
+  Bootstrap entry for official gstack $DisplayName. Lotus installed this fallback because Git or Git Bash was not available during global setup.
+allowed-tools:
+  - Read
+  - AskUserQuestion
+---
+
+# Official gstack bootstrap
+
+This is a real top-level skill entry, installed so `/gstack-*` commands do not disappear on machines without Git or Git Bash.
+
+The full official gstack runtime is not installed yet. To enable this skill's full workflow:
+
+1. Install Git for Windows: https://git-scm.com/download/win
+2. Open a fresh PowerShell.
+3. Re-run:
+
+```powershell
+install.ps1 -Global
+```
+
+If you are running from outside the Lotus repo, use the full path to `install.ps1`.
+"@
+}
+
+function Install-GstackBootstrapSkills {
+    param (
+        [string]$ClaudeSkills,
+        [string]$CodexSkills
+    )
+
+    $utf8NoBom = New-Object System.Text.UTF8Encoding $false
+    New-Item -ItemType Directory -Path $ClaudeSkills, $CodexSkills -Force | Out-Null
+
+    foreach ($skillName in $CoreExposedGstackSkills) {
+        $displayName = if ($skillName -eq "gstack") { "runtime" } else { ($skillName -replace '^gstack-', '') }
+
+        $codexTarget = Join-Path $CodexSkills $skillName
+        New-Item -ItemType Directory -Path $codexTarget -Force | Out-Null
+        [System.IO.File]::WriteAllText(
+            (Join-Path $codexTarget "SKILL.md"),
+            (New-GstackBootstrapSkillContent -SkillName $skillName -DisplayName $displayName),
+            $utf8NoBom
+        )
+
+        $claudeSkillName = Get-ClaudeGstackSkillName $skillName
+        $claudeTarget = Join-Path $ClaudeSkills $claudeSkillName
+        New-Item -ItemType Directory -Path $claudeTarget -Force | Out-Null
+        [System.IO.File]::WriteAllText(
+            (Join-Path $claudeTarget "SKILL.md"),
+            (New-GstackBootstrapSkillContent -SkillName $claudeSkillName -DisplayName $displayName),
+            $utf8NoBom
+        )
+    }
+
+    Write-Host "  Installed bootstrap entries for the 11 official gstack top-level skills"
 }
 
 if ($Global) {
@@ -297,29 +443,32 @@ if ($Global) {
 
     Write-Host "  Installing official gstack upstream..."
     if (-not (Get-Command bash -ErrorAction SilentlyContinue)) {
-        throw "Git Bash is required to install official gstack on Windows. Install Git for Windows or ensure 'bash' is on PATH."
-    }
+        Write-Warning "Git Bash was not found. Installing bootstrap entries for the official gstack top-level skills."
+        Install-GstackBootstrapSkills -ClaudeSkills $ClaudeSkills -CodexSkills $CodexSkills
+        $GstackBootstrapInstalled = $true
+    } else {
+        $BashManagedGstackInstaller = $ManagedGstackInstaller -replace '\\', '/'
 
-    $BashManagedGstackInstaller = $ManagedGstackInstaller -replace '\\', '/'
-
-    $previousGstackProfile = $env:LOTUS_GSTACK_PROFILE
-    $env:LOTUS_GSTACK_PROFILE = $GstackProfile
-    try {
-        & bash $BashManagedGstackInstaller
-        if ($LASTEXITCODE -ne 0) {
-            throw "Official gstack installation failed. Lotus rules were written, but slash skills were not fully installed."
+        $previousGstackProfile = $env:LOTUS_GSTACK_PROFILE
+        $env:LOTUS_GSTACK_PROFILE = $GstackProfile
+        try {
+            & bash $BashManagedGstackInstaller
+            if ($LASTEXITCODE -ne 0) {
+                throw "Official gstack installation failed. Lotus rules were written, but slash skills were not fully installed."
+            }
         }
-    }
-    finally {
-        if ($null -ne $previousGstackProfile) {
-            $env:LOTUS_GSTACK_PROFILE = $previousGstackProfile
-        } else {
-            Remove-Item Env:LOTUS_GSTACK_PROFILE -ErrorAction SilentlyContinue
+        finally {
+            if ($null -ne $previousGstackProfile) {
+                $env:LOTUS_GSTACK_PROFILE = $previousGstackProfile
+            } else {
+                Remove-Item Env:LOTUS_GSTACK_PROFILE -ErrorAction SilentlyContinue
+            }
         }
-    }
 
-    Assert-ManagedGstackInstall
-    Write-Host "  Official gstack configured for Claude/Codex"
+        Assert-ManagedGstackInstall
+        $OfficialGstackInstalled = $true
+        Write-Host "  Official gstack configured for Claude/Codex"
+    }
 
     Write-Host ""
     Write-Host "Global installation completed successfully!" -ForegroundColor Green
@@ -329,7 +478,12 @@ if ($Global) {
     Write-Host "  - Global rules were installed to $CodexDir\AGENTS.md and are auto-loaded in local repos."
     Write-Host "  - `-Global` does not create `AGENTS.md` inside each project folder."
     Write-Host "  - Run `.\install.ps1 -Project nextjs|vite|html` inside a project when you want local `AGENTS.md` and `.agents/rules/` files."
-    Write-Host "  - Official gstack is managed at $HOME\.gstack\repos\gstack and kept auto-updatable."
+    if ($OfficialGstackInstalled) {
+        Write-Host "  - Official gstack is managed at $HOME\.gstack\repos\gstack and kept auto-updatable."
+    } elseif ($GstackBootstrapInstalled) {
+        Write-Host "  - The 11 official gstack top-level skill entries were installed as bootstrap skills."
+        Write-Host "  - Install Git for Windows, then re-run install.ps1 -Global to install the full official gstack runtime."
+    }
     Write-Host "  - Official gstack top-level exposure profile: $GstackProfile"
     Write-Host "  - Hidden official gstack skills stay in ~/.gstack/repos/gstack/.agents/skills and can still be routed by AGENTS.md."
     Write-Host "  - Slash skills live in the managed global skills folders ~/.claude/skills and ~/.codex/skills."

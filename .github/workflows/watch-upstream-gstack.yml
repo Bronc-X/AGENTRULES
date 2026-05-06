@@ -81,7 +81,9 @@ jobs:
           echo "Tracked commit: ${{ steps.current.outputs.commit }}"
 
       - name: Create pull request
+        id: create_pr
         if: steps.upstream.outputs.changed == 'true'
+        continue-on-error: true
         uses: peter-evans/create-pull-request@v7
         with:
           branch: automation/watch-gstack-upstream
@@ -106,3 +108,18 @@ jobs:
             - merge only after review
           add-paths: |
             .github/upstream/gstack.json
+
+      - name: Report pull request permission issue
+        if: steps.upstream.outputs.changed == 'true' && steps.create_pr.outcome == 'failure'
+        run: |
+          {
+            echo "## Upstream gstack change detected"
+            echo
+            echo "The automation branch was updated, but GitHub refused to create a pull request."
+            echo
+            echo "This usually means repository settings do not allow GitHub Actions to create PRs."
+            echo
+            echo "Enable it at: Settings -> Actions -> General -> Workflow permissions -> Allow GitHub Actions to create and approve pull requests."
+            echo
+            echo "Fallback branch: \`automation/watch-gstack-upstream\`"
+          } >> "$GITHUB_STEP_SUMMARY"
