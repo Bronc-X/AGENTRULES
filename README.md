@@ -82,6 +82,8 @@ macOS / Linux：
 
 ```bash
 ~/Dev/Lotus/install.sh --global
+# 如果下载方式丢失了可执行权限，也可以用：
+bash ~/Dev/Lotus/install.sh --global
 ```
 
 这一步会：
@@ -143,13 +145,30 @@ cd ~/Projects/MyNewApp
 
 Windows 上的 `bash` 通常来自 [Git for Windows](https://git-scm.com/download/win)。
 
-如果机器没有 Git Bash，`install.ps1 -Global` 仍会安装默认 11 个顶层 gstack bootstrap skills，保证 `/gstack-*` 菜单入口不缺失。安装 Git for Windows 后，重新运行：
+如果机器没有 Git Bash，或官方 gstack runtime 安装失败，`install.ps1 -Global` 仍会安装默认 11 个顶层 gstack bootstrap skills，保证 `/gstack-*` 菜单入口不缺失。macOS / Linux 的 `install.sh --global` 也会在官方 runtime 下载失败时写入同样的 bootstrap 入口。安装 Git for Windows 并补齐依赖后，重新运行：
 
 ```powershell
 C:\Dev\Lotus\install.ps1 -Global
 ```
 
 重新运行后，bootstrap 入口会被完整官方 gstack 运行时替换，并恢复官方自动更新能力。
+
+## macOS / Codex App / Claude Code 说明
+
+Codex App、Claude Code 和 IDE 启动的命令行有时不会加载你的 `.zprofile` / `.bashrc`，导致 `bun` 已安装但安装器找不到。Lotus 安装器会自动补充常见工具路径：
+
+- `~/.bun/bin`
+- `~/.local/bin`
+- `/opt/homebrew/bin`
+- `/usr/local/bin`
+
+官方 gstack 在 macOS 上会尝试用 Homebrew 安装可选的 `coreutils`，只为了给少数命令增加 timeout 保护。Lotus 托管安装默认跳过这个可选步骤，避免全局安装卡在 Homebrew。确实需要该增强时，可以自己安装：
+
+```bash
+brew install coreutils
+```
+
+如果 GitHub 网络短暂抖动，安装器会重试官方 gstack 下载；本机已经有 `~/.gstack/repos/gstack` 时，会优先使用现有 checkout 完成 skills 同步。没有可用 checkout 时，安装器会写入 bootstrap slash skills，等网络恢复后重新运行全局安装即可替换成完整 runtime。
 
 ## 默认暴露的 gstack 顶层 skills
 

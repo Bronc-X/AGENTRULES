@@ -17,6 +17,21 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [1.1.10] - 2026-05-07
+
+### Fixed
+
+- macOS/Linux global install now preserves Lotus skill bodies when converting them to Codex `SKILL.md` directories, avoiding empty slash-skill entries caused by BSD `sed` incompatibility
+- Global install now keeps existing Codex `gstack` runtime entries in place until the official managed gstack sync succeeds, so a failed runtime update no longer removes `/gstack`
+- Managed gstack setup now searches common GUI-app and non-login-shell tool paths such as `~/.bun/bin`, `/opt/homebrew/bin`, and `/usr/local/bin`
+- Lotus-managed gstack setup now skips the optional Homebrew `coreutils` install by default to avoid blocking Codex App / Claude Code installs on macOS
+- Windows PowerShell install now falls back to real bootstrap gstack slash entries if the official runtime installer fails after Git Bash is detected
+- macOS/Linux install now retries official gstack clone/fetch, uses an existing local checkout when GitHub is temporarily unavailable, and falls back to bootstrap slash entries when no runtime can be installed
+
+### Added
+
+- Lightweight installer regression tests for Codex skill conversion, core gstack skill sync, and failed-runtime preservation
+
 ## [1.1.9] - 2026-04-22
 
 ### Changed

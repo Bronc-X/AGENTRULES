@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CORE_AGENTS="$REPO_ROOT/core/AGENTS.md"
@@ -10,11 +10,48 @@ MANAGED_GSTACK_INSTALLER="$REPO_ROOT/scripts/install-managed-gstack.sh"
 # These skills work via AGENTS.md rule-level recognition instead.
 CODEX_EXCLUDED_SKILLS=("btw" "loop")
 MANAGED_OFFICIAL_SKILLS=("gstack")
+CORE_EXPOSED_GSTACK_SKILLS=(
+    "gstack"
+    "gstack-office-hours"
+    "gstack-plan-ceo-review"
+    "gstack-plan-design-review"
+    "gstack-plan-eng-review"
+    "gstack-design-review"
+    "gstack-review"
+    "gstack-investigate"
+    "gstack-browse"
+    "gstack-qa"
+    "gstack-ship"
+)
 
 GLOBAL=0
 PROJECT=""
 ASSUME_YES=0
 GSTACK_PROFILE="core"
+OFFICIAL_GSTACK_INSTALLED=0
+GSTACK_BOOTSTRAP_INSTALLED=0
+
+prepend_path_if_dir() {
+    local dir="$1"
+
+    if [ -d "$dir" ]; then
+        case ":$PATH:" in
+            *":$dir:"*) ;;
+            *) PATH="$dir:$PATH" ;;
+        esac
+    fi
+}
+
+prepend_common_tool_paths() {
+    # GUI-launched agents often run non-login shells and miss user tool paths.
+    prepend_path_if_dir "$HOME/.bun/bin"
+    prepend_path_if_dir "$HOME/.local/bin"
+    prepend_path_if_dir "/opt/homebrew/bin"
+    prepend_path_if_dir "/usr/local/bin"
+    export PATH
+}
+
+prepend_common_tool_paths
 
 while [[ "$#" -gt 0 ]]; do
     case $1 in
@@ -191,6 +228,81 @@ copy_lotus_skills() {
     done
 }
 
+claude_gstack_skill_name() {
+    local skill_name="$1"
+
+    if [ "$skill_name" = "gstack" ]; then
+        echo "gstack"
+    else
+        echo "${skill_name#gstack-}"
+    fi
+}
+
+write_gstack_bootstrap_skill() {
+    local skill_file="$1"
+    local skill_name="$2"
+    local display_name="$3"
+
+    cat > "$skill_file" <<BOOTSTRAP_EOF
+---
+name: $skill_name
+description: |
+  Bootstrap entry for official gstack $display_name. Lotus installed this fallback because the full official gstack runtime was not available during global setup.
+allowed-tools:
+  - Read
+  - AskUserQuestion
+---
+
+# Official gstack bootstrap
+
+This is a real top-level skill entry, installed so gstack slash commands do not disappear when the full official runtime cannot be installed.
+
+The full official gstack runtime is not installed yet. To enable this skill's full workflow:
+
+1. Install Git, bash, and bun.
+2. Open a fresh terminal.
+3. Re-run:
+
+\`\`\`bash
+install.sh --global
+\`\`\`
+
+If you are running from outside the Lotus repo, use the full path to \`install.sh\`.
+BOOTSTRAP_EOF
+}
+
+install_gstack_bootstrap_skills() {
+    local codex_skill
+    local claude_skill
+    local display_name
+    local codex_dir
+    local claude_dir
+
+    mkdir -p "$HOME/.codex/skills" "$HOME/.claude/skills"
+
+    for codex_skill in "${CORE_EXPOSED_GSTACK_SKILLS[@]}"; do
+        display_name="${codex_skill#gstack-}"
+        if [ "$codex_skill" = "gstack" ]; then
+            display_name="runtime"
+        fi
+
+        codex_dir="$HOME/.codex/skills/$codex_skill"
+        mkdir -p "$codex_dir"
+        if [ ! -f "$codex_dir/SKILL.md" ]; then
+            write_gstack_bootstrap_skill "$codex_dir/SKILL.md" "$codex_skill" "$display_name"
+        fi
+
+        claude_skill="$(claude_gstack_skill_name "$codex_skill")"
+        claude_dir="$HOME/.claude/skills/$claude_skill"
+        mkdir -p "$claude_dir"
+        if [ ! -f "$claude_dir/SKILL.md" ]; then
+            write_gstack_bootstrap_skill "$claude_dir/SKILL.md" "$claude_skill" "$display_name"
+        fi
+    done
+
+    echo "  Installed bootstrap entries for the 11 official gstack top-level skills"
+}
+
 # Convert a Lotus skill .md file into a Codex-compatible SKILL.md directory.
 # Codex expects: ~/.codex/skills/<name>/SKILL.md with YAML frontmatter containing
 # name, description, and allowed-tools fields.
@@ -206,7 +318,18 @@ convert_to_codex_skill() {
 
     if echo "$content" | head -1 | grep -q "^---"; then
         local frontmatter
-        frontmatter=$(echo "$content" | sed -n '/^---$/,/^---$/p' | sed '1d;$d')
+        frontmatter=$(awk '
+            NR == 1 && $0 == "---" {
+                in_frontmatter = 1
+                next
+            }
+            in_frontmatter == 1 && $0 == "---" {
+                exit
+            }
+            in_frontmatter == 1 {
+                print
+            }
+        ' "$source_file")
         skill_name=$(echo "$frontmatter" | grep '^name:' | sed 's/^name:[[:space:]]*//' || true)
         description=$(echo "$frontmatter" | grep '^description:' | sed 's/^description:[[:space:]]*//' || true)
     fi
@@ -236,7 +359,22 @@ convert_to_codex_skill() {
     esac
 
     local body
-    body=$(echo "$content" | sed '1{/^---$/!q}; 1,/^---$/d')
+    body=$(awk '
+        NR == 1 && $0 == "---" {
+            in_frontmatter = 1
+            next
+        }
+        in_frontmatter == 1 && $0 == "---" {
+            in_frontmatter = 0
+            next
+        }
+        in_frontmatter == 1 {
+            next
+        }
+        {
+            print
+        }
+    ' "$source_file")
 
     local skill_dir="$target_dir/$skill_name"
     mkdir -p "$skill_dir"
@@ -277,7 +415,7 @@ if [ "$GLOBAL" -eq 1 ]; then
     backup_if_exists "$CODEX_RULE_FILE"
     cp "$CORE_AGENTS" "$CODEX_RULE_FILE"
 
-    for excluded in "${CODEX_EXCLUDED_SKILLS[@]}" "${MANAGED_OFFICIAL_SKILLS[@]}"; do
+    for excluded in "${CODEX_EXCLUDED_SKILLS[@]}"; do
         if [ -d "$HOME/.codex/skills/$excluded" ]; then
             rm -rf "$HOME/.codex/skills/$excluded"
             echo "    Removed incompatible skill: $excluded"
@@ -302,12 +440,15 @@ if [ "$GLOBAL" -eq 1 ]; then
     echo "  Codex CLI configured (rules + Lotus-only compatible skills)"
 
     echo "  Installing official gstack upstream..."
-    if ! LOTUS_GSTACK_PROFILE="$GSTACK_PROFILE" bash "$MANAGED_GSTACK_INSTALLER"; then
-        echo "Official gstack installation failed. Lotus rules were written, but slash skills were not fully installed." >&2
-        exit 1
+    if LOTUS_GSTACK_PROFILE="$GSTACK_PROFILE" bash "$MANAGED_GSTACK_INSTALLER"; then
+        verify_managed_gstack_install
+        OFFICIAL_GSTACK_INSTALLED=1
+        echo "  Official gstack configured for Claude/Codex"
+    else
+        echo "Official gstack installation failed. Installing bootstrap slash entries instead." >&2
+        install_gstack_bootstrap_skills
+        GSTACK_BOOTSTRAP_INSTALLED=1
     fi
-    verify_managed_gstack_install
-    echo "  Official gstack configured for Claude/Codex"
 
     echo ""
     echo -e "\033[0;32mGlobal installation completed successfully!\033[0m"
@@ -317,7 +458,12 @@ if [ "$GLOBAL" -eq 1 ]; then
     echo "  - Global rules were installed to ~/.codex/AGENTS.md and are auto-loaded in local repos."
     echo "  - --global does not create AGENTS.md inside each project folder."
     echo "  - Run ./install.sh --project nextjs|vite|html inside a project when you want local AGENTS.md and .agents/rules/ files."
-    echo "  - Official gstack is managed at ~/.gstack/repos/gstack and kept auto-updatable."
+    if [ "$OFFICIAL_GSTACK_INSTALLED" -eq 1 ]; then
+        echo "  - Official gstack is managed at ~/.gstack/repos/gstack and kept auto-updatable."
+    elif [ "$GSTACK_BOOTSTRAP_INSTALLED" -eq 1 ]; then
+        echo "  - The 11 official gstack top-level skill entries were installed as bootstrap skills."
+        echo "  - Install Git, bash, and bun, then re-run ./install.sh --global to install the full official gstack runtime."
+    fi
     echo "  - Official gstack top-level exposure profile: $GSTACK_PROFILE"
     echo "  - Hidden official gstack skills stay in ~/.gstack/repos/gstack/.agents/skills and can still be routed by AGENTS.md."
     echo "  - Slash skills live in the managed global skills folders ~/.claude/skills and ~/.codex/skills."

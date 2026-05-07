@@ -50,6 +50,31 @@ need_cmd() {
   fi
 }
 
+prepend_path_if_dir() {
+  local dir="$1"
+
+  if [ -d "$dir" ]; then
+    case ":$PATH:" in
+      *":$dir:"*) ;;
+      *) PATH="$dir:$PATH" ;;
+    esac
+  fi
+}
+
+prepend_common_tool_paths() {
+  # Codex App, Claude Code, and IDE-launched shells may not load .zprofile/.bashrc.
+  prepend_path_if_dir "$HOME/.bun/bin"
+  prepend_path_if_dir "$HOME/.local/bin"
+  prepend_path_if_dir "/opt/homebrew/bin"
+  prepend_path_if_dir "/usr/local/bin"
+  export PATH
+}
+
+prepend_common_tool_paths
+
+export GIT_TERMINAL_PROMPT=0
+export GCM_INTERACTIVE=Never
+
 need_cmd git
 need_cmd bash
 need_cmd bun
@@ -109,8 +134,118 @@ should_expose_generated_skill() {
   skill_in_list "$skill_name" "${allowed_skills[@]}"
 }
 
+run_with_timeout() {
+  local timeout_seconds="$1"
+  shift
+  local pid
+  local elapsed=0
+  local status
+
+  if command -v perl >/dev/null 2>&1; then
+    perl -MPOSIX=:sys_wait_h -e '
+      my $timeout = shift @ARGV;
+      my $pid = fork();
+      die "fork failed\n" unless defined $pid;
+
+      if ($pid == 0) {
+        setpgrp(0, 0);
+        exec @ARGV;
+        exit 127;
+      }
+
+      my $deadline = time() + $timeout;
+      while (1) {
+        my $done = waitpid($pid, WNOHANG);
+        if ($done == $pid) {
+          my $code = $? >> 8;
+          my $signal = $? & 127;
+          exit($signal ? 128 + $signal : $code);
+        }
+
+        if (time() >= $deadline) {
+          kill "TERM", -$pid;
+          sleep 1;
+          kill "KILL", -$pid;
+          waitpid($pid, 0);
+          exit 124;
+        }
+
+        sleep 1;
+      }
+    ' "$timeout_seconds" "$@"
+    return $?
+  fi
+
+  "$@" &
+  pid=$!
+
+  while kill -0 "$pid" 2>/dev/null; do
+    if [ "$elapsed" -ge "$timeout_seconds" ]; then
+      kill "$pid" 2>/dev/null || true
+      sleep 1
+      kill -9 "$pid" 2>/dev/null || true
+      wait "$pid" 2>/dev/null || true
+      return 124
+    fi
+
+    sleep 1
+    elapsed=$((elapsed + 1))
+  done
+
+  wait "$pid"
+  status=$?
+  return "$status"
+}
+
 clone_fresh() {
-  git clone --single-branch --depth 1 "$GSTACK_REPO_URL" "$GSTACK_DIR"
+  local stage_dir="${GSTACK_DIR}.lotus-stage-${TIMESTAMP}"
+  local attempt
+
+  rm -rf "$stage_dir"
+  for attempt in 1 2 3; do
+    if run_with_timeout 45 git \
+      -c http.version=HTTP/1.1 \
+      -c http.lowSpeedLimit=1000 \
+      -c http.lowSpeedTime=20 \
+      clone --single-branch --depth 1 "$GSTACK_REPO_URL" "$stage_dir"; then
+      if [ -e "$GSTACK_DIR" ]; then
+        BACKUP_DIR="${GSTACK_DIR}.lotus-bak-${TIMESTAMP}"
+        mv "$GSTACK_DIR" "$BACKUP_DIR"
+        echo "Backed up existing gstack path to: $BACKUP_DIR"
+      fi
+      mv "$stage_dir" "$GSTACK_DIR"
+      return 0
+    fi
+
+    echo "warning: gstack clone failed (attempt $attempt/3)" >&2
+    rm -rf "$stage_dir"
+    sleep $((attempt * 2))
+  done
+
+  return 1
+}
+
+fetch_origin_main() {
+  local attempt
+
+  for attempt in 1 2 3; do
+    if run_with_timeout 45 git -C "$GSTACK_DIR" \
+      -c http.version=HTTP/1.1 \
+      -c http.lowSpeedLimit=1000 \
+      -c http.lowSpeedTime=20 \
+      fetch origin main --depth 1; then
+      return 0
+    fi
+
+    echo "warning: gstack fetch failed (attempt $attempt/3)" >&2
+    sleep $((attempt * 2))
+  done
+
+  return 1
+}
+
+has_usable_gstack_checkout() {
+  [ -f "$GSTACK_DIR/setup" ] && [ -f "$GSTACK_DIR/package.json" ]
 }
 
 localized_gstack_description() {
@@ -569,24 +704,30 @@ sync_generated_host_skills() {
 if [ -d "$GSTACK_DIR/.git" ]; then
   CURRENT_REMOTE="$(git -C "$GSTACK_DIR" remote get-url origin 2>/dev/null || true)"
   if [ "$CURRENT_REMOTE" != "$GSTACK_REPO_URL" ]; then
-    BACKUP_DIR="${GSTACK_DIR}.lotus-bak-${TIMESTAMP}"
-    mv "$GSTACK_DIR" "$BACKUP_DIR"
-    echo "Backed up non-official gstack checkout to: $BACKUP_DIR"
+    echo "Existing gstack checkout does not point at the official upstream; installing a fresh official checkout."
     clone_fresh
   else
-    git -C "$GSTACK_DIR" fetch origin main --depth 1
-    git -C "$GSTACK_DIR" reset --hard FETCH_HEAD
+    if fetch_origin_main; then
+      git -C "$GSTACK_DIR" reset --hard FETCH_HEAD
+    elif has_usable_gstack_checkout; then
+      echo "warning: could not fetch latest official gstack; using existing local checkout at $GSTACK_DIR" >&2
+    else
+      echo "Official gstack fetch failed and no usable local checkout exists." >&2
+      exit 1
+    fi
   fi
 elif [ -e "$GSTACK_DIR" ]; then
-  BACKUP_DIR="${GSTACK_DIR}.lotus-bak-${TIMESTAMP}"
-  mv "$GSTACK_DIR" "$BACKUP_DIR"
-  echo "Backed up existing gstack path to: $BACKUP_DIR"
   clone_fresh
 else
   clone_fresh
 fi
 
 cd "$GSTACK_DIR"
+
+# Avoid blocking Lotus global installs on an optional Homebrew coreutils install.
+# Users can opt back in with GSTACK_SKIP_COREUTILS=0 before running the installer.
+: "${GSTACK_SKIP_COREUTILS:=1}"
+export GSTACK_SKIP_COREUTILS
 
 reset_claude_managed_gstack_checkout
 ./setup --host claude --team -q

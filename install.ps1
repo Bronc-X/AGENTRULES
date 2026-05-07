@@ -364,7 +364,8 @@ If you are running from outside the Lotus repo, use the full path to `install.ps
 function Install-GstackBootstrapSkills {
     param (
         [string]$ClaudeSkills,
-        [string]$CodexSkills
+        [string]$CodexSkills,
+        [switch]$OnlyMissing
     )
 
     $utf8NoBom = New-Object System.Text.UTF8Encoding $false
@@ -375,20 +376,26 @@ function Install-GstackBootstrapSkills {
 
         $codexTarget = Join-Path $CodexSkills $skillName
         New-Item -ItemType Directory -Path $codexTarget -Force | Out-Null
-        [System.IO.File]::WriteAllText(
-            (Join-Path $codexTarget "SKILL.md"),
-            (New-GstackBootstrapSkillContent -SkillName $skillName -DisplayName $displayName),
-            $utf8NoBom
-        )
+        $codexSkillFile = Join-Path $codexTarget "SKILL.md"
+        if (-not $OnlyMissing -or -not (Test-Path $codexSkillFile)) {
+            [System.IO.File]::WriteAllText(
+                $codexSkillFile,
+                (New-GstackBootstrapSkillContent -SkillName $skillName -DisplayName $displayName),
+                $utf8NoBom
+            )
+        }
 
         $claudeSkillName = Get-ClaudeGstackSkillName $skillName
         $claudeTarget = Join-Path $ClaudeSkills $claudeSkillName
         New-Item -ItemType Directory -Path $claudeTarget -Force | Out-Null
-        [System.IO.File]::WriteAllText(
-            (Join-Path $claudeTarget "SKILL.md"),
-            (New-GstackBootstrapSkillContent -SkillName $claudeSkillName -DisplayName $displayName),
-            $utf8NoBom
-        )
+        $claudeSkillFile = Join-Path $claudeTarget "SKILL.md"
+        if (-not $OnlyMissing -or -not (Test-Path $claudeSkillFile)) {
+            [System.IO.File]::WriteAllText(
+                $claudeSkillFile,
+                (New-GstackBootstrapSkillContent -SkillName $claudeSkillName -DisplayName $displayName),
+                $utf8NoBom
+            )
+        }
     }
 
     Write-Host "  Installed bootstrap entries for the 11 official gstack top-level skills"
@@ -423,7 +430,7 @@ if ($Global) {
     $CodexSkills = Join-Path $CodexDir "skills"
     if (-not (Test-Path $CodexSkills)) { New-Item -ItemType Directory -Path $CodexSkills -Force | Out-Null }
 
-    foreach ($excluded in ($CodexExcludedSkills + $ManagedOfficialSkills)) {
+    foreach ($excluded in $CodexExcludedSkills) {
         $excludedDir = Join-Path $CodexSkills $excluded
         if (Test-Path $excludedDir) {
             Remove-Item $excludedDir -Recurse -Force
@@ -457,6 +464,16 @@ if ($Global) {
             if ($LASTEXITCODE -ne 0) {
                 throw "Official gstack installation failed. Lotus rules were written, but slash skills were not fully installed."
             }
+
+            Assert-ManagedGstackInstall
+            $OfficialGstackInstalled = $true
+            Write-Host "  Official gstack configured for Claude/Codex"
+        }
+        catch {
+            Write-Warning $_
+            Write-Warning "Installing bootstrap entries so the default gstack slash skills remain visible."
+            Install-GstackBootstrapSkills -ClaudeSkills $ClaudeSkills -CodexSkills $CodexSkills -OnlyMissing
+            $GstackBootstrapInstalled = $true
         }
         finally {
             if ($null -ne $previousGstackProfile) {
@@ -465,10 +482,6 @@ if ($Global) {
                 Remove-Item Env:LOTUS_GSTACK_PROFILE -ErrorAction SilentlyContinue
             }
         }
-
-        Assert-ManagedGstackInstall
-        $OfficialGstackInstalled = $true
-        Write-Host "  Official gstack configured for Claude/Codex"
     }
 
     Write-Host ""
