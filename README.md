@@ -36,18 +36,23 @@ Lotus 仓库不再内置 gstack 快照。凡是 gstack 能力，官方上游 `ga
 ```text
 这是一个全新项目目录。请在本地执行以下初始化步骤：
 
-1. 将 https://github.com/Bronc-X/Lotus.git 克隆到系统临时目录。
-2. 判断当前操作系统。
-3. 在临时 Lotus 仓库中运行项目模板安装，把 nextjs 模板应用到我当前目录：
-   - Windows: install.ps1 -Project nextjs
-   - macOS/Linux: install.sh --project nextjs
-4. 为了让这台机器以后所有受托管宿主都继承 Lotus 规则，再运行全局安装：
-   - Windows: install.ps1 -Global
-   - macOS/Linux: install.sh --global
-5. 完成后删除刚才克隆的临时 Lotus 仓库。
-6. 仔细阅读当前目录中新生成的 AGENTS.md 和 .agents/rules/，确认你理解本项目的编码标准、技术栈约束和设计语言。
-7. 告诉我当前宿主是否需要完全重启或开启新会话，才能加载刚写入的全局规则和全局 skills。
-8. 最后告诉我安装是否成功；如果失败，给出失败命令、错误原文和下一步修复建议。
+1. 先记录当前项目目录的绝对路径，不要在克隆 Lotus 时丢失这个路径。
+2. 将 https://github.com/Bronc-X/Lotus.git 克隆到系统临时目录中的一个新目录。
+3. 判断当前操作系统。
+4. 在临时 Lotus 仓库中运行项目模板安装，把 nextjs 模板应用到我当前项目目录：
+   - Windows PowerShell: 使用完整路径执行 `install.ps1 -Project nextjs`
+   - macOS/Linux: 使用 `bash install.sh --project nextjs`，不要依赖 `install.sh` 是否有可执行权限
+5. 为了让这台机器以后所有受托管宿主都继承 Lotus 规则，再运行全局安装，并使用非交互确认参数避免卡住：
+   - Windows PowerShell: `install.ps1 -Global -Force`
+   - macOS/Linux: `bash install.sh --global --yes`
+6. 完成后删除刚才克隆的临时 Lotus 仓库。
+7. 仔细阅读当前项目目录中新生成的 AGENTS.md 和 .agents/rules/，确认你理解本项目的编码标准、技术栈约束和设计语言。
+8. 验证全局规则与 skills 已写入宿主目录：
+   - Codex: `~/.codex/AGENTS.md` 和 `~/.codex/skills`
+   - Claude Code: `~/.claude/CLAUDE.md` 和 `~/.claude/skills`
+9. 确认至少存在 Lotus 自带 skills（例如 `image-2`、`taste-skill`）和默认 gstack 顶层入口（例如 `gstack`、`gstack-qa` 或 Windows/网络失败时的 bootstrap 入口）。
+10. 告诉我当前宿主是否需要完全重启或开启新会话，才能加载刚写入的全局规则和全局 skills。
+11. 最后告诉我安装是否成功；如果失败，给出失败命令、错误原文、已写入了哪些 fallback/bootstrap 入口，以及下一步修复建议。
 ```
 
 如果项目不是 Next.js，把 `nextjs` 改成 `vite` 或 `html`。
