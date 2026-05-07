@@ -271,12 +271,40 @@ If you are running from outside the Lotus repo, use the full path to \`install.s
 BOOTSTRAP_EOF
 }
 
+is_gstack_bootstrap_skill_file() {
+    local skill_file="$1"
+
+    [ -f "$skill_file" ] && grep -q "Bootstrap entry for official gstack" "$skill_file"
+}
+
+write_gstack_bootstrap_skill_if_needed() {
+    local skill_file="$1"
+    local skill_name="$2"
+    local display_name="$3"
+    local only_missing="${4:-0}"
+
+    if [ -f "$skill_file" ]; then
+        if ! is_gstack_bootstrap_skill_file "$skill_file"; then
+            return 1
+        fi
+        if [ "$only_missing" -eq 1 ]; then
+            return 1
+        fi
+    fi
+
+    write_gstack_bootstrap_skill "$skill_file" "$skill_name" "$display_name"
+    return 0
+}
+
 install_gstack_bootstrap_skills() {
+    local only_missing="${1:-0}"
     local codex_skill
     local claude_skill
     local display_name
     local codex_dir
     local claude_dir
+    local written=0
+    local preserved=0
 
     mkdir -p "$HOME/.codex/skills" "$HOME/.claude/skills"
 
@@ -288,19 +316,23 @@ install_gstack_bootstrap_skills() {
 
         codex_dir="$HOME/.codex/skills/$codex_skill"
         mkdir -p "$codex_dir"
-        if [ ! -f "$codex_dir/SKILL.md" ]; then
-            write_gstack_bootstrap_skill "$codex_dir/SKILL.md" "$codex_skill" "$display_name"
+        if write_gstack_bootstrap_skill_if_needed "$codex_dir/SKILL.md" "$codex_skill" "$display_name" "$only_missing"; then
+            written=$((written + 1))
+        else
+            preserved=$((preserved + 1))
         fi
 
         claude_skill="$(claude_gstack_skill_name "$codex_skill")"
         claude_dir="$HOME/.claude/skills/$claude_skill"
         mkdir -p "$claude_dir"
-        if [ ! -f "$claude_dir/SKILL.md" ]; then
-            write_gstack_bootstrap_skill "$claude_dir/SKILL.md" "$claude_skill" "$display_name"
+        if write_gstack_bootstrap_skill_if_needed "$claude_dir/SKILL.md" "$claude_skill" "$display_name" "$only_missing"; then
+            written=$((written + 1))
+        else
+            preserved=$((preserved + 1))
         fi
     done
 
-    echo "  Installed bootstrap entries for the 11 official gstack top-level skills"
+    echo "  Installed bootstrap entries for the 11 official gstack top-level skills ($written written, $preserved preserved)"
 }
 
 # Convert a Lotus skill .md file into a Codex-compatible SKILL.md directory.
@@ -446,7 +478,7 @@ if [ "$GLOBAL" -eq 1 ]; then
         echo "  Official gstack configured for Claude/Codex"
     else
         echo "Official gstack installation failed. Installing bootstrap slash entries instead." >&2
-        install_gstack_bootstrap_skills
+        install_gstack_bootstrap_skills 1
         GSTACK_BOOTSTRAP_INSTALLED=1
     fi
 

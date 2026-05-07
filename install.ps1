@@ -361,6 +361,46 @@ If you are running from outside the Lotus repo, use the full path to `install.ps
 "@
 }
 
+function Test-IsGstackBootstrapSkillFile {
+    param ([string]$SkillFile)
+
+    if (-not (Test-Path $SkillFile)) {
+        return $false
+    }
+
+    $content = Get-Content $SkillFile -Raw -ErrorAction SilentlyContinue
+    return $content -like "*Bootstrap entry for official gstack*"
+}
+
+function Write-GstackBootstrapSkillIfNeeded {
+    param (
+        [string]$TargetDir,
+        [string]$SkillName,
+        [string]$DisplayName,
+        [System.Text.UTF8Encoding]$Encoding,
+        [switch]$OnlyMissing
+    )
+
+    $skillFile = Join-Path $TargetDir "SKILL.md"
+    if (Test-Path $skillFile) {
+        if (-not (Test-IsGstackBootstrapSkillFile -SkillFile $skillFile)) {
+            return $false
+        }
+        if ($OnlyMissing) {
+            return $false
+        }
+    }
+
+    New-Item -ItemType Directory -Path $TargetDir -Force | Out-Null
+    [System.IO.File]::WriteAllText(
+        $skillFile,
+        (New-GstackBootstrapSkillContent -SkillName $SkillName -DisplayName $DisplayName),
+        $Encoding
+    )
+
+    return $true
+}
+
 function Install-GstackBootstrapSkills {
     param (
         [string]$ClaudeSkills,
@@ -370,35 +410,29 @@ function Install-GstackBootstrapSkills {
 
     $utf8NoBom = New-Object System.Text.UTF8Encoding $false
     New-Item -ItemType Directory -Path $ClaudeSkills, $CodexSkills -Force | Out-Null
+    $written = 0
+    $preserved = 0
 
     foreach ($skillName in $CoreExposedGstackSkills) {
         $displayName = if ($skillName -eq "gstack") { "runtime" } else { ($skillName -replace '^gstack-', '') }
 
         $codexTarget = Join-Path $CodexSkills $skillName
-        New-Item -ItemType Directory -Path $codexTarget -Force | Out-Null
-        $codexSkillFile = Join-Path $codexTarget "SKILL.md"
-        if (-not $OnlyMissing -or -not (Test-Path $codexSkillFile)) {
-            [System.IO.File]::WriteAllText(
-                $codexSkillFile,
-                (New-GstackBootstrapSkillContent -SkillName $skillName -DisplayName $displayName),
-                $utf8NoBom
-            )
+        if (Write-GstackBootstrapSkillIfNeeded -TargetDir $codexTarget -SkillName $skillName -DisplayName $displayName -Encoding $utf8NoBom -OnlyMissing:$OnlyMissing) {
+            $written++
+        } else {
+            $preserved++
         }
 
         $claudeSkillName = Get-ClaudeGstackSkillName $skillName
         $claudeTarget = Join-Path $ClaudeSkills $claudeSkillName
-        New-Item -ItemType Directory -Path $claudeTarget -Force | Out-Null
-        $claudeSkillFile = Join-Path $claudeTarget "SKILL.md"
-        if (-not $OnlyMissing -or -not (Test-Path $claudeSkillFile)) {
-            [System.IO.File]::WriteAllText(
-                $claudeSkillFile,
-                (New-GstackBootstrapSkillContent -SkillName $claudeSkillName -DisplayName $displayName),
-                $utf8NoBom
-            )
+        if (Write-GstackBootstrapSkillIfNeeded -TargetDir $claudeTarget -SkillName $claudeSkillName -DisplayName $displayName -Encoding $utf8NoBom -OnlyMissing:$OnlyMissing) {
+            $written++
+        } else {
+            $preserved++
         }
     }
 
-    Write-Host "  Installed bootstrap entries for the 11 official gstack top-level skills"
+    Write-Host "  Installed bootstrap entries for the 11 official gstack top-level skills ($written written, $preserved preserved)"
 }
 
 if ($Global) {
