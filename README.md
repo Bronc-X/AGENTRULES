@@ -287,6 +287,9 @@ macOS / Linux：
 | `feynman` | 用费曼学习法解释复杂机制 |
 | `polanyi-tacit` | 分析代码背后的隐性业务和组织约束 |
 | `auto-build` | 自动执行依赖安装与构建验证 |
+| `agent-training-loop` | 机器学习式 Agent 编程循环，持续执行复现、检测、执行、检查直到收敛 |
+| `baseline-packager` | 将当前已通过行为封装为 baseline / golden master 回归保护 |
+| `conversion-copywriter` | 官网、落地页、产品页和 CTA 的高转化营销文案 |
 | `powerup` | AI 编程能力速成练习 |
 | `insights` | 使用习惯回顾与优化建议 |
 | `subagent` | 子 Agent 管理与并行任务编排 |

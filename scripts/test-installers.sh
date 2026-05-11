@@ -132,6 +132,12 @@ test_codex_conversion_with_stubbed_gstack() {
 
   assert_file_contains "$tmp/home/.codex/skills/image-2/SKILL.md" "# Image 2"
   assert_file_contains "$tmp/home/.codex/skills/taste-skill/SKILL.md" "# Taste Skill"
+  assert_file_contains "$tmp/home/.codex/skills/agent-training-loop/SKILL.md" "# Agent Training Loop"
+  assert_file_contains "$tmp/home/.codex/skills/agent-training-loop/SKILL.md" "Use only when the user explicitly invokes"
+  assert_file_contains "$tmp/home/.codex/skills/agent-training-loop/SKILL.md" "  - Bash"
+  assert_file_contains "$tmp/home/.codex/skills/baseline-packager/SKILL.md" "# Baseline Packager"
+  assert_file_contains "$tmp/home/.codex/skills/baseline-packager/SKILL.md" "Do not default to Playwright"
+  assert_file_contains "$tmp/home/.codex/skills/conversion-copywriter/SKILL.md" "# Conversion Copywriter"
   assert_file_contains "$tmp/home/.codex/skills/test-driven-development/SKILL.md" "# Test-Driven Development"
 
   [ ! -e "$tmp/home/.codex/skills/btw" ] || fail "Codex in-context skill should not be installed as slash skill: btw"

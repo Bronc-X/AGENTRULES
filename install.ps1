@@ -240,6 +240,9 @@ function Convert-ToCodexSkill {
         "insights" { "Read, Bash, Grep, Glob" }
         "image-2" { "Read, Write, Edit, Grep, Glob, Bash, AskUserQuestion" }
         "loop" { "Bash, Read, AskUserQuestion" }
+        "agent-training-loop" { "Read, Write, Edit, Grep, Glob, Bash, AskUserQuestion" }
+        "baseline-packager" { "Read, Write, Edit, Grep, Glob, Bash, AskUserQuestion" }
+        "conversion-copywriter" { "Read, AskUserQuestion" }
         "subagent" { "Bash, Read, Write, Edit, Grep, Glob, AskUserQuestion" }
         "web-to-design-md" { "Read, Write, Edit, Grep, Glob, AskUserQuestion, WebSearch" }
         "taste-skill" { "Read, Write, Edit, Grep, Glob, Bash, AskUserQuestion" }

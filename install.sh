@@ -383,6 +383,9 @@ convert_to_codex_skill() {
         insights)       allowed_tools="Read\n  - Bash\n  - Grep\n  - Glob" ;;
         image-2)        allowed_tools="Read\n  - Write\n  - Edit\n  - Grep\n  - Glob\n  - Bash\n  - AskUserQuestion" ;;
         loop)           allowed_tools="Bash\n  - Read\n  - AskUserQuestion" ;;
+        agent-training-loop) allowed_tools="Read\n  - Write\n  - Edit\n  - Grep\n  - Glob\n  - Bash\n  - AskUserQuestion" ;;
+        baseline-packager) allowed_tools="Read\n  - Write\n  - Edit\n  - Grep\n  - Glob\n  - Bash\n  - AskUserQuestion" ;;
+        conversion-copywriter) allowed_tools="Read\n  - AskUserQuestion" ;;
         subagent)       allowed_tools="Bash\n  - Read\n  - Write\n  - Edit\n  - Grep\n  - Glob\n  - AskUserQuestion" ;;
         web-to-design-md) allowed_tools="Read\n  - Write\n  - Edit\n  - Grep\n  - Glob\n  - AskUserQuestion\n  - WebSearch" ;;
         taste-skill)    allowed_tools="Read\n  - Write\n  - Edit\n  - Grep\n  - Glob\n  - Bash\n  - AskUserQuestion" ;;
