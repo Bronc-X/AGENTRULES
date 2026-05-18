@@ -239,6 +239,7 @@ function Convert-ToCodexSkill {
         "powerup" { "Read, AskUserQuestion" }
         "insights" { "Read, Bash, Grep, Glob" }
         "image-2" { "Read, Write, Edit, Grep, Glob, Bash, AskUserQuestion" }
+        "ai-progress-workspace" { "Read, Write, Edit, Grep, Glob, Bash, AskUserQuestion, WebSearch" }
         "loop" { "Bash, Read, AskUserQuestion" }
         "agent-training-loop" { "Read, Write, Edit, Grep, Glob, Bash, AskUserQuestion" }
         "baseline-packager" { "Read, Write, Edit, Grep, Glob, Bash, AskUserQuestion" }

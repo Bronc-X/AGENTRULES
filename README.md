@@ -281,6 +281,7 @@ macOS / Linux：
 | `frontend-design` | 前端审美与交互质量约束 |
 | `taste-skill` | Taste Skill 前端审美与实现质量约束，强化布局、字体、动效、间距和组件完成度，来源于 `Leonxlnx/taste-skill` |
 | `image-2` | GPT Image 2 生图与改图入口，用于图片生成、图片编辑、风格迁移、换背景、透明素材和批量视觉资产 |
+| `ai-progress-workspace` | 搭建带真实 AI 工具进度、中间生成工作区和结构化 artifact 的 Agent 产品 |
 | `web-to-design-md` | 从参考网页、品牌资料、需求文档生成结构化 `design.md` |
 | `debugging-strategies` | 系统性排错，先定位根因再修复 |
 | `security-auditor` | 安全审查，覆盖鉴权、注入、依赖风险等 |

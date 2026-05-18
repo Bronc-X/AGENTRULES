@@ -175,18 +175,19 @@ npm ls --depth=0
 3. **@frontend-design** — Vercel 级前端审美。内置 DFII，杜绝“通用 AI 缝合怪 UI”。
 4. **@taste-skill** — 前端审美与实现质量约束。强化布局、字体、动效、间距和组件完成度。
 5. **@image-2** — GPT Image 2 生图与改图入口。用于图片生成、图片编辑、风格迁移、换背景、透明素材和批量视觉资产。
-6. **@web-to-design-md** — 网页拆解 + 官网设计顾问融合技能。读取参考链接、现有 `design.md`、品牌规范、需求文档或截图，先提炼结构化设计情报，再生成 `design.md`，必要时补一个可视化 HTML 预览。适合官网、作品集、营销页在编码前先锁定方向。
-7. **@debugging-strategies** — 科学排错。不再瞎盲猜，强制走“假设->排除->提议->修复”的严谨证明链路。
-8. **@security-auditor** — OWASP 安全专员。审查鉴权、SQL注入、跨站脚本及依赖风险。
-9. **@feynman** — 费曼学习法拆解。白痴原则，【痛点源头】→【物理齿轮】→【确切变化】。
-10. **@polanyi-tacit** — 默会知识理论。挖掘防御性代码背后的组织架构妥协与边缘业务现实。
-11. **@auto-build** — 自动构建。执行 `npm install` → `npm run build`。
-12. **@agent-training-loop** — 机器学习式 Agent 编程循环。仅在显式 `/agent-training-loop` 调用时使用，持续执行复现、检测、执行、检查直到目标收敛或触发停止条件。
-13. **@baseline-packager** — Baseline 封装。仅在显式 `/baseline-packager` 调用时使用，把当前已测试通过的行为固化为 baseline / golden master 回归保护。
-14. **@conversion-copywriter** — 营销文案。仅在显式 `/conversion-copywriter` 调用时使用，为官网、落地页、产品页和 CTA 写高转化文案。
-15. **@powerup** — 能力速成闯关。10 关结构化教学，从基础到高阶，20 分钟通关。
-16. **@insights** — 习惯回顾报告。分析过去 30 天的使用模式，识别摩擦点，推荐优化措施。
-17. **@subagent** — 子 Agent 管理。创建独立上下文的子 Agent 并行处理复杂任务，隔离噪音，主线保持干净。
+6. **@ai-progress-workspace** — 真实 AI 工作进度 + 中间生成工作区架构。用于 Cursor/Codex 类 Agent 产品、结构化 artifact、工具调用日志、SSE/WebSocket 事件流、右侧进度面板、AI 画布/文档编辑器。
+7. **@web-to-design-md** — 网页拆解 + 官网设计顾问融合技能。读取参考链接、现有 `design.md`、品牌规范、需求文档或截图，先提炼结构化设计情报，再生成 `design.md`，必要时补一个可视化 HTML 预览。适合官网、作品集、营销页在编码前先锁定方向。
+8. **@debugging-strategies** — 科学排错。不再瞎盲猜，强制走“假设->排除->提议->修复”的严谨证明链路。
+9. **@security-auditor** — OWASP 安全专员。审查鉴权、SQL注入、跨站脚本及依赖风险。
+10. **@feynman** — 费曼学习法拆解。白痴原则，【痛点源头】→【物理齿轮】→【确切变化】。
+11. **@polanyi-tacit** — 默会知识理论。挖掘防御性代码背后的组织架构妥协与边缘业务现实。
+12. **@auto-build** — 自动构建。执行 `npm install` → `npm run build`。
+13. **@agent-training-loop** — 机器学习式 Agent 编程循环。仅在显式 `/agent-training-loop` 调用时使用，持续执行复现、检测、执行、检查直到目标收敛或触发停止条件。
+14. **@baseline-packager** — Baseline 封装。仅在显式 `/baseline-packager` 调用时使用，把当前已测试通过的行为固化为 baseline / golden master 回归保护。
+15. **@conversion-copywriter** — 营销文案。仅在显式 `/conversion-copywriter` 调用时使用，为官网、落地页、产品页和 CTA 写高转化文案。
+16. **@powerup** — 能力速成闯关。10 关结构化教学，从基础到高阶，20 分钟通关。
+17. **@insights** — 习惯回顾报告。分析过去 30 天的使用模式，识别摩擦点，推荐优化措施。
+18. **@subagent** — 子 Agent 管理。创建独立上下文的子 Agent 并行处理复杂任务，隔离噪音，主线保持干净。
 
 **会话内技能**（依赖"不中断当前对话"，在对话中直接输入触发词即可，不要用 `/` 命令）：
 8. **@btw** — 旁路快问。在不中断当前任务、不修改代码的前提下快速回答一个临时问题，然后无缝回到主线。

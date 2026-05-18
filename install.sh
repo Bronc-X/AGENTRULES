@@ -382,6 +382,7 @@ convert_to_codex_skill() {
         powerup)        allowed_tools="Read\n  - AskUserQuestion" ;;
         insights)       allowed_tools="Read\n  - Bash\n  - Grep\n  - Glob" ;;
         image-2)        allowed_tools="Read\n  - Write\n  - Edit\n  - Grep\n  - Glob\n  - Bash\n  - AskUserQuestion" ;;
+        ai-progress-workspace) allowed_tools="Read\n  - Write\n  - Edit\n  - Grep\n  - Glob\n  - Bash\n  - AskUserQuestion\n  - WebSearch" ;;
         loop)           allowed_tools="Bash\n  - Read\n  - AskUserQuestion" ;;
         agent-training-loop) allowed_tools="Read\n  - Write\n  - Edit\n  - Grep\n  - Glob\n  - Bash\n  - AskUserQuestion" ;;
         baseline-packager) allowed_tools="Read\n  - Write\n  - Edit\n  - Grep\n  - Glob\n  - Bash\n  - AskUserQuestion" ;;

@@ -131,6 +131,8 @@ test_codex_conversion_with_stubbed_gstack() {
   HOME="$tmp/home" bash "$tmp/lotus/install.sh" --global --yes >/dev/null
 
   assert_file_contains "$tmp/home/.codex/skills/image-2/SKILL.md" "# Image 2"
+  assert_file_contains "$tmp/home/.codex/skills/ai-progress-workspace/SKILL.md" "# AI Progress Workspace"
+  assert_file_contains "$tmp/home/.codex/skills/ai-progress-workspace/SKILL.md" "  - WebSearch"
   assert_file_contains "$tmp/home/.codex/skills/taste-skill/SKILL.md" "# Taste Skill"
   assert_file_contains "$tmp/home/.codex/skills/agent-training-loop/SKILL.md" "# Agent Training Loop"
   assert_file_contains "$tmp/home/.codex/skills/agent-training-loop/SKILL.md" "Use only when the user explicitly invokes"
