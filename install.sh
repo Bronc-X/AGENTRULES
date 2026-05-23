@@ -242,39 +242,79 @@ write_gstack_bootstrap_skill() {
     local skill_file="$1"
     local skill_name="$2"
     local display_name="$3"
+    local description
+
+    case "$skill_name" in
+        gstack)
+            description="官方 gstack 工作流总入口，用于连接上游工程、评审、调研和发布能力。"
+            ;;
+        gstack-office-hours)
+            description="用 office-hours 方式快速讨论方案、取舍和下一步工程决策。"
+            ;;
+        gstack-investigate)
+            description="系统化调研代码、日志、资料和问题线索，输出可执行结论。"
+            ;;
+        gstack-plan-eng-review)
+            description="从工程视角审查计划，提前发现实现风险、依赖和测试缺口。"
+            ;;
+        gstack-plan-ceo-review)
+            description="从产品和业务视角审查计划，确认目标、优先级和取舍是否正确。"
+            ;;
+        gstack-plan-design-review)
+            description="从设计视角审查计划，确认体验、信息架构和视觉方向是否清晰。"
+            ;;
+        gstack-design-review)
+            description="评审界面设计和交互完成度，指出视觉、布局和可用性问题。"
+            ;;
+        gstack-browse)
+            description="用浏览器检查页面、交互和视觉结果，帮助确认真实运行效果。"
+            ;;
+        gstack-qa)
+            description="执行质量检查，覆盖测试、回归、边界条件和可交付风险。"
+            ;;
+        gstack-review)
+            description="进行代码评审，重点发现 bug、回归风险、缺失测试和实现问题。"
+            ;;
+        gstack-ship)
+            description="梳理发布交付流程，检查版本、构建、验证和上线风险。"
+            ;;
+        *)
+            description="官方 gstack $display_name 工作流入口，用于调用上游维护的工程能力。"
+            ;;
+    esac
 
     cat > "$skill_file" <<BOOTSTRAP_EOF
 ---
 name: $skill_name
 description: |
-  Bootstrap entry for official gstack $display_name. Lotus installed this fallback because the full official gstack runtime was not available during global setup.
+  $description
 allowed-tools:
   - Read
   - AskUserQuestion
 ---
 
-# Official gstack bootstrap
+# 官方 gstack bootstrap
 
-This is a real top-level skill entry, installed so gstack slash commands do not disappear when the full official runtime cannot be installed.
+这是一个真实的顶层 skill 入口。Lotus 在完整官方 gstack runtime 暂时无法安装时写入它，避免 gstack slash 菜单入口消失。
 
-The full official gstack runtime is not installed yet. To enable this skill's full workflow:
+完整的官方 gstack runtime 还没有安装。要启用完整工作流：
 
-1. Install Git, bash, and bun.
-2. Open a fresh terminal.
-3. Re-run:
+1. 安装 Git、bash 和 bun。
+2. 打开新的终端。
+3. 重新运行：
 
 \`\`\`bash
 install.sh --global
 \`\`\`
 
-If you are running from outside the Lotus repo, use the full path to \`install.sh\`.
+如果你不在 Lotus 仓库目录内运行，请使用 \`install.sh\` 的完整路径。
 BOOTSTRAP_EOF
 }
 
 is_gstack_bootstrap_skill_file() {
     local skill_file="$1"
 
-    [ -f "$skill_file" ] && grep -q "Bootstrap entry for official gstack" "$skill_file"
+    [ -f "$skill_file" ] && grep -Eq "Bootstrap entry for official gstack|官方 gstack bootstrap" "$skill_file"
 }
 
 write_gstack_bootstrap_skill_if_needed() {

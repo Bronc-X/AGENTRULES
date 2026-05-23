@@ -1,4 +1,4 @@
-param (
+﻿param (
     [switch]$Global,
     [string]$Project,
     [switch]$Force,
@@ -337,31 +337,46 @@ function New-GstackBootstrapSkillContent {
         [string]$DisplayName
     )
 
+    $description = switch ($SkillName) {
+        "gstack" { "官方 gstack 工作流总入口，用于连接上游工程、评审、调研和发布能力。" }
+        "gstack-office-hours" { "用 office-hours 方式快速讨论方案、取舍和下一步工程决策。" }
+        "gstack-investigate" { "系统化调研代码、日志、资料和问题线索，输出可执行结论。" }
+        "gstack-plan-eng-review" { "从工程视角审查计划，提前发现实现风险、依赖和测试缺口。" }
+        "gstack-plan-ceo-review" { "从产品和业务视角审查计划，确认目标、优先级和取舍是否正确。" }
+        "gstack-plan-design-review" { "从设计视角审查计划，确认体验、信息架构和视觉方向是否清晰。" }
+        "gstack-design-review" { "评审界面设计和交互完成度，指出视觉、布局和可用性问题。" }
+        "gstack-browse" { "用浏览器检查页面、交互和视觉结果，帮助确认真实运行效果。" }
+        "gstack-qa" { "执行质量检查，覆盖测试、回归、边界条件和可交付风险。" }
+        "gstack-review" { "进行代码评审，重点发现 bug、回归风险、缺失测试和实现问题。" }
+        "gstack-ship" { "梳理发布交付流程，检查版本、构建、验证和上线风险。" }
+        default { "官方 gstack $DisplayName 工作流入口，用于调用上游维护的工程能力。" }
+    }
+
     return @"
 ---
 name: $SkillName
 description: |
-  Bootstrap entry for official gstack $DisplayName. Lotus installed this fallback because Git or Git Bash was not available during global setup.
+  $description
 allowed-tools:
   - Read
   - AskUserQuestion
 ---
 
-# Official gstack bootstrap
+# 官方 gstack bootstrap
 
-This is a real top-level skill entry, installed so `/gstack-*` commands do not disappear on machines without Git or Git Bash.
+这是一个真实的顶层 skill 入口。Lotus 在当前机器缺少 Git 或 Git Bash 时安装它，避免 `/gstack-*` 菜单入口消失。
 
-The full official gstack runtime is not installed yet. To enable this skill's full workflow:
+完整的官方 gstack runtime 还没有安装。要启用完整工作流：
 
-1. Install Git for Windows: https://git-scm.com/download/win
-2. Open a fresh PowerShell.
-3. Re-run:
+1. 安装 Git for Windows: https://git-scm.com/download/win
+2. 打开新的 PowerShell。
+3. 重新运行：
 
 ```powershell
 install.ps1 -Global
 ```
 
-If you are running from outside the Lotus repo, use the full path to `install.ps1`.
+如果你不在 Lotus 仓库目录内运行，请使用 `install.ps1` 的完整路径。
 "@
 }
 
@@ -373,7 +388,8 @@ function Test-IsGstackBootstrapSkillFile {
     }
 
     $content = Get-Content $SkillFile -Raw -ErrorAction SilentlyContinue
-    return $content -like "*Bootstrap entry for official gstack*"
+    return ($content -like "*Bootstrap entry for official gstack*") -or
+        ($content -like "*官方 gstack bootstrap*")
 }
 
 function Write-GstackBootstrapSkillIfNeeded {
