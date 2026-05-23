@@ -1,6 +1,6 @@
 ---
 name: agent-training-loop
-description: 仅在用户显式调用 /agent-training-loop 时使用。把 AI 编程当作机器学习式优化过程，循环执行复现、检测、执行、检查，直到目标收敛或触发停止条件。
+description: 循环执行问题复现、定位、修复和验证，直到问题修好或触发停止条件。
 risk: medium
 source: lotus
 date_added: "2026-05-11"

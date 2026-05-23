@@ -1,6 +1,6 @@
 ---
 name: baseline-packager
-description: 仅在用户显式调用 /baseline-packager 时使用。把当前已测试通过的代码和行为封装成 baseline/golden master 回归保护，防止后续修改破坏既有行为。
+description: 把当前已验证通过的行为固化为 baseline 或 golden master，防止后续改动破坏。
 risk: medium
 source: lotus
 date_added: "2026-05-11"

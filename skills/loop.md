@@ -1,6 +1,6 @@
 ---
 name: loop
-description: 会话内定时循环任务。设置一个定期自动执行的指令，用于监控、轮询或定时检查。灵感来源于 Claude Code 的 /loop 命令。
+description: 在当前会话内设置周期性任务，用于轮询状态、监控进度或定时检查。
 ---
 
 # Loop 定时循环 (@loop)

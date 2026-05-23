@@ -1,6 +1,6 @@
 ---
 name: powerup
-description: AI 编程能力速成闯关。10 关结构化教学，覆盖从基础到高阶的所有核心技巧。灵感来源于 Claude Code 的 /powerup 命令。
+description: 通过 10 关结构化练习快速掌握从基础到高阶的 AI 编程技巧。
 ---
 
 # PowerUp 能力速成 (@powerup)

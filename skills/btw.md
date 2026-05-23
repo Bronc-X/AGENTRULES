@@ -1,6 +1,6 @@
 ---
 name: btw
-description: 旁路快问模式。灵感来源于 Claude Code 的 /btw 功能——在不打断当前任务主线的前提下，快速回答一个临时问题。
+description: 在不打断当前主线任务的前提下，快速回答一个临时插入的小问题。
 ---
 
 # BTW 旁路快问模式 (@btw)

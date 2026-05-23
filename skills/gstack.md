@@ -1,6 +1,6 @@
 ---
 name: gstack
-description: Lotus 现在不再内置 gstack 快照，而是由安装器全局安装并更新官方 gstack 上游。
+description: 连接官方 gstack 工作流入口，用于调用上游维护的工程、评审、调研和发布能力。
 ---
 
 # Official gstack

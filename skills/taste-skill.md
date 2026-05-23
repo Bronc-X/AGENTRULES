@@ -1,6 +1,6 @@
 ---
 name: taste-skill
-description: Taste Skill 前端审美与实现质量约束。用于提升 AI 生成界面的布局、字体、动效、间距和组件完成度，减少模板化 AI 味。
+description: 提升 AI 生成界面的布局、字体、动效、间距和组件完成度，减少模板感。
 allowed-tools:
   - Read
   - Write

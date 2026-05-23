@@ -1,6 +1,6 @@
 ---
 name: subagent
-description: 子 Agent 管理与任务编排。创建独立的专门化 AI 子进程来并行处理复杂任务，隔离上下文噪音。灵感来源于 Claude Code 的 /agents 命令。
+description: 创建和编排独立子 Agent 并行处理复杂任务，隔离上下文噪音。
 ---
 
 # Subagent 子 Agent 管理 (@subagent)

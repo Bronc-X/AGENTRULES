@@ -1,6 +1,6 @@
 ---
 name: web-to-design-md
-description: "融合网页拆解与官网设计顾问流程。读取参考网站、现有 design.md、品牌规范、需求文档或截图，抽取结构化设计情报，生成 design.md，并在需要时产出可视化 HTML 预览。适合官网、作品集、营销页和品牌站前期方案。"
+description: 拆解参考网站、品牌资料或截图，生成结构化 design.md 和可视化设计预览。
 risk: safe
 source: community
 date_added: "2026-04-22"

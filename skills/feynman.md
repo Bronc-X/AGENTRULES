@@ -1,6 +1,6 @@
 ---
 name: feynman
-description: 运用费曼学习法进行极简、去术语化、直抵本质的机制拆解与原理讲述。
+description: 用费曼学习法把复杂概念讲成简单、去术语、直抵本质的解释。
 ---
 
 # 费曼学习法 (Feynman Technique) 专项技能

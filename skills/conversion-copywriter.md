@@ -1,6 +1,6 @@
 ---
 name: conversion-copywriter
-description: 仅在用户显式调用 /conversion-copywriter 时使用。为官网、落地页、产品页、广告和 CTA 写高转化营销文案，强调具体、可信、有销售张力且不油腻。
+description: 为官网、落地页、产品页、广告和 CTA 写具体可信、有转化力的营销文案。
 risk: low
 source: lotus
 date_added: "2026-05-11"

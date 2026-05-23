@@ -1,6 +1,6 @@
 ---
 name: test-driven-development
-description: "Use when implementing any feature or bugfix, before writing implementation code"
+description: 在实现功能或修 bug 前先写失败测试，再用红绿重构完成代码。
 risk: unknown
 source: community
 date_added: "2026-02-27"

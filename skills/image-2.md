@@ -1,6 +1,6 @@
 ---
 name: image-2
-description: GPT Image 2 生图与改图 skill。用于在 Codex 中直接生成图片、编辑图片、做风格迁移、换背景、产品图、海报、UI mockup、透明背景素材和批量视觉资产；用户输入 /image-2、image-2、生图、改图、生成图片、图片效果、gpt-image-2 时应使用。
+description: 使用 GPT Image 2 生成或编辑图片，包括海报、产品图、UI mockup 和透明素材。
 allowed-tools:
   - Read
   - Write

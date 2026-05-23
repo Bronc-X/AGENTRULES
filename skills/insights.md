@@ -1,6 +1,6 @@
 ---
 name: insights
-description: AI 编程习惯回顾与优化报告。分析过去的使用模式，识别摩擦点，推荐改进措施。灵感来源于 Claude Code 的 /insights 命令。
+description: 回顾 AI 编程使用习惯，找出摩擦点并给出更高效的工作方式建议。
 ---
 
 # Insights 习惯回顾 (@insights)

@@ -1,6 +1,6 @@
 ---
 name: ai-progress-workspace
-description: "Build agentic AI products with live generated workspaces, real tool-call progress, streaming task logs, and structured artifacts. Use when creating Cursor/Codex-like AI workers, generated canvases or document editors, right-side AI progress panels, tool/function calling flows, SSE/WebSocket event streams, or products like scriptwriting, course generation, research workspaces, design boards, slide builders, and similar AI copilots."
+description: 设计带实时工作区、工具调用进度、任务日志和结构化产物的 AI Agent 产品。
 risk: unknown
 source: community
 date_added: "2026-05-18"

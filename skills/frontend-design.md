@@ -1,6 +1,6 @@
 ---
 name: frontend-design
-description: "You are a frontend designer-engineer, not a layout generator."
+description: 用前端设计师视角提升页面布局、视觉层次、交互细节和整体完成度。
 risk: unknown
 source: community
 date_added: "2026-02-27"

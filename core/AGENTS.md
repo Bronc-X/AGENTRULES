@@ -170,28 +170,29 @@ npm ls --depth=0
 > **顶层露出 vs 后台路由**：Lotus 默认只把少数官方 gstack skill 暴露到宿主顶层菜单，供用户手动 `/` 或 `@` 选择：`gstack`、`office-hours`、`plan-ceo-review`、`plan-design-review`、`plan-eng-review`、`design-review`、`review`、`investigate`、`browse`、`qa`、`ship`。其他官方 gstack skill 仍保留在 `~/.gstack/repos/gstack/.agents/skills/` 中，不在顶层菜单显示；当任务语义明显命中时，可在后台按需读取对应 `SKILL.md` 并执行其流程。
 
 **任务级技能**（可作为独立任务执行，兼容所有平台的 `/` 命令）：
-1. **@gstack** — 官方 gstack 工作流入口。由 Lotus 全局安装并更新上游版本，相关的 `/office-hours`、`/plan-eng-review`、`/review`、`/investigate`、`/qa`、`/ship` 等能力均以上游实现为准。
-2. **@test-driven-development** — 红绿重构 TDD。强制要求：先写挂掉的测试，再写业务代码，彻底防幻觉。
-3. **@frontend-design** — Vercel 级前端审美。内置 DFII，杜绝“通用 AI 缝合怪 UI”。
-4. **@taste-skill** — 前端审美与实现质量约束。强化布局、字体、动效、间距和组件完成度。
-5. **@image-2** — GPT Image 2 生图与改图入口。用于图片生成、图片编辑、风格迁移、换背景、透明素材和批量视觉资产。
-6. **@ai-progress-workspace** — 真实 AI 工作进度 + 中间生成工作区架构。用于 Cursor/Codex 类 Agent 产品、结构化 artifact、工具调用日志、SSE/WebSocket 事件流、右侧进度面板、AI 画布/文档编辑器。
-7. **@web-to-design-md** — 网页拆解 + 官网设计顾问融合技能。读取参考链接、现有 `design.md`、品牌规范、需求文档或截图，先提炼结构化设计情报，再生成 `design.md`，必要时补一个可视化 HTML 预览。适合官网、作品集、营销页在编码前先锁定方向。
-8. **@debugging-strategies** — 科学排错。不再瞎盲猜，强制走“假设->排除->提议->修复”的严谨证明链路。
-9. **@security-auditor** — OWASP 安全专员。审查鉴权、SQL注入、跨站脚本及依赖风险。
-10. **@feynman** — 费曼学习法拆解。白痴原则，【痛点源头】→【物理齿轮】→【确切变化】。
-11. **@polanyi-tacit** — 默会知识理论。挖掘防御性代码背后的组织架构妥协与边缘业务现实。
-12. **@auto-build** — 自动构建。执行 `npm install` → `npm run build`。
-13. **@agent-training-loop** — 机器学习式 Agent 编程循环。仅在显式 `/agent-training-loop` 调用时使用，持续执行复现、检测、执行、检查直到目标收敛或触发停止条件。
-14. **@baseline-packager** — Baseline 封装。仅在显式 `/baseline-packager` 调用时使用，把当前已测试通过的行为固化为 baseline / golden master 回归保护。
-15. **@conversion-copywriter** — 营销文案。仅在显式 `/conversion-copywriter` 调用时使用，为官网、落地页、产品页和 CTA 写高转化文案。
-16. **@powerup** — 能力速成闯关。10 关结构化教学，从基础到高阶，20 分钟通关。
-17. **@insights** — 习惯回顾报告。分析过去 30 天的使用模式，识别摩擦点，推荐优化措施。
-18. **@subagent** — 子 Agent 管理。创建独立上下文的子 Agent 并行处理复杂任务，隔离噪音，主线保持干净。
+1. **@gstack** — 连接官方 gstack 工作流入口，用于调用上游维护的工程、评审、调研和发布能力。
+2. **@test-driven-development** — 在实现功能或修 bug 前先写失败测试，再用红绿重构完成代码。
+3. **@frontend-design** — 用前端设计师视角提升页面布局、视觉层次、交互细节和整体完成度。
+4. **@taste-skill** — 提升 AI 生成界面的布局、字体、动效、间距和组件完成度，减少模板感。
+5. **@image-2** — 使用 GPT Image 2 生成或编辑图片，包括海报、产品图、UI mockup 和透明素材。
+6. **@ai-progress-workspace** — 设计带实时工作区、工具调用进度、任务日志和结构化产物的 AI Agent 产品。
+7. **@web-to-design-md** — 拆解参考网站、品牌资料或截图，生成结构化 design.md 和可视化设计预览。
+8. **@debugging-strategies** — 用系统化假设、排查和验证方法定位 bug，避免靠猜测修问题。
+9. **@security-auditor** — 从 DevSecOps、应用安全、依赖、权限和合规角度审计项目安全风险。
+10. **@feynman** — 用费曼学习法把复杂概念讲成简单、去术语、直抵本质的解释。
+11. **@polanyi-tacit** — 用波兰尼默会知识视角分析代码和架构背后的隐性约束与真实动机。
+12. **@auto-build** — 自动安装项目依赖并运行构建命令，快速确认项目能否成功打包。
+13. **@agent-training-loop** — 循环执行问题复现、定位、修复和验证，直到问题修好或触发停止条件。
+14. **@baseline-packager** — 把当前已验证通过的行为固化为 baseline 或 golden master，防止后续改动破坏。
+15. **@conversion-copywriter** — 为官网、落地页、产品页、广告和 CTA 写具体可信、有转化力的营销文案。
+16. **@powerup** — 通过 10 关结构化练习快速掌握从基础到高阶的 AI 编程技巧。
+17. **@insights** — 回顾 AI 编程使用习惯，找出摩擦点并给出更高效的工作方式建议。
+18. **@subagent** — 创建和编排独立子 Agent 并行处理复杂任务，隔离上下文噪音。
+19. **@goal** — 封装 Codex 原生 Goal mode，用来设置、查看、暂停、恢复或清除长期编程目标。
 
 **会话内技能**（依赖"不中断当前对话"，在对话中直接输入触发词即可，不要用 `/` 命令）：
-8. **@btw** — 旁路快问。在不中断当前任务、不修改代码的前提下快速回答一个临时问题，然后无缝回到主线。
-9. **@loop** — 会话内定时循环。设置周期性自动任务（如轮询部署状态），关闭会话即停止。
+8. **@btw** — 在不打断当前主线任务的前提下，快速回答一个临时插入的小问题。
+9. **@loop** — 在当前会话内设置周期性任务，用于轮询状态、监控进度或定时检查。
 
 > **平台差异说明**：Codex App 中每个 `/` 命令会创建独立任务，因此"会话内技能"不注册为 `/` 命令。在 Codex 中使用这些技能时，直接在对话中输入 `btw，你的问题` 即可，AI 会根据本规则识别并响应。
 
