@@ -1,6 +1,6 @@
 ---
 name: image-2
-description: 使用 GPT Image 2 生成或编辑图片，包括海报、产品图、UI mockup 和透明素材。
+description: 生图改图时生成视觉素材
 allowed-tools:
   - Read
   - Write

@@ -1,6 +1,6 @@
 ---
 name: insights
-description: 回顾 AI 编程使用习惯，找出摩擦点并给出更高效的工作方式建议。
+description: 复盘习惯时分析摩擦给建议
 ---
 
 # Insights 习惯回顾 (@insights)

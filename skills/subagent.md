@@ -1,6 +1,6 @@
 ---
 name: subagent
-description: 创建和编排独立子 Agent 并行处理复杂任务，隔离上下文噪音。
+description: 任务可并行时编排子Agent
 ---
 
 # Subagent 子 Agent 管理 (@subagent)

@@ -1,6 +1,6 @@
 ---
 name: polanyi-tacit
-description: 用波兰尼默会知识视角分析代码和架构背后的隐性约束与真实动机。
+description: 读复杂代码时分析隐性约束
 ---
 
 # 迈克尔·波兰尼默会机制 (Polanyi's Tacit Knowledge) 专项技能

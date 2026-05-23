@@ -1,6 +1,6 @@
 ---
 name: ai-progress-workspace
-description: 设计带实时工作区、工具调用进度、任务日志和结构化产物的 AI Agent 产品。
+description: 做AI产品时设计进度工作区
 risk: unknown
 source: community
 date_added: "2026-05-18"

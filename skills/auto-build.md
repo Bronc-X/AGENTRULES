@@ -1,6 +1,6 @@
 ---
 name: auto-build
-description: 自动安装项目依赖并运行构建命令，快速确认项目能否成功打包。
+description: 验构建时自动装依赖并打包
 ---
 // turbo-all
 

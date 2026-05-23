@@ -1,6 +1,6 @@
 ---
 name: loop
-description: 在当前会话内设置周期性任务，用于轮询状态、监控进度或定时检查。
+description: 需轮询时会话内定时执行
 ---
 
 # Loop 定时循环 (@loop)

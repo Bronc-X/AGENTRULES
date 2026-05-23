@@ -1,6 +1,6 @@
 ---
 name: test-driven-development
-description: 在实现功能或修 bug 前先写失败测试，再用红绿重构完成代码。
+description: 写功能修Bug前先写失败测试
 risk: unknown
 source: community
 date_added: "2026-02-27"

@@ -1,6 +1,6 @@
 ---
 name: taste-skill
-description: 提升 AI 生成界面的布局、字体、动效、间距和组件完成度，减少模板感。
+description: 界面显模板时提升审美质感
 allowed-tools:
   - Read
   - Write

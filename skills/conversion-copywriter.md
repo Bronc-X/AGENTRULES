@@ -1,6 +1,6 @@
 ---
 name: conversion-copywriter
-description: 为官网、落地页、产品页、广告和 CTA 写具体可信、有转化力的营销文案。
+description: 写营销页时生成转化文案
 risk: low
 source: lotus
 date_added: "2026-05-11"

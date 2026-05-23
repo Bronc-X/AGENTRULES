@@ -1,6 +1,6 @@
 ---
 name: goal
-description: 封装 Codex 原生 Goal mode，用来设置、查看、暂停、恢复或清除长期编程目标。
+description: 长期任务时管理Codex目标
 risk: medium
 source: lotus
 date_added: "2026-05-23"

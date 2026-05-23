@@ -1,6 +1,6 @@
 ---
 name: feynman
-description: 用费曼学习法把复杂概念讲成简单、去术语、直抵本质的解释。
+description: 讲概念时用白话解释本质
 ---
 
 # 费曼学习法 (Feynman Technique) 专项技能

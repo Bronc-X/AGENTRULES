@@ -1,6 +1,6 @@
 ---
 name: security-auditor
-description: 从 DevSecOps、应用安全、依赖、权限和合规角度审计项目安全风险。
+description: 审安全时查权限依赖合规风险
 risk: unknown
 source: community
 date_added: '2026-02-27'

@@ -246,40 +246,40 @@ write_gstack_bootstrap_skill() {
 
     case "$skill_name" in
         gstack)
-            description="官方 gstack 工作流总入口，用于连接上游工程、评审、调研和发布能力。"
+            description="需 gstack 流程时打开总入口"
             ;;
         gstack-office-hours)
-            description="用 office-hours 方式快速讨论方案、取舍和下一步工程决策。"
+            description="讨论方案时快速找取舍"
             ;;
         gstack-investigate)
-            description="系统化调研代码、日志、资料和问题线索，输出可执行结论。"
+            description="需调研时收集线索给结论"
             ;;
         gstack-plan-eng-review)
-            description="从工程视角审查计划，提前发现实现风险、依赖和测试缺口。"
+            description="审工程计划时查实现风险"
             ;;
         gstack-plan-ceo-review)
-            description="从产品和业务视角审查计划，确认目标、优先级和取舍是否正确。"
+            description="审产品计划时查目标取舍"
             ;;
         gstack-plan-design-review)
-            description="从设计视角审查计划，确认体验、信息架构和视觉方向是否清晰。"
+            description="审设计计划时查体验方向"
             ;;
         gstack-design-review)
-            description="评审界面设计和交互完成度，指出视觉、布局和可用性问题。"
+            description="审界面时查视觉交互问题"
             ;;
         gstack-browse)
-            description="用浏览器检查页面、交互和视觉结果，帮助确认真实运行效果。"
+            description="验页面时浏览器检查效果"
             ;;
         gstack-qa)
-            description="执行质量检查，覆盖测试、回归、边界条件和可交付风险。"
+            description="验质量时查测试回归风险"
             ;;
         gstack-review)
-            description="进行代码评审，重点发现 bug、回归风险、缺失测试和实现问题。"
+            description="审代码时查Bug和测试缺口"
             ;;
         gstack-ship)
-            description="梳理发布交付流程，检查版本、构建、验证和上线风险。"
+            description="发布前检查构建验证风险"
             ;;
         *)
-            description="官方 gstack $display_name 工作流入口，用于调用上游维护的工程能力。"
+            description="需 gstack $display_name 时打开入口"
             ;;
     esac
 

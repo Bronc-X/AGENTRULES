@@ -338,18 +338,18 @@ function New-GstackBootstrapSkillContent {
     )
 
     $description = switch ($SkillName) {
-        "gstack" { "官方 gstack 工作流总入口，用于连接上游工程、评审、调研和发布能力。" }
-        "gstack-office-hours" { "用 office-hours 方式快速讨论方案、取舍和下一步工程决策。" }
-        "gstack-investigate" { "系统化调研代码、日志、资料和问题线索，输出可执行结论。" }
-        "gstack-plan-eng-review" { "从工程视角审查计划，提前发现实现风险、依赖和测试缺口。" }
-        "gstack-plan-ceo-review" { "从产品和业务视角审查计划，确认目标、优先级和取舍是否正确。" }
-        "gstack-plan-design-review" { "从设计视角审查计划，确认体验、信息架构和视觉方向是否清晰。" }
-        "gstack-design-review" { "评审界面设计和交互完成度，指出视觉、布局和可用性问题。" }
-        "gstack-browse" { "用浏览器检查页面、交互和视觉结果，帮助确认真实运行效果。" }
-        "gstack-qa" { "执行质量检查，覆盖测试、回归、边界条件和可交付风险。" }
-        "gstack-review" { "进行代码评审，重点发现 bug、回归风险、缺失测试和实现问题。" }
-        "gstack-ship" { "梳理发布交付流程，检查版本、构建、验证和上线风险。" }
-        default { "官方 gstack $DisplayName 工作流入口，用于调用上游维护的工程能力。" }
+        "gstack" { "需 gstack 流程时打开总入口" }
+        "gstack-office-hours" { "讨论方案时快速找取舍" }
+        "gstack-investigate" { "需调研时收集线索给结论" }
+        "gstack-plan-eng-review" { "审工程计划时查实现风险" }
+        "gstack-plan-ceo-review" { "审产品计划时查目标取舍" }
+        "gstack-plan-design-review" { "审设计计划时查体验方向" }
+        "gstack-design-review" { "审界面时查视觉交互问题" }
+        "gstack-browse" { "验页面时浏览器检查效果" }
+        "gstack-qa" { "验质量时查测试回归风险" }
+        "gstack-review" { "审代码时查Bug和测试缺口" }
+        "gstack-ship" { "发布前检查构建验证风险" }
+        default { "需 gstack $DisplayName 时打开入口" }
     }
 
     return @"
@@ -387,7 +387,7 @@ function Test-IsGstackBootstrapSkillFile {
         return $false
     }
 
-    $content = Get-Content $SkillFile -Raw -ErrorAction SilentlyContinue
+    $content = Get-Content $SkillFile -Raw -Encoding UTF8 -ErrorAction SilentlyContinue
     return ($content -like "*Bootstrap entry for official gstack*") -or
         ($content -like "*官方 gstack bootstrap*")
 }

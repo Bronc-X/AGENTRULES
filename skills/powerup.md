@@ -1,6 +1,6 @@
 ---
 name: powerup
-description: 通过 10 关结构化练习快速掌握从基础到高阶的 AI 编程技巧。
+description: 练AI编程时走10关训练
 ---
 
 # PowerUp 能力速成 (@powerup)

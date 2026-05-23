@@ -1,6 +1,6 @@
 ---
 name: web-to-design-md
-description: 拆解参考网站、品牌资料或截图，生成结构化 design.md 和可视化设计预览。
+description: 做官网前拆参考生成design.md
 risk: safe
 source: community
 date_added: "2026-04-22"

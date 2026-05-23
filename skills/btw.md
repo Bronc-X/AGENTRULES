@@ -1,6 +1,6 @@
 ---
 name: btw
-description: 在不打断当前主线任务的前提下，快速回答一个临时插入的小问题。
+description: 临时插问时不中断主线回答
 ---
 
 # BTW 旁路快问模式 (@btw)

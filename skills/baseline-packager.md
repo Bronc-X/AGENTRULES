@@ -1,6 +1,6 @@
 ---
 name: baseline-packager
-description: 把当前已验证通过的行为固化为 baseline 或 golden master，防止后续改动破坏。
+description: 防回归时固化已验证行为
 risk: medium
 source: lotus
 date_added: "2026-05-11"
