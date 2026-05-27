@@ -175,7 +175,7 @@ npm ls --depth=0
 3. **@frontend-design** — 做前端页时提升布局视觉交互。
 4. **@taste-skill** — 界面显模板时提升审美质感。
 5. **@image-2** — 生图改图时生成视觉素材。
-6. **@ai-progress-workspace** — 做 AI 产品时设计进度工作区。
+6. **@ai-progress-workspace** — 用事件流展示 AI 真实进度。
 7. **@web-to-design-md** — 做官网前拆参考生成 design.md。
 8. **@debugging-strategies** — 排 Bug 时用假设验证定位问题。
 9. **@security-auditor** — 审安全时查权限依赖合规风险。
