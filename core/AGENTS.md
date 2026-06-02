@@ -163,32 +163,33 @@ npm ls --depth=0
 
 ## 技能库 (Skills)
 
-以下技能可通过 `@` 或 `/` 触发（需安装到对应平台的 skills 目录）：
+以下顶层技能通过 `/skill-name` 触发（需安装到对应平台的 skills 目录）：
 
 > **官方源说明**：从现在开始，`gstack` 不再以 Lotus 仓库里的快照为准。Lotus 的全局安装脚本会把 **官方 [garrytan/gstack](https://github.com/garrytan/gstack)** 安装到 `~/.gstack/repos/gstack` 并为支持的平台生成技能。凡是 `gstack` 相关能力，以上游仓库为唯一真源。
 
-> **顶层露出 vs 后台路由**：Lotus 默认只把少数官方 gstack skill 暴露到宿主顶层菜单，供用户手动 `/` 或 `@` 选择：`gstack`、`office-hours`、`plan-ceo-review`、`plan-design-review`、`plan-eng-review`、`design-review`、`review`、`investigate`、`browse`、`qa`、`ship`。其他官方 gstack skill 仍保留在 `~/.gstack/repos/gstack/.agents/skills/` 中，不在顶层菜单显示；当任务语义明显命中时，可在后台按需读取对应 `SKILL.md` 并执行其流程。
+> **顶层露出 vs 后台路由**：Lotus 默认只把少数官方 gstack skill 暴露到宿主顶层菜单，供用户手动 `/` 选择：`gstack`、`office-hours`、`plan-ceo-review`、`plan-design-review`、`plan-eng-review`、`design-review`、`review`、`investigate`、`browse`、`qa`、`ship`。其他官方 gstack skill 仍保留在 `~/.gstack/repos/gstack/.agents/skills/` 中，不在顶层菜单显示；当任务语义明显命中时，可在后台按需读取对应 `SKILL.md` 并执行其流程。
 
 **任务级技能**（可作为独立任务执行，兼容所有平台的 `/` 命令）：
-1. **@gstack** — 需 gstack 流程时打开总入口。
-2. **@test-driven-development** — 写功能修 Bug 前先写失败测试。
-3. **@frontend-design** — 做前端页时提升布局视觉交互。
-4. **@taste-skill** — 界面显模板时提升审美质感。
-5. **@image-2** — 生图改图时生成视觉素材。
-6. **@ai-progress-workspace** — 用事件流展示 AI 真实进度。
-7. **@web-to-design-md** — 做官网前拆参考生成 design.md。
-8. **@debugging-strategies** — 排 Bug 时用假设验证定位问题。
-9. **@security-auditor** — 审安全时查权限依赖合规风险。
-10. **@feynman** — 讲概念时用白话解释本质。
-11. **@polanyi-tacit** — 读复杂代码时分析隐性约束。
-12. **@auto-build** — 验构建时自动装依赖并打包。
-13. **@agent-training-loop** — 修 Bug 时循环复现定位修复验证。
-14. **@baseline-packager** — 防回归时固化已验证行为。
-15. **@conversion-copywriter** — 写营销页时生成转化文案。
-16. **@powerup** — 练 AI 编程时走 10 关训练。
-17. **@insights** — 复盘习惯时分析摩擦给建议。
-18. **@subagent** — 任务可并行时编排子 Agent。
-19. **@goal** — 长期任务时管理 Codex 目标。
+1. **/gstack** — 需 gstack 流程时打开总入口。
+2. **/test-driven-development** — 写功能修 Bug 前先写失败测试。
+3. **/frontend-design** — 做前端页时提升布局视觉交互。
+4. **/taste-skill** — 界面显模板时提升审美质感。
+5. **/image-2** — 生图改图时生成视觉素材。
+6. **/ai-progress-workspace** — 用事件流展示 AI 真实进度。
+7. **/web-to-design-md** — 做官网前拆参考生成 design.md。
+8. **/debugging-strategies** — 排 Bug 时用假设验证定位问题。
+9. **/mini-investigate** — 查小 Bug 时做最小修复。
+10. **/security-auditor** — 审安全时查权限依赖合规风险。
+11. **/feynman** — 讲概念时用白话解释本质。
+12. **/polanyi-tacit** — 读复杂代码时分析隐性约束。
+13. **/auto-build** — 验构建时自动装依赖并打包。
+14. **/agent-training-loop** — 修 Bug 时循环复现定位修复验证。
+15. **/baseline-packager** — 防回归时固化已验证行为。
+16. **/conversion-copywriter** — 写营销页时生成转化文案。
+17. **/powerup** — 练 AI 编程时走 10 关训练。
+18. **/insights** — 复盘习惯时分析摩擦给建议。
+19. **/subagent** — 任务可并行时编排子 Agent。
+20. **/goal** — 长期任务时管理 Codex 目标。
 
 **会话内技能**（依赖"不中断当前对话"，在对话中直接输入触发词即可，不要用 `/` 命令）：
 8. **@btw** — 临时插问时不中断主线回答。

@@ -243,6 +243,7 @@ function Convert-ToCodexSkill {
         "loop" { "Bash, Read, AskUserQuestion" }
         "agent-training-loop" { "Read, Write, Edit, Grep, Glob, Bash, AskUserQuestion" }
         "baseline-packager" { "Read, Write, Edit, Grep, Glob, Bash, AskUserQuestion" }
+        "mini-investigate" { "Read, Write, Edit, Grep, Glob, Bash, AskUserQuestion" }
         "conversion-copywriter" { "Read, AskUserQuestion" }
         "subagent" { "Bash, Read, Write, Edit, Grep, Glob, AskUserQuestion" }
         "web-to-design-md" { "Read, Write, Edit, Grep, Glob, AskUserQuestion, WebSearch" }
