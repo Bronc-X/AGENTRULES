@@ -271,9 +271,9 @@ macOS / Linux：
 
 如果 Windows 没有 Git Bash，安装器会写入 bootstrap skills。bootstrap skills 是真实菜单入口，但只负责提示如何补齐完整官方 gstack runtime。
 
-## 常用 Lotus 自带 skills
+## Lotus 自带顶层 skills
 
-这些是 Lotus 仓库自身提供的跨平台 skills。官方 gstack skills 由 `garrytan/gstack` 提供。全局安装或更新 Lotus 后，下面这些 skill 会写入受托管宿主的全局 skills 目录；重启宿主后即可用 `/skill-name` 调用，例如 `/taste-skill`、`/image-2`。
+这些是 Lotus 仓库自身提供的跨平台顶层 skills，不含 `@btw`、`@loop` 这类会话内技能。官方 gstack skills 由 `garrytan/gstack` 提供。全局安装或更新 Lotus 后，下面这些 skill 会写入受托管宿主的全局 skills 目录；重启宿主后即可用 `/skill-name` 调用，例如 `/taste-skill`、`/image-2`。
 
 | Skill | 用途 |
 |---|---|
@@ -284,6 +284,7 @@ macOS / Linux：
 | `ai-progress-workspace` | 搭建带真实 AI 工具进度、中间生成工作区和结构化 artifact 的 Agent 产品 |
 | `web-to-design-md` | 从参考网页、品牌资料、需求文档生成结构化 `design.md` |
 | `debugging-strategies` | 系统性排错，先定位根因再修复 |
+| `mini-investigate` | 小型 Bug 的最小根因定位、修复与验证 |
 | `security-auditor` | 安全审查，覆盖鉴权、注入、依赖风险等 |
 | `feynman` | 用费曼学习法解释复杂机制 |
 | `polanyi-tacit` | 分析代码背后的隐性业务和组织约束 |
@@ -294,6 +295,7 @@ macOS / Linux：
 | `powerup` | AI 编程能力速成练习 |
 | `insights` | 使用习惯回顾与优化建议 |
 | `subagent` | 子 Agent 管理与并行任务编排 |
+| `goal` | 长期任务目标管理，优先路由到宿主原生 Goal 能力 |
 
 ## 仓库结构
 
