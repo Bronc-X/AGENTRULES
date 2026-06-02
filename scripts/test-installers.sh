@@ -142,6 +142,14 @@ test_codex_conversion_with_stubbed_gstack() {
   assert_file_contains "$tmp/home/.codex/skills/conversion-copywriter/SKILL.md" "# Conversion Copywriter"
   assert_file_contains "$tmp/home/.codex/skills/mini-investigate/SKILL.md" "# Minimal Bug Fix"
   assert_file_contains "$tmp/home/.codex/skills/test-driven-development/SKILL.md" "# Test-Driven Development"
+  assert_file_contains "$tmp/home/.codex/skills/anysearch/SKILL.md" "## Overview"
+  assert_file_contains "$tmp/home/.codex/skills/anysearch/runtime.conf" "scripts/anysearch_cli"
+  [ -f "$tmp/home/.codex/skills/anysearch/scripts/anysearch_cli.py" ] || fail "missing Codex anysearch CLI"
+  [ ! -e "$tmp/home/.codex/skills/anysearch/.env" ] || fail "Codex anysearch .env should not be installed"
+  assert_file_contains "$tmp/home/.claude/skills/anysearch/SKILL.md" "## Overview"
+  assert_file_contains "$tmp/home/.claude/skills/anysearch/runtime.conf" "scripts/anysearch_cli"
+  [ -f "$tmp/home/.claude/skills/anysearch/scripts/anysearch_cli.py" ] || fail "missing Claude anysearch CLI"
+  [ ! -e "$tmp/home/.claude/skills/anysearch/.env" ] || fail "Claude anysearch .env should not be installed"
 
   [ ! -e "$tmp/home/.codex/skills/btw" ] || fail "Codex in-context skill should not be installed as slash skill: btw"
   [ ! -e "$tmp/home/.codex/skills/loop" ] || fail "Codex in-context skill should not be installed as slash skill: loop"
@@ -169,8 +177,8 @@ test_failed_gstack_install_preserves_existing_codex_runtime_and_succeeds() {
   HOME="$tmp/home" bash "$tmp/lotus/install.sh" --global --yes >/dev/null 2>"$tmp/stderr"
 
   assert_file_contains "$tmp/home/.codex/skills/gstack/SKILL.md" "sentinel"
-  assert_file_contains "$tmp/home/.codex/skills/gstack-qa/SKILL.md" "Official gstack bootstrap"
-  assert_file_contains "$tmp/home/.claude/skills/qa/SKILL.md" "Official gstack bootstrap"
+  assert_file_contains "$tmp/home/.codex/skills/gstack-qa/SKILL.md" "gstack bootstrap"
+  assert_file_contains "$tmp/home/.claude/skills/qa/SKILL.md" "gstack bootstrap"
 }
 
 test_shell_syntax

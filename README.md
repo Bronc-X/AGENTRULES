@@ -273,10 +273,11 @@ macOS / Linux：
 
 ## Lotus 自带顶层 skills
 
-这些是 Lotus 仓库自身提供的跨平台顶层 skills，不含 `@btw`、`@loop` 这类会话内技能。官方 gstack skills 由 `garrytan/gstack` 提供。全局安装或更新 Lotus 后，下面这些 skill 会写入受托管宿主的全局 skills 目录；重启宿主后即可用 `/skill-name` 调用，例如 `/taste-skill`、`/image-2`。
+这些是 Lotus 仓库托管和打包的跨平台顶层 skills，不含 `@btw`、`@loop` 这类会话内技能。官方 gstack skills 由 `garrytan/gstack` 提供。全局安装或更新 Lotus 后，下面这些 skill 会写入受托管宿主的全局 skills 目录；重启宿主后即可用 `/skill-name` 调用，例如 `/taste-skill`、`/image-2`。
 
 | Skill | 用途 |
 |---|---|
+| `anysearch` | 实时搜索、垂直领域检索、批量搜索和 URL 内容提取 |
 | `test-driven-development` | 严格红绿重构，先写失败测试再写实现 |
 | `frontend-design` | 前端审美与交互质量约束 |
 | `taste-skill` | Taste Skill 前端审美与实现质量约束，强化布局、字体、动效、间距和组件完成度，来源于 `Leonxlnx/taste-skill` |

@@ -208,24 +208,90 @@ confirm_global_rule_overwrite() {
     esac
 }
 
+is_skill_excluded() {
+    local skill_name="$1"
+    shift
+
+    for excluded in "$@"; do
+        if [ "$skill_name" = "$excluded" ]; then
+            return 0
+        fi
+    done
+    return 1
+}
+
+write_anysearch_runtime_conf() {
+    local skill_dir="$1"
+
+    if [ "$(basename "$skill_dir")" != "anysearch" ]; then
+        return 0
+    fi
+
+    local runtime
+    local command
+    if command -v python3 >/dev/null 2>&1; then
+        runtime="Python"
+        command="python3 \"$skill_dir/scripts/anysearch_cli.py\""
+    elif command -v python >/dev/null 2>&1; then
+        runtime="Python"
+        command="python \"$skill_dir/scripts/anysearch_cli.py\""
+    elif command -v node >/dev/null 2>&1; then
+        runtime="Node.js"
+        command="node \"$skill_dir/scripts/anysearch_cli.js\""
+    else
+        runtime="Shell"
+        command="bash \"$skill_dir/scripts/anysearch_cli.sh\""
+    fi
+
+    cat > "$skill_dir/runtime.conf" <<RUNTIME_EOF
+Runtime: $runtime
+Command: $command
+RUNTIME_EOF
+}
+
+copy_lotus_skill_packages() {
+    local target_dir="$1"
+    shift
+
+    for skill_dir in "$SKILLS_DIR"/*; do
+        [ -d "$skill_dir" ] || continue
+        [ -f "$skill_dir/SKILL.md" ] || continue
+
+        local skill_name
+        skill_name="$(basename "$skill_dir")"
+        if is_skill_excluded "$skill_name" "$@"; then
+            continue
+        fi
+
+        local target_skill_dir="$target_dir/$skill_name"
+        rm -rf "$target_skill_dir"
+        mkdir -p "$target_skill_dir"
+        (
+            cd "$skill_dir"
+            tar --exclude=".env" --exclude="runtime.conf" -cf - .
+        ) | (
+            cd "$target_skill_dir"
+            tar -xf -
+        )
+        write_anysearch_runtime_conf "$target_skill_dir"
+        echo "    Copied skill package: $skill_name"
+    done
+}
+
 copy_lotus_skills() {
     local target_dir="$1"
     shift
     mkdir -p "$target_dir"
+
     for skill_file in "$SKILLS_DIR"/*.md; do
         local skill_name
         skill_name="$(basename "$skill_file" .md)"
-        local should_skip=false
-        for excluded in "$@"; do
-            if [ "$skill_name" = "$excluded" ]; then
-                should_skip=true
-                break
-            fi
-        done
-        if [ "$should_skip" = false ]; then
+        if ! is_skill_excluded "$skill_name" "$@"; then
             cp "$skill_file" "$target_dir/"
         fi
     done
+
+    copy_lotus_skill_packages "$target_dir" "$@"
 }
 
 claude_gstack_skill_name() {
@@ -514,6 +580,7 @@ if [ "$GLOBAL" -eq 1 ]; then
             convert_to_codex_skill "$skill_file" ~/.codex/skills
         fi
     done
+    copy_lotus_skill_packages ~/.codex/skills "${CODEX_EXCLUDED_SKILLS[@]}" "${MANAGED_OFFICIAL_SKILLS[@]}"
     echo "  Codex CLI configured (rules + Lotus-only compatible skills)"
 
     echo "  Installing official gstack upstream..."

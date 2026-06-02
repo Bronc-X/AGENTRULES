@@ -186,6 +186,67 @@ function Confirm-GlobalRuleOverwrite {
     }
 }
 
+function Test-SkillExcluded {
+    param (
+        [string]$SkillName,
+        [string[]]$ExcludedSkills = @()
+    )
+
+    return ($ExcludedSkills -contains $SkillName)
+}
+
+function Write-AnySearchRuntimeConf {
+    param ([string]$SkillDir)
+
+    if ([System.IO.Path]::GetFileName($SkillDir) -ne "anysearch") {
+        return
+    }
+
+    if (Get-Command python -ErrorAction SilentlyContinue) {
+        $runtime = "Python"
+        $command = "python `"$SkillDir\scripts\anysearch_cli.py`""
+    } elseif (Get-Command python3 -ErrorAction SilentlyContinue) {
+        $runtime = "Python"
+        $command = "python3 `"$SkillDir\scripts\anysearch_cli.py`""
+    } elseif (Get-Command node -ErrorAction SilentlyContinue) {
+        $runtime = "Node.js"
+        $command = "node `"$SkillDir\scripts\anysearch_cli.js`""
+    } else {
+        $runtime = "PowerShell"
+        $command = "powershell -ExecutionPolicy Bypass -File `"$SkillDir\scripts\anysearch_cli.ps1`""
+    }
+
+    $content = "Runtime: $runtime`nCommand: $command`n"
+    $utf8NoBom = New-Object System.Text.UTF8Encoding $false
+    [System.IO.File]::WriteAllText((Join-Path $SkillDir "runtime.conf"), $content, $utf8NoBom)
+}
+
+function Copy-LotusSkillPackages {
+    param (
+        [string]$TargetDir,
+        [string[]]$ExcludedSkills = @()
+    )
+
+    Get-ChildItem $SkillsDir -Directory | ForEach-Object {
+        $skillName = $_.Name
+        if ((Test-SkillExcluded -SkillName $skillName -ExcludedSkills $ExcludedSkills) -or
+            -not (Test-Path (Join-Path $_.FullName "SKILL.md"))) {
+            return
+        }
+
+        $destination = Join-Path $TargetDir $skillName
+        if (Test-Path $destination) {
+            Remove-Item $destination -Recurse -Force
+        }
+
+        Copy-Item $_.FullName $destination -Recurse -Force
+        Remove-Item (Join-Path $destination ".env") -Force -ErrorAction SilentlyContinue
+        Remove-Item (Join-Path $destination "runtime.conf") -Force -ErrorAction SilentlyContinue
+        Write-AnySearchRuntimeConf -SkillDir $destination
+        Write-Host "    Copied skill package: $skillName"
+    }
+}
+
 function Copy-LotusSkills {
     param (
         [string]$TargetDir,
@@ -198,10 +259,12 @@ function Copy-LotusSkills {
 
     Get-ChildItem (Join-Path $SkillsDir "*.md") | ForEach-Object {
         $baseName = [System.IO.Path]::GetFileNameWithoutExtension($_.Name)
-        if ($ExcludedSkills -notcontains $baseName) {
+        if (-not (Test-SkillExcluded -SkillName $baseName -ExcludedSkills $ExcludedSkills)) {
             Copy-Item $_.FullName $TargetDir -Force
         }
     }
+
+    Copy-LotusSkillPackages -TargetDir $TargetDir -ExcludedSkills $ExcludedSkills
 }
 
 function Convert-ToCodexSkill {
@@ -502,6 +565,7 @@ if ($Global) {
             Write-Host "    Converted skill: $baseName"
         }
     }
+    Copy-LotusSkillPackages -TargetDir $CodexSkills -ExcludedSkills ($CodexExcludedSkills + $ManagedOfficialSkills)
     Write-Host "  Codex CLI configured (rules + Lotus-only compatible skills)"
 
     Write-Host "  Installing official gstack upstream..."

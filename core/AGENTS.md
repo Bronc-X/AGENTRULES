@@ -171,25 +171,26 @@ npm ls --depth=0
 
 **任务级技能**（可作为独立任务执行，兼容所有平台的 `/` 命令）：
 1. **/gstack** — 需 gstack 流程时打开总入口。
-2. **/test-driven-development** — 写功能修 Bug 前先写失败测试。
-3. **/frontend-design** — 做前端页时提升布局视觉交互。
-4. **/taste-skill** — 界面显模板时提升审美质感。
-5. **/image-2** — 生图改图时生成视觉素材。
-6. **/ai-progress-workspace** — 用事件流展示 AI 真实进度。
-7. **/web-to-design-md** — 做官网前拆参考生成 design.md。
-8. **/debugging-strategies** — 排 Bug 时用假设验证定位问题。
-9. **/mini-investigate** — 查小 Bug 时做最小修复。
-10. **/security-auditor** — 审安全时查权限依赖合规风险。
-11. **/feynman** — 讲概念时用白话解释本质。
-12. **/polanyi-tacit** — 读复杂代码时分析隐性约束。
-13. **/auto-build** — 验构建时自动装依赖并打包。
-14. **/agent-training-loop** — 修 Bug 时循环复现定位修复验证。
-15. **/baseline-packager** — 防回归时固化已验证行为。
-16. **/conversion-copywriter** — 写营销页时生成转化文案。
-17. **/powerup** — 练 AI 编程时走 10 关训练。
-18. **/insights** — 复盘习惯时分析摩擦给建议。
-19. **/subagent** — 任务可并行时编排子 Agent。
-20. **/goal** — 长期任务时管理 Codex 目标。
+2. **/anysearch** — 实时搜索、垂直检索、批量搜索和 URL 内容提取。
+3. **/test-driven-development** — 写功能修 Bug 前先写失败测试。
+4. **/frontend-design** — 做前端页时提升布局视觉交互。
+5. **/taste-skill** — 界面显模板时提升审美质感。
+6. **/image-2** — 生图改图时生成视觉素材。
+7. **/ai-progress-workspace** — 用事件流展示 AI 真实进度。
+8. **/web-to-design-md** — 做官网前拆参考生成 design.md。
+9. **/debugging-strategies** — 排 Bug 时用假设验证定位问题。
+10. **/mini-investigate** — 查小 Bug 时做最小修复。
+11. **/security-auditor** — 审安全时查权限依赖合规风险。
+12. **/feynman** — 讲概念时用白话解释本质。
+13. **/polanyi-tacit** — 读复杂代码时分析隐性约束。
+14. **/auto-build** — 验构建时自动装依赖并打包。
+15. **/agent-training-loop** — 修 Bug 时循环复现定位修复验证。
+16. **/baseline-packager** — 防回归时固化已验证行为。
+17. **/conversion-copywriter** — 写营销页时生成转化文案。
+18. **/powerup** — 练 AI 编程时走 10 关训练。
+19. **/insights** — 复盘习惯时分析摩擦给建议。
+20. **/subagent** — 任务可并行时编排子 Agent。
+21. **/goal** — 长期任务时管理 Codex 目标。
 
 **会话内技能**（依赖"不中断当前对话"，在对话中直接输入触发词即可，不要用 `/` 命令）：
 8. **@btw** — 临时插问时不中断主线回答。
