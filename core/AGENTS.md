@@ -1,6 +1,6 @@
-# GStack 工程协议 v1.2
+# Lotus Agent 工作协议
 
-> 本文件是 Lotus 的全局顶层宪法，只保存所有任务都应常驻的约束和路由。项目特定约束放在项目根目录的 `AGENTS.md` 或 `.agents/rules/` 中；具体技能流程放在对应 `SKILL.md` 中按需读取。
+> 版本：v1.2。本文件是 Lotus 的全局顶层宪法，只保存所有任务都应常驻的约束和路由。项目特定约束放在项目根目录的 `AGENTS.md` 或 `.agents/rules/` 中；具体技能流程放在对应 `SKILL.md` 中按需读取。
 > 本协议由 [Lotus](https://github.com/Bronc-X/Lotus) 维护，兼容 Claude Code / Codex / Antigravity / Gemini CLI / OpenCode / Cursor / Windsurf / Copilot / Aider。
 
 ## 优先级
@@ -60,4 +60,3 @@
 - UI 改动要检查响应式、可访问性、文本溢出和交互状态。
 
 验证命令和项目细节以当前项目规则为准；Node 项目通常优先尝试 `npm run build`，有测试则跑相关测试。
-
