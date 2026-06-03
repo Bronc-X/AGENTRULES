@@ -277,6 +277,7 @@ function Convert-ToCodexSkill {
 
     $skillName = ""
     $description = ""
+    $frontmatter = ""
     if ($content -match '(?s)^---\r?\n(.*?)\r?\n---') {
         $frontmatter = $Matches[1]
         if ($frontmatter -match 'name:\s*(.+)') {
@@ -292,6 +293,16 @@ function Convert-ToCodexSkill {
     }
     if (-not $description) {
         $description = "Lotus skill: $skillName"
+    }
+
+    $skillDir = Join-Path $TargetDir $skillName
+    if (-not (Test-Path $skillDir)) {
+        New-Item -ItemType Directory -Path $skillDir -Force | Out-Null
+    }
+
+    if ($frontmatter -match '(?m)^allowed-tools\s*:') {
+        Copy-Item $SourceFile (Join-Path $skillDir "SKILL.md") -Force
+        return
     }
 
     $allowedTools = switch ($skillName) {
@@ -328,11 +339,6 @@ $(($allowedTools -split ', ' | ForEach-Object { "  - $_" }) -join "`n")
 "@
 
     $codexContent = "$codexFrontmatter`n$body"
-
-    $skillDir = Join-Path $TargetDir $skillName
-    if (-not (Test-Path $skillDir)) {
-        New-Item -ItemType Directory -Path $skillDir -Force | Out-Null
-    }
 
     $utf8NoBom = New-Object System.Text.UTF8Encoding $false
     [System.IO.File]::WriteAllText((Join-Path $skillDir "SKILL.md"), $codexContent, $utf8NoBom)

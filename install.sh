@@ -453,9 +453,9 @@ convert_to_codex_skill() {
 
     local skill_name=""
     local description=""
+    local frontmatter=""
 
     if echo "$content" | head -1 | grep -q "^---"; then
-        local frontmatter
         frontmatter=$(awk '
             NR == 1 && $0 == "---" {
                 in_frontmatter = 1
@@ -501,6 +501,15 @@ convert_to_codex_skill() {
         *)              allowed_tools="Read\n  - AskUserQuestion" ;;
     esac
 
+    local skill_dir="$target_dir/$skill_name"
+    mkdir -p "$skill_dir"
+
+    if echo "$frontmatter" | grep -q '^allowed-tools:'; then
+        cp "$source_file" "$skill_dir/SKILL.md"
+        echo "    Installed skill: $skill_name"
+        return 0
+    fi
+
     local body
     body=$(awk '
         NR == 1 && $0 == "---" {
@@ -518,9 +527,6 @@ convert_to_codex_skill() {
             print
         }
     ' "$source_file")
-
-    local skill_dir="$target_dir/$skill_name"
-    mkdir -p "$skill_dir"
 
     cat > "$skill_dir/SKILL.md" <<CODEX_EOF
 ---
