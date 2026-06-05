@@ -17,6 +17,18 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [1.1.11] - 2026-06-06
+
+### Added
+
+- Added the `mobile-agent-bridge` Lotus skill for phone-to-local-agent bridge setup, verification, and debugging.
+- Added the current Leonxlnx taste-skill suite as Lotus-packaged top-level skills, including `gpt-taste`, `image-to-code`, redesign, visual design, image generation, brand kit, minimalist, brutalist, stitch, and output-enforcement variants.
+
+### Changed
+
+- Updated `taste-skill` to the current Leonxlnx v2 anti-slop frontend guidance.
+- Updated `anysearch` from 2.0.0 to 2.1.0 with `get_sub_domains` support and revised vertical-search routing guidance.
+
 ## [1.1.10] - 2026-05-07
 
 ### Fixed

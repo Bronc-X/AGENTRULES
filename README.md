@@ -281,6 +281,18 @@ macOS / Linux：
 | `test-driven-development` | 严格红绿重构，先写失败测试再写实现 |
 | `frontend-design` | 前端审美与交互质量约束 |
 | `taste-skill` | Taste Skill 前端审美与实现质量约束，强化布局、字体、动效、间距和组件完成度，来源于 `Leonxlnx/taste-skill` |
+| `gpt-taste` | 面向 GPT / Codex 的更严格 Taste Skill 变体，强化非模板化布局、动效和 anti-slop 约束 |
+| `image-to-code` | 图像优先的网站设计到代码流程，先生成/分析视觉参考，再实现前端 |
+| `redesign-existing-projects` | 既有项目 UI 改版流程，先审计再手术式改进布局、间距、层级和动效 |
+| `imagegen-frontend-web` | 生成网站视觉参考图，用于 hero、官网、落地页和多区块网页设计 |
+| `imagegen-frontend-mobile` | 生成移动端界面和流程参考图 |
+| `brandkit` | 生成品牌板、Logo 方向、配色、字体和身份应用参考 |
+| `high-end-visual-design` | 柔和、克制、高级感视觉设计方向 |
+| `minimalist-ui` | 极简、编辑感、Linear / Notion 风格产品 UI 方向 |
+| `industrial-brutalist-ui` | 工业粗野主义、强对比、机械感界面方向 |
+| `stitch-design-taste` | Google Stitch 兼容的 Taste Skill 规则 |
+| `full-output-enforcement` | 防止模型半成品输出，要求完整可运行交付 |
+| `mobile-agent-bridge` | 手机连接本机 Agent 的 daemon / runtime 两层架构调试与验证 |
 | `image-2` | GPT Image 2 生图与改图入口，用于图片生成、图片编辑、风格迁移、换背景、透明素材和批量视觉资产 |
 | `ai-progress-workspace` | 搭建带真实 AI 工具进度、中间生成工作区和结构化 artifact 的 Agent 产品 |
 | `web-to-design-md` | 从参考网页、品牌资料、需求文档生成结构化 `design.md` |

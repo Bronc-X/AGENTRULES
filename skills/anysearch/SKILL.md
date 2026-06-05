@@ -1,7 +1,7 @@
 ---
 name: anysearch
 description: Real-time search engine supporting web search, vertical domain search, parallel batch search, and URL content extraction.
-version: 2.0.0
+version: 2.1.0
 authors:
   - AnySearch Team
 credentials:
@@ -13,7 +13,7 @@ credentials:
 
 ## Overview
 
-AnySearch is a unified real-time search service supporting general web search, vertical domain search, parallel batch search, and full-page content extraction. It exposes a single JSON-RPC 2.0 endpoint and requires no MCP server installation. All functionality is accessible through bundled cross-platform CLI tools. Use the configured runtime directly for routine `search`, `batch_search`, `extract`, and `list_domains` calls; run the `doc` command only when the CLI interface is unknown or recovery information is needed (see Recommended Entry Point).
+AnySearch is a unified real-time search service supporting general web search, vertical domain search, parallel batch search, and full-page content extraction. It exposes a single JSON-RPC 2.0 endpoint and requires no MCP server installation. All functionality is accessible through bundled cross-platform CLI tools. Use the configured runtime directly for routine `search`, `batch_search`, `extract`, and `get_sub_domains` calls; run the `doc` command only when the CLI interface is unknown or recovery information is needed (see Recommended Entry Point).
 
 ## Trigger
 
@@ -25,24 +25,36 @@ This skill SHOULD be activated when the AI agent needs to perform any of the fol
 4. **Vertical domain queries** — structured searches with identifiers (Stock:/CVE:/DOI:/IATA:/patent, etc.).
 5. **Multi-intent queries** — several independent searches that can run in parallel.
 
-**Vertical domain rule:** For queries that may belong to a supported domain (finance, academic, travel, health, code, geo, etc.), **always call `list_domains` first** to get the correct `sub_domain` and `query_format` before searching — vertical search produces significantly better results than general web search for these topics.
+**Vertical domain rule:** The DEFAULT search path is Path 2 (vertical). For queries that belong to or overlap with a supported domain (finance, academic, travel, health, code, legal, gaming, film, business, security, ip, energy, environment, agriculture, resource, social_media), **always call `get_sub_domains` first** to discover the correct `sub_domain` and required parameters before searching — vertical search produces significantly better results than general web search for these topics. Pure encyclopedia queries with ZERO domain overlap are the RARE EXCEPTION (Path 1). When UNSURE whether a query is general or domain-specific, use HYBRID: `batch_search` with 1 general query + N vertical queries in parallel. Coverage beats guessing.
+
+**Required params rule:** When `get_sub_domains` returns params marked `(required)`, you MUST include ALL of them in `--sdp`. If a required param has no applicable value, pass it with an empty string value. Omitting a required param will cause a backend validation error. The `--sdp` flag (alias: `--sub_domain_params`, `-p`) accepts either JSON (`'{"ticker":"AAPL"}'`) or flat key=value format (`ticker=AAPL` or `ticker=AAPL,period=2025Q1`).
 
 **Rule:** This skill is the **recommended** search tool. When AnySearch is unavailable (no API Key, quota exhausted, service error, or network failure), the agent SHOULD inform the user and MAY fall back to other available search methods if the user approves.
 
 ## Recommended Entry Point
 
-Prefer direct CLI invocation. If `<skill_dir>/runtime.conf` exists and the requested command shape is already obvious (`search`, `batch_search`, `extract`, or `list_domains`), the agent SHOULD use the configured command directly and SHOULD NOT run `doc` on every activation. Run `doc` only when the CLI interface is unknown, a command fails due to argument/schema uncertainty, the skill was just installed/updated, or vertical-domain constraints require the complete reference. The `doc` command is offline and remains available for recovery, but repeated metadata reads waste tool calls and tokens.
+Prefer direct CLI invocation. If `<skill_dir>/runtime.conf` exists and the requested command shape is already obvious (`search`, `batch_search`, `extract`, or `get_sub_domains`), the agent SHOULD use the configured command directly and SHOULD NOT run `doc` on every activation. Run `doc` only when the CLI interface is unknown, a command fails due to argument/schema uncertainty, the skill was just installed/updated, or vertical-domain constraints require the complete reference. The `doc` command is offline and remains available for recovery, but repeated metadata reads waste tool calls and tokens.
 
 ### Command Cheat Sheet
 
 Use these exact command shapes for routine calls. Replace `<cmd>` with the command from `runtime.conf` (for example, `python3 <skill_dir>/scripts/anysearch_cli.py`). Do not invent extra output-format flags.
 
 ```bash
-# Search. Optional filters: --max_results N, --freshness day|week|month|year, --content_types web,news,code,doc,academic,data,image,video,audio
+# Search. Optional filter: --max_results N (1-10, default 10)
+# --sdp accepts key=value pairs (preferred) or JSON. Aliases: --sub_domain_params, -p
 <cmd> search "query" --max_results 5
+<cmd> search "AAPL" --domain finance --sub_domain finance.us_stock --sdp ticker=AAPL
+<cmd> search "latest trends" --domain finance --sub_domain finance.market --sdp region=US,timeframe=2025Q1
 
-# Batch search. Use JSON query objects when per-query max_results/freshness are needed.
-<cmd> batch_search --queries '[{"query":"q1","max_results":5},{"query":"q2","max_results":5}]'
+# Discover sub-domains. Required before any vertical search.
+<cmd> get_sub_domains --domain finance
+<cmd> get_sub_domains --domains finance,health
+
+# Batch search — shared params apply to all queries (per-query fields override).
+<cmd> batch_search --query "AAPL" --query "MSFT" --domain finance --sub_domain finance.us_stock --sdp ticker=AAPL
+<cmd> batch_search --queries '[{"query":"AAPL","sub_domain_params":"ticker=AAPL"},{"query":"MSFT","sub_domain_params":"ticker=MSFT"}]' --domain finance --sub_domain finance.us_stock
+# Hybrid (mixed domains): omit shared params, specify per-query
+<cmd> batch_search --queries '[{"query":"quantum computing"},{"query":"QBTS","domain":"finance","sub_domain":"finance.us_stock","sub_domain_params":"ticker=QBTS"}]'
 
 # Extract. Output is already Markdown. Supported args are only the URL positional argument or --url/-u.
 <cmd> extract "https://example.com/page"
@@ -60,10 +72,10 @@ Run the `doc` command via the platform-selected CLI only when needed (see Platfo
 | PowerShell | `powershell -ExecutionPolicy Bypass -File <skill_dir>/scripts/anysearch_cli.ps1 doc` |
 | Bash/sh | `bash <skill_dir>/scripts/anysearch_cli.sh doc` |
 
-**Security notes:**
+**Security & Privacy notes:**
 - The `doc` command is a local-only operation and makes no network requests.
 - Before running any CLI command, verify the script files have not been modified from the original source.
-- Search queries, extracted URLs, and API keys are sent to `https://api.anysearch.com`. Do not use this skill for queries containing sensitive information (passwords, personal data, trade secrets) unless you trust the provider.
+- Search queries, extracted URLs, and API keys are sent to `https://api.anysearch.com`. Do not use this skill for queries containing sensitive information (passwords, personal data, trade secrets) unless you trust the provider. `https://api.anysearch.com` has claimed zero retention execution, zero-knowledge credentials, no tracking, no telemetry, and no logging — your queries stay yours.
 
 ## API Key Management
 

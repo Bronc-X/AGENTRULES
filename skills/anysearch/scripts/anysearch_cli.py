@@ -47,17 +47,10 @@ _load_env()
 
 # BEGIN GENERATED:CONSTANTS
 AVAILABLE_DOMAINS = [
-    "code", "travel", "home", "ecommerce", "gaming", "film",
-    "music", "finance", "academic", "legal", "business", "ip",
-    "health", "geo", "environment", "energy",
+    "general", "resource", "social_media", "finance", "academic", "legal",
+    "health", "business", "security", "ip", "code", "energy",
+    "environment", "agriculture", "travel", "film", "gaming",
 ]
-
-CONTENT_TYPES = [
-    "web", "news", "code", "doc", "academic", "data", "image", "video", "audio",
-]
-
-FRESHNESS_VALUES = ["day", "week", "month", "year"]
-ZONES = ["cn", "intl"]
 # END GENERATED:CONSTANTS
 
 
@@ -115,6 +108,41 @@ def _parse_json_list(value: str) -> list:
         return [s.strip() for s in value.split(",") if s.strip()]
 
 
+def _parse_sub_domain_params(value: str):
+    """Parse sub_domain_params from JSON, {key:value} or key=value format."""
+    if not value:
+        return None
+    try:
+        return json.loads(value)
+    except json.JSONDecodeError:
+        # {key:value,key2:value2} format (PowerShell strips inner quotes from JSON)
+        if value.startswith("{") and value.endswith("}"):
+            inner = value[1:-1].strip()
+            if inner:
+                result = {}
+                for pair in inner.split(","):
+                    if ":" not in pair:
+                        continue
+                    idx = pair.index(":")
+                    key = pair[:idx].strip().strip("'\"")
+                    val = pair[idx + 1:].strip().strip("'\"")
+                    if key:
+                        result[key] = val
+                if result:
+                    return result
+        # key=value,key2=value2 format
+        result = {}
+        for pair in value.split(","):
+            if "=" not in pair:
+                continue
+            idx = pair.index("=")
+            key = pair[:idx].strip()
+            val = pair[idx + 1:].strip()
+            if key:
+                result[key] = val
+        return result if result else None
+
+
 def cmd_search(args):
     """Execute search (general or vertical)."""
     arguments = {"query": args.query}
@@ -124,25 +152,19 @@ def cmd_search(args):
         if args.sub_domain:
             arguments["sub_domain"] = args.sub_domain
         if args.sub_domain_params:
-            try:
-                arguments["sub_domain_params"] = json.loads(args.sub_domain_params)
-            except json.JSONDecodeError:
-                print("Error: --sub_domain_params must be valid JSON", file=sys.stderr)
+            parsed = _parse_sub_domain_params(args.sub_domain_params)
+            if not parsed:
+                print("Error: --sub_domain_params must be valid JSON or key=value pairs", file=sys.stderr)
                 sys.exit(1)
+            arguments["sub_domain_params"] = parsed
 
-    if args.content_types:
-        arguments["content_types"] = _parse_json_list(args.content_types)
-    if args.zone:
-        arguments["zone"] = args.zone
     if args.max_results is not None:
-        arguments["max_results"] = args.max_results
-    if args.freshness:
-        arguments["freshness"] = args.freshness
+        arguments["max_results"] = min(args.max_results, 10)
 
     print(_call_api("search", arguments, args.api_key))
 
 
-def cmd_list_domains(args):
+def cmd_get_sub_domains(args):
     """List available sub_domains for given domain(s)."""
     arguments = {}
     if args.domains:
@@ -153,7 +175,7 @@ def cmd_list_domains(args):
         print("Error: provide --domain or --domains", file=sys.stderr)
         sys.exit(1)
 
-    print(_call_api("list_domains", arguments, args.api_key))
+    print(_call_api("get_sub_domains", arguments, args.api_key))
 
 
 def cmd_extract(args):
@@ -283,6 +305,23 @@ def cmd_batch_search(args):
         print("Error: provide --queries or --query", file=sys.stderr)
         sys.exit(1)
 
+    # Inject shared params into each query item (item's own fields take precedence)
+    shared_domain = getattr(args, "batch_domain", None)
+    shared_sub_domain = getattr(args, "batch_sub_domain", None)
+    shared_sdp_raw = getattr(args, "batch_sdp", None)
+    shared_sdp = _parse_sub_domain_params(shared_sdp_raw) if shared_sdp_raw else None
+
+    for item in queries:
+        if shared_domain and not item.get("domain"):
+            item["domain"] = shared_domain
+        if shared_sub_domain and not item.get("sub_domain"):
+            item["sub_domain"] = shared_sub_domain
+        if shared_sdp and not item.get("sub_domain_params"):
+            item["sub_domain_params"] = shared_sdp
+        # Parse KV string sub_domain_params inside query items
+        if isinstance(item.get("sub_domain_params"), str):
+            item["sub_domain_params"] = _parse_sub_domain_params(item["sub_domain_params"])
+
     arguments = {"queries": queries}
     print(_call_api("batch_search", arguments, args.api_key))
 
@@ -292,21 +331,14 @@ def _render_doc():
     import json as _json
     _dir = os.path.dirname(os.path.abspath(__file__))
     _shared = os.path.join(_dir, "shared")
-    try:
-        with open(os.path.join(_shared, "doc_spec.md"), "r", encoding="utf-8") as _f:
-            _tpl = _f.read()
-        with open(os.path.join(_shared, "constants.json"), "r", encoding="utf-8") as _f:
-            _c = _json.load(_f)
-    except (OSError, ValueError) as _e:
-        return (
-            f"Error: could not load help template from {_shared}\n  {_e}\n"
-            "Usage: python scripts/anysearch_cli.py <search|list_domains|extract|batch_search|doc>"
-        )
+    with open(os.path.join(_shared, "doc_spec.md"), "r", encoding="utf-8") as _f:
+        _tpl = _f.read()
+    with open(os.path.join(_shared, "constants.json"), "r", encoding="utf-8") as _f:
+        _c = _json.load(_f)
     _tpl = _tpl.replace("{{LANG_NAME}}", "Python")
     _tpl = _tpl.replace("{{LANG_CODEBLOCK}}", "")
     _tpl = _tpl.replace("{{LANG_INVOKE}}", "python scripts/anysearch_cli.py")
     _tpl = _tpl.replace("{{DOMAINS_SPACE}}", " ".join(_c["available_domains"]))
-    _tpl = _tpl.replace("{{CONTENT_TYPES_SPACE}}", " ".join(_c["content_types"]))
     return _tpl
 # END GENERATED:DOC_SPEC
 
@@ -329,7 +361,7 @@ def build_parser() -> argparse.ArgumentParser:
             "examples:\n"
             "  anysearch search \"quantum computing\"\n"
             "  anysearch search \"AAPL\" --domain finance --sub_domain finance.us_stock\n"
-            "  anysearch list_domains --domain finance\n"
+            "  anysearch get_sub_domains --domain finance\n"
             "  anysearch extract --url https://example.com\n"
             "  anysearch batch_search --queries '[{\"query\":\"AAPL\"},{\"query\":\"GOOG\"}]'\n"
         ),
@@ -352,12 +384,12 @@ def build_parser() -> argparse.ArgumentParser:
             "Two modes:\n"
             "  General search:   omit --domain (open-ended natural language queries)\n"
             "  Vertical search:  specify --domain and --sub_domain for structured queries\n\n"
-            "For vertical search, run 'list_domains' first to discover available\n"
+            "For vertical search, run 'get_sub_domains' first to discover available\n"
             "sub_domains and their required query formats."
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    search_p.add_argument("query", help="Search query string. For vertical search, follow the format returned by list_domains.")
+    search_p.add_argument("query", help="Search query string. For vertical search, follow the format returned by get_sub_domains.")
     search_p.add_argument(
         "--domain", "-d",
         choices=AVAILABLE_DOMAINS,
@@ -368,38 +400,21 @@ def build_parser() -> argparse.ArgumentParser:
     )
     search_p.add_argument(
         "--sub_domain", "-s",
-        help="Sub-domain routing key (e.g. finance.us_stock). Required for vertical search; obtain via list_domains.",
+        help="Sub-domain routing key (e.g. finance.us_stock). Required for vertical search; obtain via get_sub_domains.",
     )
     search_p.add_argument(
-        "--sub_domain_params",
-        help="Additional sub_domain parameters as JSON string. Schema depends on the sub_domain (see list_domains output).",
-    )
-    search_p.add_argument(
-        "--content_types", "-t",
-        help=(
-            "Content type filter(s). Comma-separated or JSON array.\n"
-            f"Available: {', '.join(CONTENT_TYPES)}"
-        ),
-    )
-    search_p.add_argument(
-        "--zone", "-z",
-        choices=ZONES,
-        help="Region zone: 'cn' for China, 'intl' for international. Required when list_domains marks CN.",
+        "--sub_domain_params", "--sdp", "-p",
+        help="Sub_domain parameters as JSON or key=value pairs (e.g. ticker=AAPL,period=2025). Schema depends on the sub_domain (see get_sub_domains output).",
     )
     search_p.add_argument(
         "--max_results", "-m",
         type=int,
-        help="Maximum number of results to return (default 10, max 100).",
-    )
-    search_p.add_argument(
-        "--freshness", "-f",
-        choices=FRESHNESS_VALUES,
-        help="Time-based filter: day, week, month, year.",
+        help="Maximum number of results to return (1-10, default 10).",
     )
     search_p.set_defaults(func=cmd_search)
 
     ld_p = subparsers.add_parser(
-        "list_domains",
+        "get_sub_domains",
         help="Query domain directory for available sub_domains",
         description=(
             "List available sub_domains, query formats, and parameter schemas\n"
@@ -424,7 +439,7 @@ def build_parser() -> argparse.ArgumentParser:
             "Takes precedence over --domain."
         ),
     )
-    ld_p.set_defaults(func=cmd_list_domains)
+    ld_p.set_defaults(func=cmd_get_sub_domains)
 
     ext_p = subparsers.add_parser(
         "extract",
@@ -450,8 +465,7 @@ def build_parser() -> argparse.ArgumentParser:
             "Each query follows the same parameter structure as the 'search' command.\n"
             "A single query failure does not block others; results are merged.\n\n"
             "Queries are provided as a JSON array of objects. Each object supports\n"
-            "the same fields as 'search': query, domain, sub_domain, content_types,\n"
-            "zone, max_results, freshness."
+            "the same fields as 'search': query, domain, sub_domain, max_results."
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=(
@@ -468,7 +482,7 @@ def build_parser() -> argparse.ArgumentParser:
         help=(
             'JSON array of search query objects (1-5 items). '
             'Tolerates PowerShell quote-stripping automatically.\n'
-            'Each object supports: query (required), domain, sub_domain, content_types, zone, max_results, freshness.\n'
+            'Each object supports: query (required), domain, sub_domain, sub_domain_params, max_results.\n'
             'Example: \'[{"query":"AAPL"},{"query":"GOOG"}]\''
         ),
     )
@@ -481,6 +495,22 @@ def build_parser() -> argparse.ArgumentParser:
         action="append",
         dest="query_items",
         help="Shorthand: repeatable single-query string. Easier for PowerShell. Up to 5.",
+    )
+    batch_p.add_argument(
+        "--domain", "-d",
+        dest="batch_domain",
+        choices=AVAILABLE_DOMAINS,
+        help="Shared domain injected into all query items (item's own domain takes precedence).",
+    )
+    batch_p.add_argument(
+        "--sub_domain", "-s",
+        dest="batch_sub_domain",
+        help="Shared sub_domain injected into all query items (item's own sub_domain takes precedence).",
+    )
+    batch_p.add_argument(
+        "--sub_domain_params", "--sdp", "-p",
+        dest="batch_sdp",
+        help="Shared sub_domain_params as JSON or key=value pairs, injected into all query items.",
     )
     batch_p.set_defaults(func=cmd_batch_search)
 

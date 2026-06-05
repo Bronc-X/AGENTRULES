@@ -11,17 +11,10 @@ const ENDPOINT = "https://api.anysearch.com/mcp";
 
 // BEGIN GENERATED:CONSTANTS
 const AVAILABLE_DOMAINS = [
-  "code","travel","home","ecommerce","gaming","film",
-  "music","finance","academic","legal","business","ip",
-  "health","geo","environment","energy",
+  "general","resource","social_media","finance","academic","legal",
+  "health","business","security","ip","code","energy",
+  "environment","agriculture","travel","film","gaming",
 ];
-
-const CONTENT_TYPES = [
-  "web","news","code","doc","academic","data","image","video","audio",
-];
-
-const FRESHNESS_VALUES = ["day","week","month","year"];
-const ZONES = ["cn","intl"];
 // END GENERATED:CONSTANTS
 
 function loadEnv() {
@@ -122,6 +115,41 @@ function parseJsonList(value) {
   }
 }
 
+function parseSubDomainParams(value) {
+  if (!value) return undefined;
+  try {
+    return JSON.parse(value);
+  } catch (_) {
+    // {key:value,key2:value2} format (PowerShell strips inner quotes from JSON)
+    if (value.startsWith("{") && value.endsWith("}")) {
+      const inner = value.slice(1, -1).trim();
+      if (inner) {
+        const result = {};
+        const pairs = inner.split(",");
+        for (const pair of pairs) {
+          const idx = pair.indexOf(":");
+          if (idx === -1) continue;
+          const key = pair.substring(0, idx).trim().replace(/^['"]|['"]$/g, "");
+          const val = pair.substring(idx + 1).trim().replace(/^['"]|['"]$/g, "");
+          if (key) result[key] = val;
+        }
+        if (Object.keys(result).length > 0) return result;
+      }
+    }
+    // key=value,key2=value2 format
+    const result = {};
+    const pairs = value.split(",");
+    for (const pair of pairs) {
+      const idx = pair.indexOf("=");
+      if (idx === -1) continue;
+      const key = pair.substring(0, idx).trim();
+      const val = pair.substring(idx + 1).trim();
+      if (key) result[key] = val;
+    }
+    return Object.keys(result).length > 0 ? result : undefined;
+  }
+}
+
 async function cmdSearch(opts) {
   const args = { query: opts.query };
 
@@ -129,19 +157,16 @@ async function cmdSearch(opts) {
     args.domain = opts.domain;
     if (opts.subDomain) args.sub_domain = opts.subDomain;
     if (opts.subDomainParams) {
-      try {
-        args.sub_domain_params = JSON.parse(opts.subDomainParams);
-      } catch (_) {
-        console.error("Error: --sub_domain_params must be valid JSON");
+      const parsed = parseSubDomainParams(opts.subDomainParams);
+      if (!parsed) {
+        console.error("Error: --sub_domain_params must be valid JSON or key=value pairs");
         process.exit(1);
       }
+      args.sub_domain_params = parsed;
     }
   }
 
-  if (opts.contentTypes) args.content_types = parseJsonList(opts.contentTypes);
-  if (opts.zone) args.zone = opts.zone;
-  if (opts.maxResults !== undefined) args.max_results = opts.maxResults;
-  if (opts.freshness) args.freshness = opts.freshness;
+  if (opts.maxResults !== undefined) args.max_results = Math.min(opts.maxResults, 10);
 
   const result = await callApi("search", args, opts.apiKey);
   console.log(result);
@@ -158,7 +183,7 @@ async function cmdListDomains(opts) {
     process.exit(1);
   }
 
-  const result = await callApi("list_domains", args, opts.apiKey);
+  const result = await callApi("get_sub_domains", args, opts.apiKey);
   console.log(result);
 }
 
@@ -274,6 +299,21 @@ async function cmdBatchSearch(opts) {
     process.exit(1);
   }
 
+  // Inject shared params into each query item (item's own fields take precedence)
+  const sharedDomain = opts.domain;
+  const sharedSubDomain = opts.subDomain;
+  const sharedSdp = opts.subDomainParams ? parseSubDomainParams(opts.subDomainParams) : undefined;
+
+  for (const item of queries) {
+    if (sharedDomain && !item.domain) item.domain = sharedDomain;
+    if (sharedSubDomain && !item.sub_domain) item.sub_domain = sharedSubDomain;
+    if (sharedSdp && !item.sub_domain_params) item.sub_domain_params = sharedSdp;
+    // Parse string sub_domain_params inside query items (KV or {key:value} format)
+    if (typeof item.sub_domain_params === "string") {
+      item.sub_domain_params = parseSubDomainParams(item.sub_domain_params);
+    }
+  }
+
   const result = await callApi("batch_search", { queries }, opts.apiKey);
   console.log(result);
 }
@@ -281,18 +321,13 @@ async function cmdBatchSearch(opts) {
 // BEGIN GENERATED:DOC_SPEC
 function renderDoc() {
   const shared = path.join(__dirname, "shared");
-  try {
-    let tpl = fs.readFileSync(path.join(shared, "doc_spec.md"), "utf-8");
-    const c = JSON.parse(fs.readFileSync(path.join(shared, "constants.json"), "utf-8"));
-    tpl = tpl.replace(/\{\{LANG_NAME\}\}/g, "Node.js");
-    tpl = tpl.replace(/\{\{LANG_CODEBLOCK\}\}/g, "");
-    tpl = tpl.replace(/\{\{LANG_INVOKE\}\}/g, "node scripts/anysearch_cli.js");
-    tpl = tpl.replace(/\{\{DOMAINS_SPACE\}\}/g, c.available_domains.join(" "));
-    tpl = tpl.replace(/\{\{CONTENT_TYPES_SPACE\}\}/g, c.content_types.join(" "));
-    return tpl;
-  } catch (e) {
-    return `Error: could not load help template from ${shared}\n  ${e.message}\nUsage: node scripts/anysearch_cli.js <search|list_domains|extract|batch_search|doc>`;
-  }
+  let tpl = fs.readFileSync(path.join(shared, "doc_spec.md"), "utf-8");
+  const c = JSON.parse(fs.readFileSync(path.join(shared, "constants.json"), "utf-8"));
+  tpl = tpl.replace(/\{\{LANG_NAME\}\}/g, "Node.js");
+  tpl = tpl.replace(/\{\{LANG_CODEBLOCK\}\}/g, "");
+  tpl = tpl.replace(/\{\{LANG_INVOKE\}\}/g, "node scripts/anysearch_cli.js");
+  tpl = tpl.replace(/\{\{DOMAINS_SPACE\}\}/g, c.available_domains.join(" "));
+  return tpl;
 }
 // END GENERATED:DOC_SPEC
 
@@ -336,11 +371,8 @@ function parseArgs(argv) {
         switch (flag) {
           case "--domain": case "-d": opts.domain = shiftVal(); break;
           case "--sub_domain": case "-s": opts.subDomain = shiftVal(); break;
-          case "--sub_domain_params": opts.subDomainParams = shiftVal(); break;
-          case "--content_types": case "-t": opts.contentTypes = shiftVal(); break;
-          case "--zone": case "-z": opts.zone = shiftVal(); break;
+          case "--sub_domain_params": case "--sdp": case "-p": opts.subDomainParams = shiftVal(); break;
           case "--max_results": case "-m": opts.maxResults = parseInt(shiftVal(), 10); break;
-          case "--freshness": case "-f": opts.freshness = shiftVal(); break;
           case "--api_key": opts.apiKey = shiftVal(); break;
           default: console.error(`Unknown flag: ${flag}`); usage(); process.exit(1);
         }
@@ -352,7 +384,7 @@ function parseArgs(argv) {
       return { action: "search", opts };
     }
 
-    case "list_domains": {
+    case "get_sub_domains": {
       while (rest.length > 0) {
         const flag = rest.shift();
         switch (flag) {
@@ -384,12 +416,18 @@ function parseArgs(argv) {
     case "batch_search": {
       opts.queryItems = [];
       opts.queries = undefined;
+      opts.domain = undefined;
+      opts.subDomain = undefined;
+      opts.subDomainParams = undefined;
       let positional = undefined;
       while (rest.length > 0) {
         const flag = rest.shift();
         switch (flag) {
           case "--queries": case "-q": opts.queries = shiftVal(); break;
           case "--query": opts.queryItems.push(shiftVal()); break;
+          case "--domain": case "-d": opts.domain = shiftVal(); break;
+          case "--sub_domain": case "-s": opts.subDomain = shiftVal(); break;
+          case "--sub_domain_params": case "--sdp": case "-p": opts.subDomainParams = shiftVal(); break;
           case "--api_key": opts.apiKey = shiftVal(); break;
           default:
             if (!positional) positional = flag;
