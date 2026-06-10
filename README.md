@@ -293,6 +293,7 @@ macOS / Linux：
 | `stitch-design-taste` | Google Stitch 兼容的 Taste Skill 规则 |
 | `full-output-enforcement` | 防止模型半成品输出，要求完整可运行交付 |
 | `mobile-agent-bridge` | 手机连接本机 Agent 的 daemon / runtime 两层架构调试与验证 |
+| `shadcn-preset-refactor` | 用 shadcn/create preset 对既有前端项目做无损视觉改造和设计系统迁移 |
 | `image-2` | GPT Image 2 生图与改图入口，用于图片生成、图片编辑、风格迁移、换背景、透明素材和批量视觉资产 |
 | `ai-progress-workspace` | 搭建带真实 AI 工具进度、中间生成工作区和结构化 artifact 的 Agent 产品 |
 | `web-to-design-md` | 从参考网页、品牌资料、需求文档生成结构化 `design.md` |

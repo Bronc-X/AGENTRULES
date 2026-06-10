@@ -17,6 +17,12 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [1.1.12] - 2026-06-10
+
+### Added
+
+- Added the `shadcn-preset-refactor` Lotus top-level skill for safe shadcn/create preset application during frontend redesigns, including preflight checks, diff review, and build/browser validation guidance.
+
 ## [1.1.11] - 2026-06-06
 
 ### Added
