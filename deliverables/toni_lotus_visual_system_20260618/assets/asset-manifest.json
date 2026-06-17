@@ -1,0 +1,13 @@
+{
+  "source_master": "D:\\Toni\\code\\lotus\\deliverables\\lotus_logo_vi_image2_refine_1_3_20260617\\01A-kernel-lotus-executive.png",
+  "principle": "Exact assets are raster crops from 01A. Editable SVG is approximate and must not replace exact master when pixel identity matters.",
+  "palette_from_master": {
+    "ink_900": "#0D0F12",
+    "ink_800": "#1A1C21",
+    "ink_700": "#2B2E36",
+    "paper_100": "#F6F6F4",
+    "paper_200": "#E6E7EB",
+    "petal_pink": "#DFA7B0",
+    "sync_green": "#7BCA71"
+  }
+}

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Toni Lotus logo mark">
+  <rect width="512" height="512" rx="108" fill="#0D0F12"/>
+  <g fill="#F6F6F4" stroke="#111418" stroke-width="18" stroke-linejoin="round">
+    <path d="M256 248 C214 202 207 148 236 90 C269 129 290 180 256 248Z"/>
+    <path d="M256 248 C301 199 356 176 418 184 C402 254 346 302 256 315Z"/>
+    <path d="M256 248 C211 199 156 176 94 184 C110 254 166 302 256 315Z"/>
+    <path d="M256 283 C309 254 369 255 430 286 C385 352 314 376 256 336Z"/>
+    <path d="M256 283 C203 254 143 255 82 286 C127 352 198 376 256 336Z"/>
+  </g>
+  <path d="M256 70 C283 102 297 134 256 174 C215 134 229 102 256 70Z" fill="#DFA7B0"/>
+</svg>

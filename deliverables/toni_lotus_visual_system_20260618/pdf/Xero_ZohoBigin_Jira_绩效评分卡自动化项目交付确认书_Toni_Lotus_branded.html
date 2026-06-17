@@ -1,0 +1,65 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>Xero · Zoho Bigin · Jira 绩效评分卡自动化项目交付确认书</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm 17mm; }
+  * { box-sizing: border-box; }
+  body { margin: 0; color: #172033; font-family: "Microsoft YaHei", "SimHei", "SimSun", Arial, sans-serif; font-size: 12.2px; line-height: 1.58; background: white; }
+  .cover { border-bottom: 3px solid #2563eb; padding-bottom: 16px; margin-bottom: 18px; }
+  h1 { margin: 0 0 10px; font-size: 26px; line-height: 1.18; color: #0f172a; letter-spacing: 0; }
+  .meta { display: inline-flex; gap: 12px; color: #475569; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 8px; padding: 7px 10px; margin-top: 2px; }
+  .logos { display: flex; align-items: center; gap: 14px; margin: 15px 0 2px; flex-wrap: wrap; }
+  .logo-card { min-width: 154px; height: 64px; display: flex; align-items: center; justify-content: center; gap: 9px; border: 1px solid #e2e8f0; border-radius: 10px; background: #ffffff; padding: 9px 12px; }
+  .logo-card img { max-width: 96px; max-height: 30px; object-fit: contain; display: block; }
+  .logo-card span { font-size: 12px; font-weight: 700; color: #334155; white-space: nowrap; }
+  h2 { break-after: avoid; margin: 19px 0 8px; padding-left: 10px; border-left: 4px solid #2563eb; font-size: 16px; color: #0f172a; }
+  p { margin: 8px 0 12px; }
+  table { width: 100%; border-collapse: collapse; margin: 8px 0 14px; break-inside: avoid; }
+  th, td { border: 1px solid #dbe3ef; padding: 7px 8px; vertical-align: top; text-align: left; }
+  th { background: #eff6ff; color: #1d4ed8; font-weight: 700; }
+  tr:nth-child(even) td { background: #fbfdff; }
+  ul, ol { margin: 7px 0 13px 22px; padding: 0; }
+  li { margin: 3px 0; }
+  code { background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 5px; padding: 1px 4px; font-size: 11.5px; }
+  .quote { white-space: pre-wrap; border: 1px solid #dbe3ef; border-left: 4px solid #10b981; background: #f8fafc; border-radius: 8px; padding: 10px 12px; margin: 8px 0 14px; }
+  .footer { margin-top: 20px; padding-top: 10px; border-top: 1px solid #e2e8f0; color: #64748b; font-size: 10.5px; }
+
+  .toni-lotus-brand { display:flex; align-items:center; gap:12px; margin:0 0 14px; padding:12px 14px; border-radius:14px; background:#0D0F12; color:#F6F6F4; width:max-content; }
+  .toni-lotus-brand img { width:54px; height:54px; object-fit:contain; }
+  .toni-lotus-brand strong { display:block; font-size:18px; letter-spacing:.01em; }
+  .toni-lotus-brand span { display:block; font-size:10.5px; color:#DFA7B0; margin-top:2px; letter-spacing:.08em; text-transform:uppercase; }
+
+</style>
+</head>
+<body>
+  <section class="cover">
+    <div class="toni-lotus-brand"><img src="file:///D:/Toni/code/lotus/deliverables/toni_lotus_visual_system_20260618/assets/exact-logo-symbol-dark-transparent.png" alt="Lotus × Toni logo"><div><strong>Lotus × Toni</strong><span>Agent rules & skills system</span></div></div>
+    <h1>Xero · Zoho Bigin · Jira 绩效评分卡自动化项目交付确认书</h1>
+    <div class="meta"><span>版本：v1.1</span><span>日期：2026-06-17</span></div>
+    <div class="logos">
+      <div class="logo-card"><img src="file:///D:/Toni/code/scorecard_automation_system/docs/assets/xero-logo.png" alt="Xero logo"><span>Xero</span></div><div class="logo-card"><img src="file:///D:/Toni/code/scorecard_automation_system/docs/assets/bigin-logo.svg" alt="Zoho Bigin logo"><span>Zoho Bigin</span></div><div class="logo-card"><img src="file:///D:/Toni/code/scorecard_automation_system/docs/assets/jira-logo.svg" alt="Jira logo"><span>Jira</span></div>
+    </div>
+  </section>
+  <p>交互方：项目实施方<br>客户方：Joey</p>
+<p>这份清单用于确认本次交付内容、验收方式，以及客户需要提前提供的资料。</p>
+<h2>1. 本次交付内容</h2>
+<table><tr><th>模块</th><th>交付内容</th></tr><tr><td>前端 Dashboard</td><td>按 <code>q1-performance-dashboard.html</code> 复刻页面，把后端数据接进去。</td></tr><tr><td>Xero 接入</td><td>用 OAuth 授权读取财务相关数据。</td></tr><tr><td>Zoho Bigin 接入</td><td>用 OAuth 授权读取销售、客户、pipeline 等数据。</td></tr><tr><td>Jira 接入</td><td>用 Jira URL、邮箱和 API token 读取项目、缺陷、部署等数据。</td></tr><tr><td>评分计算</td><td>按客户现有 Excel 评分规则计算 KPI 和角色分数。</td></tr><tr><td>Excel 生成</td><td>生成新的季度绩效评分卡 Excel，支持下载。</td></tr><tr><td>缺失数据提示</td><td>API 拿不到或字段没对上的数据，不乱填，明确标出来。</td></tr><tr><td>手工补录</td><td>给 API 拿不到的指标留一个轻量录入口。</td></tr><tr><td>运行记录</td><td>保存每次生成的时间、状态、错误和下载文件。</td></tr><tr><td>Docker 包</td><td>提供可运行的 Docker / docker-compose 和启动说明。</td></tr></table>
+<h2>2. 前端按这个 HTML 做</h2>
+<p>目标文件：</p>
+<div class='quote'>C:\Users\Administrator\AppData\Local\Temp\q1-performance-dashboard.html</div>
+<p>确认口径：</p>
+<ul><li>这个 HTML 是前端验收目标，不是普通参考图。</li><li>页面布局、模块顺序、卡片、表格、图表、弹窗、信息密度，都尽量按它复刻。</li><li>正式代码会做成 React/shadcn/Tailwind 组件，不是直接把静态 HTML 粘进去。</li><li>HTML 里如果有后端暂时支撑不了的模块，可以删掉、隐藏或做成只读，但要提前说清楚。</li></ul>
+<p>默认保留这些模块：</p>
+<table><tr><th>模块</th><th>处理方式</th></tr><tr><td>顶部栏、季度/角色/部门筛选</td><td>保留</td></tr><tr><td>KPI 概览卡</td><td>保留</td></tr><tr><td>Organization Snapshot</td><td>默认只读展示，客户提供图片</td></tr><tr><td>Strategic Target Cascade</td><td>保留</td></tr><tr><td>Performance Analytics 图表</td><td>保留</td></tr><tr><td>KPI Detail</td><td>保留</td></tr><tr><td>Data Setup Readiness</td><td>保留</td></tr><tr><td>Role Performance Summary</td><td>保留</td></tr><tr><td>View Scorecard 弹窗</td><td>保留</td></tr><tr><td>Approval Workflow</td><td>默认只读展示，不做真实审批</td></tr><tr><td>IOGSMT 弹窗</td><td>待确认：做只读/草稿/删除/追加真实保存</td></tr></table>
+<h2>3. 客户需要提供</h2>
+<table><tr><th>资料</th><th>说明</th></tr><tr><td>Excel 模板</td><td>当前正式使用的绩效评分卡模板。</td></tr><tr><td>KPI 规则</td><td>KPI 名称、公式、目标值、角色权重、季度口径。</td></tr><tr><td>前端 HTML 和资源</td><td><code>q1-performance-dashboard.html</code> 以及里面用到的图片。</td></tr><tr><td>Xero 授权资料</td><td>client id、client secret、管理员授权、财务科目口径。</td></tr><tr><td>Zoho Bigin 授权资料</td><td>client id、client secret、数据中心、字段和 pipeline 说明。</td></tr><tr><td>Jira 资料</td><td>site URL、邮箱、API token、project key、字段和标签规则。</td></tr><tr><td>手工数据</td><td>API 拿不到但评分需要的数据。</td></tr></table>
+<h2>4. 验收标准</h2>
+<table><tr><th>项目</th><th>验收方式</th></tr><tr><td>页面</td><td>Dashboard 和目标 HTML 高度一致，核心模块都能看到。</td></tr><tr><td>交互</td><td>筛选、树展开、KPI 详情、角色评分弹窗可用。</td></tr><tr><td>数据</td><td>Xero、Zoho Bigin、Jira 连接状态可见。</td></tr><tr><td>评分</td><td>能按确认后的 Excel 规则生成评分卡。</td></tr><tr><td>下载</td><td>能下载生成后的 Excel。</td></tr><tr><td>缺失项</td><td>缺数据会明确提示，不会假装有数据。</td></tr><tr><td>Docker</td><td>按说明能启动系统。</td></tr><tr><td>安全</td><td>密钥不写死在代码里，不显示在前端和日志里。</td></tr></table>
+<h2>5. 需要客户确认的几个点</h2>
+<ol><li>前端是否确认按 <code>q1-performance-dashboard.html</code> 作为验收目标？</li><li>IOGSMT 弹窗第一版怎么处理：删除、只读、草稿保存，还是做真实保存？</li><li>Approval Workflow 第一版是否只做展示，不做真实审批？</li><li>Organization Snapshot 是否只展示图片？</li><li>角色数量是否固定为 29 个？</li><li>KPI 数量是否固定为 43 个？</li><li>API 拿不到的数据，是否由客户手工补录？</li></ol>
+  <div class="footer">本文件用于项目交付范围确认。后续若客户确认增加功能或部署服务，可在此基础上另行补充。</div>
+</body>
+</html>
+

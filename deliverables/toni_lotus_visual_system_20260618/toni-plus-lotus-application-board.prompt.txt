@@ -1,0 +1,9 @@
+﻿Use case: premium visual identity application board.
+Primary request: Using the provided Lotus 01A brand board as the strict visual source, create a Lotus × Toni visual system application board. Do not invent a new logo concept. Preserve the same dark developer-tool kernel identity, lotus symbol style, off-white panels, charcoal background, pink petal accent, precise grid, and premium developer-tool tone. The system must feel like "Lotus × Toni" together: Toni is the personal/product umbrella, Lotus is the agent rules/skills system.
+Input image role: reference image and visual source of truth. The logo shape, mood, palette, and layout style must match the reference closely.
+Subject: A 16:10 brand application board showing Lotus × Toni lockup, website header for toni.asia, project card, documentation page, PDF cover, app icon, favicon, social preview, and agent command terminal. Include the wordmarks "Lotus" and "Toni" clearly, with Lotus as the system/product under Toni.
+Style: high-end identity studio presentation, precise 3x3 grid, dark charcoal canvas, warm white panels, sparse typography, premium engineering/product system.
+Composition: large top-left Lotus × Toni lockup, central website/application mockup, right-side PDF/document cover, bottom row with favicon, README/GitHub badge, toni.asia navigation badge, terminal command card.
+Text: "Lotus × Toni" must appear clearly. "Agent rules & skills system" can appear as small subtitle. Keep all other text minimal and legible.
+Constraints: no new logo direction, no generic flower logo, no colorful redesign. Must be a coherent visual application system derived from the selected 01A image.
+Avoid: random unreadable text, fake long paragraphs, messy moodboard, changing the logo concept, watermark, low-resolution artifacts.
