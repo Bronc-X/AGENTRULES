@@ -19,6 +19,7 @@ allowed-tools:
 
 - 默认直接生图或改图，不要只给提示词模板。
 - 不要要求用户提供 `OPENAI_API_KEY`；Codex 原生生图不需要用户在对话里粘贴 key。
+- 调用 API 时，默认使用当前本机 Codex 已登录账号/会话对应的 API 能力；不要另找、另配或要求用户提供其他 API key，除非用户明确指定。
 - 如果当前 Codex 暴露了可选模型，选择 GPT Image 2 / `gpt-image-2`。
 - 如果当前 Codex 只暴露原生 `image_generation` / `image_gen` 工具而没有模型参数，直接使用原生工具，不要为了指定模型改走临时 SDK 脚本。
 - 只有在用户明确要求 API/CLI、批处理脚本、固定输出路径参数，或原生工具不可用时，才说明 CLI/API 回退方案。
