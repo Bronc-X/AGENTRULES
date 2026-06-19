@@ -17,3 +17,6 @@ yarn-error.log
 *.tmp
 *.bak
 *~
+
+# Local QA/browser artifacts
+.playwright-mcp/
