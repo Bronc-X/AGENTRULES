@@ -6,6 +6,7 @@ import io
 import json
 import os
 import sys
+from urllib.parse import urlparse
 import requests
 
 if sys.stdout.encoding != "utf-8":
@@ -184,8 +185,44 @@ def cmd_extract(args):
     if not url:
         print("Error: url is required", file=sys.stderr)
         sys.exit(1)
+    direct_markdown = _try_fetch_markdown(url)
+    if direct_markdown is not None:
+        print(direct_markdown)
+        return
     arguments = {"url": url}
-    print(_call_api("extract", arguments, args.api_key))
+    result = _call_api("extract", arguments, args.api_key)
+    if _is_markdown_unsupported_extract(result):
+        print(_fetch_markdown(url))
+        return
+    print(result)
+
+
+def _is_markdown_unsupported_extract(result: str) -> bool:
+    text = result.lower()
+    return "extract_unsupported_content" in text and "text/markdown" in text
+
+
+def _fetch_markdown(url: str) -> str:
+    result = _try_fetch_markdown(url)
+    if result is not None:
+        return result
+    print("Markdown fallback did not receive markdown content", file=sys.stderr)
+    sys.exit(1)
+
+
+def _try_fetch_markdown(url: str):
+    parsed = urlparse(url)
+    if parsed.scheme not in ("http", "https"):
+        return None
+    try:
+        resp = requests.get(url, headers={"User-Agent": "anysearch-cli/markdown-fallback"}, timeout=30)
+        resp.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        return None
+    content_type = resp.headers.get("Content-Type", "").split(";")[0].strip().lower()
+    if content_type not in ("text/markdown", "text/x-markdown", "text/md", "application/markdown"):
+        return None
+    return resp.text
 
 
 def _repair_json(raw: str) -> list:
