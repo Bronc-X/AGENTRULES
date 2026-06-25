@@ -293,6 +293,8 @@ macOS / Linux：
 | `stitch-design-taste` | Google Stitch 兼容的 Taste Skill 规则 |
 | `full-output-enforcement` | 防止模型半成品输出，要求完整可运行交付 |
 | `mobile-agent-bridge` | 手机连接本机 Agent 的 daemon / runtime 两层架构调试与验证 |
+| `ios-codex-preview` | 为 iOS / SwiftUI 项目安装并验证 Codex 侧边浏览器实时预览 |
+| `ios-ui-centering-fix` | 修复 SwiftUI 中标题、加载块和 tab 参考轴的结构性居中偏移 |
 | `shadcn-preset-refactor` | 用 shadcn/create preset 对既有前端项目做无损视觉改造和设计系统迁移 |
 | `image-2` | GPT Image 2 生图与改图入口，用于图片生成、图片编辑、风格迁移、换背景、透明素材和批量视觉资产 |
 | `ai-progress-workspace` | 搭建带真实 AI 工具进度、中间生成工作区和结构化 artifact 的 Agent 产品 |
@@ -311,12 +313,27 @@ macOS / Linux：
 | `subagent` | 子 Agent 管理与并行任务编排 |
 | `goal` | 长期任务目标管理，优先路由到宿主原生 Goal 能力 |
 
+## Lotus 可选 Codex 插件
+
+Lotus 也可以托管 Codex 插件市场文件。当前仓库内置一个可选 marketplace：
+
+- `.agents/plugins/marketplace.json`
+
+其中包含：
+
+| Plugin | 用途 |
+|---|---|
+| `build-ios-apps` | iOS / SwiftUI / Xcode / Simulator 调试与预览工作流，位于 `plugins/build-ios-apps` |
+
+`codex-security` 是 Codex 官方专有插件，不把插件运行时代码复制进 Lotus。安全审查的 Lotus 自带顶层入口仍是 `/security-auditor`；更完整的官方扫描工作流请在 Codex App 中安装或启用 Codex Security 插件。
+
 ## 仓库结构
 
 ```text
 Lotus/
 ├── core/                 # 全局规则真源
 ├── skills/               # Lotus 自带 skills
+├── plugins/              # 可选 Codex 插件
 ├── templates/            # 项目级模板
 ├── scripts/              # gstack 托管安装脚本
 ├── install.ps1           # Windows 安装器

@@ -1,0 +1,4 @@
+interface:
+  display_name: "iOS Codex Preview Intel"
+  short_description: "Set up live iOS Simulator preview"
+  default_prompt: "Use $ios-codex-preview to set up live Codex Browser preview and auto-rebuild for this iOS app."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Mobile Agent Bridge"
+  short_description: "Set up and debug phone-to-local-agent bridges."
+  default_prompt: "Set up or debug a mobile-to-local agent bridge with a pairing daemon and an app-server runtime."
