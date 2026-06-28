@@ -235,6 +235,12 @@ function Copy-LotusSkillPackages {
         }
 
         $destination = Join-Path $TargetDir $skillName
+        $localRuntime = Join-Path $destination "runtime.local.json"
+        $savedLocalRuntime = $null
+        if (Test-Path $localRuntime) {
+            $savedLocalRuntime = Get-Content $localRuntime -Raw -Encoding UTF8
+        }
+
         if (Test-Path $destination) {
             Remove-Item $destination -Recurse -Force
         }
@@ -242,6 +248,11 @@ function Copy-LotusSkillPackages {
         Copy-Item $_.FullName $destination -Recurse -Force
         Remove-Item (Join-Path $destination ".env") -Force -ErrorAction SilentlyContinue
         Remove-Item (Join-Path $destination "runtime.conf") -Force -ErrorAction SilentlyContinue
+        Remove-Item (Join-Path $destination "runtime.local.json") -Force -ErrorAction SilentlyContinue
+        if ($null -ne $savedLocalRuntime) {
+            $utf8NoBom = New-Object System.Text.UTF8Encoding $false
+            [System.IO.File]::WriteAllText($localRuntime, $savedLocalRuntime, $utf8NoBom)
+        }
         Write-AnySearchRuntimeConf -SkillDir $destination
         Write-Host "    Copied skill package: $skillName"
     }
@@ -305,6 +316,21 @@ function Convert-ToCodexSkill {
         return
     }
 
+    if ($skillName -eq "image-2") {
+        $body = $content -replace '(?s)^---\r?\n.*?\r?\n---\r?\n?', ''
+        $codexContent = @"
+---
+name: $skillName
+description: $description
+---
+
+$body
+"@
+        $utf8NoBom = New-Object System.Text.UTF8Encoding $false
+        [System.IO.File]::WriteAllText((Join-Path $skillDir "SKILL.md"), $codexContent, $utf8NoBom)
+        return
+    }
+
     $allowedTools = switch ($skillName) {
         "auto-build" { "Bash, Read" }
         "btw" { "Read, AskUserQuestion" }
@@ -312,7 +338,6 @@ function Convert-ToCodexSkill {
         "polanyi-tacit" { "Read, AskUserQuestion" }
         "powerup" { "Read, AskUserQuestion" }
         "insights" { "Read, Bash, Grep, Glob" }
-        "image-2" { "Read, Write, Edit, Grep, Glob, Bash, AskUserQuestion" }
         "ai-progress-workspace" { "Read, Write, Edit, Grep, Glob, Bash, AskUserQuestion, WebSearch" }
         "loop" { "Bash, Read, AskUserQuestion" }
         "agent-training-loop" { "Read, Write, Edit, Grep, Glob, Bash, AskUserQuestion" }

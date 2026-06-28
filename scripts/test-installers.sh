@@ -116,6 +116,19 @@ STUB
   chmod +x "$script"
 }
 
+write_incomplete_gstack_stub() {
+  local script="$1"
+
+  cat > "$script" <<'STUB'
+#!/usr/bin/env bash
+set -euo pipefail
+
+mkdir -p "$HOME/.gstack/repos/gstack/.git" "$HOME/.codex/skills/gstack"
+printf -- "---\nname: gstack\n---\n# partial stub\n" > "$HOME/.codex/skills/gstack/SKILL.md"
+STUB
+  chmod +x "$script"
+}
+
 test_shell_syntax() {
   bash -n "$ROOT/install.sh" "$ROOT/scripts/install-managed-gstack.sh" "$ROOT/scripts/test-installers.sh"
 }
@@ -131,9 +144,16 @@ test_codex_conversion_with_stubbed_gstack() {
   HOME="$tmp/home" bash "$tmp/lotus/install.sh" --global --yes >/dev/null
 
   assert_file_contains "$tmp/home/.codex/skills/image-2/SKILL.md" "# Image 2"
+  if grep -q "^allowed-tools:" "$tmp/home/.codex/skills/image-2/SKILL.md"; then
+    fail "image-2 should not restrict Codex native image tools with allowed-tools"
+  fi
+  assert_file_contains "$tmp/home/.codex/skills/image-2/SKILL.md" "image_gen"
+  [ -f "$tmp/home/.codex/skills/image-2/scripts/image2_newapi.py" ] || fail "missing image-2 newapi fallback"
+  [ -f "$tmp/home/.codex/skills/image-2/runtime.example.json" ] || fail "missing image-2 runtime example"
+  [ ! -e "$tmp/home/.codex/skills/image-2/runtime.local.json" ] || fail "image-2 local runtime should not be installed from repo"
   assert_file_contains "$tmp/home/.codex/skills/ai-progress-workspace/SKILL.md" "# AI Progress Workspace"
   assert_file_contains "$tmp/home/.codex/skills/ai-progress-workspace/SKILL.md" "  - WebSearch"
-  assert_file_contains "$tmp/home/.codex/skills/taste-skill/SKILL.md" "# Taste Skill"
+  assert_file_contains "$tmp/home/.codex/skills/taste-skill/SKILL.md" "# tasteskill: Anti-Slop Frontend Skill"
   assert_file_contains "$tmp/home/.codex/skills/agent-training-loop/SKILL.md" "# Agent Training Loop"
   assert_file_contains "$tmp/home/.codex/skills/agent-training-loop/SKILL.md" "Use only when the user explicitly invokes"
   assert_file_contains "$tmp/home/.codex/skills/agent-training-loop/SKILL.md" "  - Bash"
@@ -181,8 +201,25 @@ test_failed_gstack_install_preserves_existing_codex_runtime_and_succeeds() {
   assert_file_contains "$tmp/home/.claude/skills/qa/SKILL.md" "gstack bootstrap"
 }
 
+test_incomplete_gstack_install_falls_back_to_bootstrap() {
+  local tmp
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' RETURN
+
+  copy_repo_fixture "$tmp/lotus"
+  write_incomplete_gstack_stub "$tmp/lotus/scripts/install-managed-gstack.sh"
+
+  HOME="$tmp/home" bash "$tmp/lotus/install.sh" --global --yes >/dev/null 2>"$tmp/stderr"
+
+  assert_file_contains "$tmp/stderr" "Official gstack installation or verification failed"
+  assert_file_contains "$tmp/home/.codex/skills/gstack/SKILL.md" "partial stub"
+  assert_file_contains "$tmp/home/.codex/skills/gstack-qa/SKILL.md" "gstack bootstrap"
+  assert_file_contains "$tmp/home/.claude/skills/qa/SKILL.md" "gstack bootstrap"
+}
+
 test_shell_syntax
 test_codex_conversion_with_stubbed_gstack
 test_failed_gstack_install_preserves_existing_codex_runtime_and_succeeds
+test_incomplete_gstack_install_falls_back_to_bootstrap
 
 echo "installer tests passed"

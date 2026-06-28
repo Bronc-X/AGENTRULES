@@ -264,15 +264,25 @@ copy_lotus_skill_packages() {
         fi
 
         local target_skill_dir="$target_dir/$skill_name"
+        local saved_runtime=""
+        local had_runtime=0
+        if [ -f "$target_skill_dir/runtime.local.json" ]; then
+            saved_runtime="$(cat "$target_skill_dir/runtime.local.json")"
+            had_runtime=1
+        fi
+
         rm -rf "$target_skill_dir"
         mkdir -p "$target_skill_dir"
         (
             cd "$skill_dir"
-            tar --exclude=".env" --exclude="runtime.conf" -cf - .
+            tar --exclude=".env" --exclude="runtime.conf" --exclude="runtime.local.json" -cf - .
         ) | (
             cd "$target_skill_dir"
             tar -xf -
         )
+        if [ "$had_runtime" -eq 1 ]; then
+            printf '%s\n' "$saved_runtime" > "$target_skill_dir/runtime.local.json"
+        fi
         write_anysearch_runtime_conf "$target_skill_dir"
         echo "    Copied skill package: $skill_name"
     done
@@ -443,7 +453,9 @@ install_gstack_bootstrap_skills() {
 
 # Convert a Lotus skill .md file into a Codex-compatible SKILL.md directory.
 # Codex expects: ~/.codex/skills/<name>/SKILL.md with YAML frontmatter containing
-# name, description, and allowed-tools fields.
+# name and description. Most legacy Lotus skills also carry allowed-tools, but
+# image-2 intentionally avoids a tool whitelist so native image tools stay available
+# when the host exposes them.
 convert_to_codex_skill() {
     local source_file="$1"
     local target_dir="$2"
@@ -487,7 +499,6 @@ convert_to_codex_skill() {
         polanyi-tacit)  allowed_tools="Read\n  - AskUserQuestion" ;;
         powerup)        allowed_tools="Read\n  - AskUserQuestion" ;;
         insights)       allowed_tools="Read\n  - Bash\n  - Grep\n  - Glob" ;;
-        image-2)        allowed_tools="Read\n  - Write\n  - Edit\n  - Grep\n  - Glob\n  - Bash\n  - AskUserQuestion" ;;
         ai-progress-workspace) allowed_tools="Read\n  - Write\n  - Edit\n  - Grep\n  - Glob\n  - Bash\n  - AskUserQuestion\n  - WebSearch" ;;
         loop)           allowed_tools="Bash\n  - Read\n  - AskUserQuestion" ;;
         agent-training-loop) allowed_tools="Read\n  - Write\n  - Edit\n  - Grep\n  - Glob\n  - Bash\n  - AskUserQuestion" ;;
@@ -527,6 +538,19 @@ convert_to_codex_skill() {
             print
         }
     ' "$source_file")
+
+    if [ "$skill_name" = "image-2" ]; then
+        cat > "$skill_dir/SKILL.md" <<CODEX_EOF
+---
+name: $skill_name
+description: $description
+---
+$body
+CODEX_EOF
+
+        echo "    Converted skill: $skill_name"
+        return 0
+    fi
 
     cat > "$skill_dir/SKILL.md" <<CODEX_EOF
 ---
@@ -590,12 +614,11 @@ if [ "$GLOBAL" -eq 1 ]; then
     echo "  Codex CLI configured (rules + Lotus-only compatible skills)"
 
     echo "  Installing official gstack upstream..."
-    if LOTUS_GSTACK_PROFILE="$GSTACK_PROFILE" bash "$MANAGED_GSTACK_INSTALLER"; then
-        verify_managed_gstack_install
+    if LOTUS_GSTACK_PROFILE="$GSTACK_PROFILE" bash "$MANAGED_GSTACK_INSTALLER" && verify_managed_gstack_install; then
         OFFICIAL_GSTACK_INSTALLED=1
         echo "  Official gstack configured for Claude/Codex"
     else
-        echo "Official gstack installation failed. Installing bootstrap slash entries instead." >&2
+        echo "Official gstack installation or verification failed. Installing bootstrap slash entries instead." >&2
         install_gstack_bootstrap_skills 1
         GSTACK_BOOTSTRAP_INSTALLED=1
     fi

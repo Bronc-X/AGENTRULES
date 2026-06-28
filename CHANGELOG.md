@@ -17,6 +17,19 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [1.1.13] - 2026-06-21
+
+### Fixed
+
+- Updated `image-2` so Codex installs no longer add an `allowed-tools` whitelist that can hide native GPT Image tools; the skill now routes directly to `image_gen` / `image_generation` when the host exposes them.
+- Added a local `image-2` newapi fallback package that can call `gpt-image-2` when the host does not expose native image tools, while preserving per-machine `runtime.local.json` secrets across reinstalls.
+
+### Changed
+
+- Clarified `image-2` as an execution entrypoint, not a prompt-only guide, with the system `imagegen` skill as the detailed built-in image workflow source.
+
+---
+
 ## [1.1.12] - 2026-06-10
 
 ### Added
