@@ -168,7 +168,7 @@ cd ~/Projects/MyNewApp
 - `gstack-design-review`
 - `gstack-review`
 - `gstack-investigate`
-- `gstack-browse`
+- `browse`
 - `gstack-qa`
 - `gstack-ship`
 
@@ -199,6 +199,8 @@ C:\Dev\Lotus\install.ps1 -Global -GstackProfile design
 | Skill | 用途 |
 |---|---|
 | `anysearch` | 实时搜索、垂直领域检索、批量搜索和 URL 内容提取 |
+| `agent-reach` | 互联网能力路由器，覆盖网页、搜索、YouTube、RSS、V2EX、B站和需登录态的社交平台 |
+| `codebase-memory-mcp` | 代码库记忆与图谱检索，支持索引、结构搜索、调用路径和架构追踪 |
 | `test-driven-development` | 严格红绿重构，先写失败测试再写实现 |
 | `frontend-design` | 前端审美与交互质量约束 |
 | `taste-skill` | 前端审美与实现质量约束，强化布局、字体、动效、间距和组件完成度 |
@@ -218,6 +220,7 @@ C:\Dev\Lotus\install.ps1 -Global -GstackProfile design
 | `ios-ui-centering-fix` | 修复 SwiftUI 中标题、加载块和 tab 参考轴的结构性居中偏移 |
 | `shadcn-preset-refactor` | 用 shadcn/create preset 做无损视觉改造 |
 | `image-2` | GPT Image 2 生图与改图入口 |
+| `gsap` | GreenSock 官方 GSAP 动画 skill 聚合入口，路由到 React、ScrollTrigger、Timeline、Plugins 等官方子 skill |
 | `ai-progress-workspace` | 搭建带真实 AI 工具进度和结构化 artifact 的 Agent 产品 |
 | `web-to-design-md` | 从参考网页、品牌资料、需求文档生成结构化 `design.md` |
 | `debugging-strategies` | 系统性排错，先定位根因再修复 |

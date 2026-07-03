@@ -138,8 +138,8 @@ function Assert-ManagedGstackInstall {
     Add-MissingSkillIfAbsent $missing "Codex design-review skill (~/.codex/skills/gstack-design-review/SKILL.md)" @(
         (Join-Path $HOME ".codex\skills\gstack-design-review\SKILL.md")
     )
-    Add-MissingSkillIfAbsent $missing "Codex browse skill (~/.codex/skills/gstack-browse/SKILL.md)" @(
-        (Join-Path $HOME ".codex\skills\gstack-browse\SKILL.md")
+    Add-MissingSkillIfAbsent $missing "Codex browse skill (~/.codex/skills/gstack/browse/SKILL.md)" @(
+        (Join-Path $HOME ".codex\skills\gstack\browse\SKILL.md")
     )
     Add-MissingSkillIfAbsent $missing "Codex qa skill (~/.codex/skills/gstack-qa/SKILL.md)" @(
         (Join-Path $HOME ".codex\skills\gstack-qa\SKILL.md")
@@ -271,7 +271,8 @@ function Copy-LotusSkills {
     Get-ChildItem (Join-Path $SkillsDir "*.md") | ForEach-Object {
         $baseName = [System.IO.Path]::GetFileNameWithoutExtension($_.Name)
         if (-not (Test-SkillExcluded -SkillName $baseName -ExcludedSkills $ExcludedSkills)) {
-            Copy-Item $_.FullName $TargetDir -Force
+            Remove-Item (Join-Path $TargetDir "$baseName.md") -Force -ErrorAction SilentlyContinue
+            Convert-ToCodexSkill -SourceFile $_.FullName -TargetDir $TargetDir
         }
     }
 
@@ -379,6 +380,16 @@ function Get-ClaudeGstackSkillName {
     return ($SkillName -replace '^gstack-', '')
 }
 
+function Test-ShouldSyncGstackSkillForCodex {
+    param ([string]$SkillName)
+
+    return @(
+        "gstack-browse",
+        "gstack-open-gstack-browser",
+        "gstack-setup-browser-cookies"
+    ) -notcontains $SkillName
+}
+
 function Copy-DirectoryClean {
     param (
         [string]$Source,
@@ -414,13 +425,22 @@ function Sync-GstackSkillsFromGeneratedDocs {
             throw "Expected generated gstack skill is missing: $sourceSkillFile"
         }
 
-        $codexTarget = Join-Path $CodexSkills $skillName
-        Copy-DirectoryClean -Source $sourceSkillDir -Destination $codexTarget
+        if (Test-ShouldSyncGstackSkillForCodex -SkillName $skillName) {
+            $codexTarget = Join-Path $CodexSkills $skillName
+            Copy-DirectoryClean -Source $sourceSkillDir -Destination $codexTarget
+        }
 
         $claudeSkillName = Get-ClaudeGstackSkillName $skillName
         $claudeTarget = Join-Path $ClaudeSkills $claudeSkillName
         New-Item -ItemType Directory -Path $claudeTarget -Force | Out-Null
         Copy-Item $sourceSkillFile (Join-Path $claudeTarget "SKILL.md") -Force
+    }
+
+    foreach ($duplicateCodexBrowserSkill in @("gstack-browse", "gstack-open-gstack-browser", "gstack-setup-browser-cookies")) {
+        $duplicateCodexBrowserSkillDir = Join-Path $CodexSkills $duplicateCodexBrowserSkill
+        if (Test-Path $duplicateCodexBrowserSkillDir) {
+            Remove-Item $duplicateCodexBrowserSkillDir -Recurse -Force
+        }
     }
 
     Write-Host "  Synced official gstack top-level skills without Git/Bash"

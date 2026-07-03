@@ -17,6 +17,20 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [1.1.14] - 2026-07-03
+
+### Added
+
+- Added the `gsap` Lotus top-level skill router and bundled the official GreenSock GSAP skills for core tweens, timelines, ScrollTrigger, plugins, utilities, React, framework integration, and performance guidance.
+- Added the `agent-reach` Lotus top-level skill package for internet search, web/video/RSS reading, and multi-platform social research routing.
+- Added the `codebase-memory-mcp` Lotus top-level skill for codebase memory setup, MCP indexing, graph search, call-path tracing, and architecture discovery.
+
+### Fixed
+
+- Stopped installing duplicate Codex browser-adjacent top-level skills; Codex now uses the official `gstack/browse` runtime skill as the single browse entry.
+
+---
+
 ## [1.1.13] - 2026-06-21
 
 ### Fixed

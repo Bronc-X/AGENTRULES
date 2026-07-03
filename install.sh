@@ -148,8 +148,8 @@ verify_managed_gstack_install() {
         "$HOME/.codex/skills/gstack-plan-design-review/SKILL.md"
     require_skill_file missing "Codex design-review skill (~/.codex/skills/gstack-design-review/SKILL.md)" \
         "$HOME/.codex/skills/gstack-design-review/SKILL.md"
-    require_skill_file missing "Codex browse skill (~/.codex/skills/gstack-browse/SKILL.md)" \
-        "$HOME/.codex/skills/gstack-browse/SKILL.md"
+    require_skill_file missing "Codex browse skill (~/.codex/skills/gstack/browse/SKILL.md)" \
+        "$HOME/.codex/skills/gstack/browse/SKILL.md"
     require_skill_file missing "Codex qa skill (~/.codex/skills/gstack-qa/SKILL.md)" \
         "$HOME/.codex/skills/gstack-qa/SKILL.md"
     require_skill_file missing "Codex review skill (~/.codex/skills/gstack-review/SKILL.md)" \
@@ -297,7 +297,8 @@ copy_lotus_skills() {
         local skill_name
         skill_name="$(basename "$skill_file" .md)"
         if ! is_skill_excluded "$skill_name" "$@"; then
-            cp "$skill_file" "$target_dir/"
+            rm -f "$target_dir/$skill_name.md"
+            convert_to_codex_skill "$skill_file" "$target_dir"
         fi
     done
 

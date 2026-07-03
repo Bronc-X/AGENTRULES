@@ -134,6 +134,27 @@ should_expose_generated_skill() {
   skill_in_list "$skill_name" "${allowed_skills[@]}"
 }
 
+should_sync_generated_skill_for_host() {
+  local host_name="$1"
+  local skill_name="$2"
+
+  if ! should_expose_generated_skill "$skill_name"; then
+    return 1
+  fi
+
+  # Codex already exposes the official runtime subskill at gstack/browse.
+  # Extra browser-adjacent top-level skills crowd the menu with near-duplicates.
+  if [ "$host_name" = "Codex" ]; then
+    case "$skill_name" in
+      gstack-browse|gstack-open-gstack-browser|gstack-setup-browser-cookies)
+        return 1
+        ;;
+    esac
+  fi
+
+  return 0
+}
+
 run_with_timeout() {
   local timeout_seconds="$1"
   shift
@@ -654,7 +675,7 @@ sync_generated_host_skills() {
     if [ -e "$skill_dir" ]; then
       generated_count=$((generated_count + 1))
       skill_name="$(basename "$skill_dir")"
-      if should_expose_generated_skill "$skill_name"; then
+      if should_sync_generated_skill_for_host "$host_name" "$skill_name"; then
         cp -R "$skill_dir" "$staging_dir"/
         copied=$((copied + 1))
         selected_skill_names+=("$skill_name")

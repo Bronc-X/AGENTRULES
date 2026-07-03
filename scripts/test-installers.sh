@@ -12,7 +12,6 @@ CORE_GSTACK_SKILLS=(
   "gstack-design-review"
   "gstack-review"
   "gstack-investigate"
-  "gstack-browse"
   "gstack-qa"
   "gstack-ship"
 )
@@ -71,7 +70,6 @@ core_skills=(
   "gstack-design-review"
   "gstack-review"
   "gstack-investigate"
-  "gstack-browse"
   "gstack-qa"
   "gstack-ship"
 )
@@ -95,6 +93,9 @@ for skill in "${core_skills[@]}"; do
   mkdir -p "$HOME/.codex/skills/$skill"
   printf -- "---\nname: %s\n---\n# stub\n" "$skill" > "$HOME/.codex/skills/$skill/SKILL.md"
 done
+
+mkdir -p "$HOME/.codex/skills/gstack/browse"
+printf -- "---\nname: browse\n---\n# stub\n" > "$HOME/.codex/skills/gstack/browse/SKILL.md"
 
 for skill in "${claude_skills[@]}"; do
   mkdir -p "$HOME/.claude/skills/$skill"
@@ -170,6 +171,9 @@ test_codex_conversion_with_stubbed_gstack() {
   assert_file_contains "$tmp/home/.claude/skills/anysearch/runtime.conf" "scripts/anysearch_cli"
   [ -f "$tmp/home/.claude/skills/anysearch/scripts/anysearch_cli.py" ] || fail "missing Claude anysearch CLI"
   [ ! -e "$tmp/home/.claude/skills/anysearch/.env" ] || fail "Claude anysearch .env should not be installed"
+  assert_file_contains "$tmp/home/.claude/skills/gsap/SKILL.md" "# GSAP Skill Router"
+  [ ! -e "$tmp/home/.claude/skills/gsap.md" ] || fail "Claude should not keep legacy flat gsap.md"
+  assert_file_contains "$tmp/home/.claude/skills/gsap-react/SKILL.md" "# GSAP with React"
 
   [ ! -e "$tmp/home/.codex/skills/btw" ] || fail "Codex in-context skill should not be installed as slash skill: btw"
   [ ! -e "$tmp/home/.codex/skills/loop" ] || fail "Codex in-context skill should not be installed as slash skill: loop"
@@ -177,6 +181,8 @@ test_codex_conversion_with_stubbed_gstack() {
   for skill in "${CORE_GSTACK_SKILLS[@]}"; do
     [ -f "$tmp/home/.codex/skills/$skill/SKILL.md" ] || fail "missing Codex gstack skill: $skill"
   done
+  [ -f "$tmp/home/.codex/skills/gstack/browse/SKILL.md" ] || fail "missing Codex nested browse skill"
+  [ ! -e "$tmp/home/.codex/skills/gstack-browse" ] || fail "Codex should rely on gstack/browse instead of duplicate gstack-browse"
 
   for skill in "${CLAUDE_GSTACK_SKILLS[@]}"; do
     [ -f "$tmp/home/.claude/skills/$skill/SKILL.md" ] || fail "missing Claude gstack skill: $skill"
