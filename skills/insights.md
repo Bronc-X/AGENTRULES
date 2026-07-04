@@ -1,6 +1,6 @@
 ---
 name: insights
-description: 复盘习惯时分析摩擦给建议
+description: 复盘工作习惯和摩擦点，提炼可执行改进建议。
 ---
 
 # Insights 习惯回顾 (@insights)

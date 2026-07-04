@@ -1,6 +1,6 @@
 ---
 name: gstack
-description: 需gstack流程时打开总入口
+description: 需 gstack 调研、评审、调试、QA 或发布流程时打开总入口。
 ---
 
 # Official gstack

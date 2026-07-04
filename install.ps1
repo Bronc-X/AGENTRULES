@@ -16,6 +16,30 @@ $ManagedGstackInstaller = Join-Path $RepoRoot "scripts\install-managed-gstack.sh
 # These skills work via AGENTS.md rule-level recognition instead.
 $CodexExcludedSkills = @("btw", "loop")
 $ManagedOfficialSkills = @("gstack")
+$ObsoleteLotusSkills = @(
+    "auto-build",
+    "conversion-copywriter",
+    "debugging-strategies",
+    "design-taste-frontend-v1",
+    "gpt-taste",
+    "gsap-core",
+    "gsap-frameworks",
+    "gsap-performance",
+    "gsap-plugins",
+    "gsap-react",
+    "gsap-scrolltrigger",
+    "gsap-timeline",
+    "gsap-utils",
+    "high-end-visual-design",
+    "image-to-code",
+    "industrial-brutalist-ui",
+    "minimalist-ui",
+    "mobile-agent-bridge",
+    "powerup",
+    "redesign-existing-projects",
+    "stitch-design-taste",
+    "web-to-design-md"
+)
 $OfficialGstackInstalled = $false
 $GstackBootstrapInstalled = $false
 $CoreExposedGstackSkills = @(
@@ -24,11 +48,8 @@ $CoreExposedGstackSkills = @(
     "gstack-plan-ceo-review",
     "gstack-plan-design-review",
     "gstack-plan-eng-review",
-    "gstack-design-review",
-    "gstack-review",
     "gstack-investigate",
     "gstack-browse",
-    "gstack-qa",
     "gstack-ship"
 )
 
@@ -100,17 +121,9 @@ function Assert-ManagedGstackInstall {
         (Join-Path $HOME ".claude\skills\gstack-plan-design-review\SKILL.md"),
         (Join-Path $HOME ".claude\skills\plan-design-review\SKILL.md")
     )
-    Add-MissingSkillIfAbsent $missing "Claude design-review skill (~/.claude/skills/gstack-design-review or design-review)" @(
-        (Join-Path $HOME ".claude\skills\gstack-design-review\SKILL.md"),
-        (Join-Path $HOME ".claude\skills\design-review\SKILL.md")
-    )
-    Add-MissingSkillIfAbsent $missing "Claude qa skill (~/.claude/skills/gstack-qa or qa)" @(
-        (Join-Path $HOME ".claude\skills\gstack-qa\SKILL.md"),
-        (Join-Path $HOME ".claude\skills\qa\SKILL.md")
-    )
-    Add-MissingSkillIfAbsent $missing "Claude review skill (~/.claude/skills/gstack-review or review)" @(
-        (Join-Path $HOME ".claude\skills\gstack-review\SKILL.md"),
-        (Join-Path $HOME ".claude\skills\review\SKILL.md")
+    Add-MissingSkillIfAbsent $missing "Claude browse skill (~/.claude/skills/gstack-browse or browse)" @(
+        (Join-Path $HOME ".claude\skills\gstack-browse\SKILL.md"),
+        (Join-Path $HOME ".claude\skills\browse\SKILL.md")
     )
     Add-MissingSkillIfAbsent $missing "Claude ship skill (~/.claude/skills/gstack-ship or ship)" @(
         (Join-Path $HOME ".claude\skills\gstack-ship\SKILL.md"),
@@ -135,17 +148,9 @@ function Assert-ManagedGstackInstall {
     Add-MissingSkillIfAbsent $missing "Codex plan-design-review skill (~/.codex/skills/gstack-plan-design-review/SKILL.md)" @(
         (Join-Path $HOME ".codex\skills\gstack-plan-design-review\SKILL.md")
     )
-    Add-MissingSkillIfAbsent $missing "Codex design-review skill (~/.codex/skills/gstack-design-review/SKILL.md)" @(
-        (Join-Path $HOME ".codex\skills\gstack-design-review\SKILL.md")
-    )
-    Add-MissingSkillIfAbsent $missing "Codex browse skill (~/.codex/skills/gstack/browse/SKILL.md)" @(
+    Add-MissingSkillIfAbsent $missing "Codex browse skill (~/.codex/skills/gstack-browse/SKILL.md or gstack/browse/SKILL.md)" @(
+        (Join-Path $HOME ".codex\skills\gstack-browse\SKILL.md"),
         (Join-Path $HOME ".codex\skills\gstack\browse\SKILL.md")
-    )
-    Add-MissingSkillIfAbsent $missing "Codex qa skill (~/.codex/skills/gstack-qa/SKILL.md)" @(
-        (Join-Path $HOME ".codex\skills\gstack-qa\SKILL.md")
-    )
-    Add-MissingSkillIfAbsent $missing "Codex review skill (~/.codex/skills/gstack-review/SKILL.md)" @(
-        (Join-Path $HOME ".codex\skills\gstack-review\SKILL.md")
     )
     Add-MissingSkillIfAbsent $missing "Codex ship skill (~/.codex/skills/gstack-ship/SKILL.md)" @(
         (Join-Path $HOME ".codex\skills\gstack-ship\SKILL.md")
@@ -258,6 +263,28 @@ function Copy-LotusSkillPackages {
     }
 }
 
+function Remove-ObsoleteLotusSkills {
+    param ([string]$TargetDir)
+
+    if (-not (Test-Path $TargetDir)) {
+        return
+    }
+
+    foreach ($skillName in $ObsoleteLotusSkills) {
+        $staleDir = Join-Path $TargetDir $skillName
+        $staleFile = Join-Path $TargetDir "$skillName.md"
+
+        if (Test-Path $staleDir) {
+            Remove-Item $staleDir -Recurse -Force
+            Write-Host "    Removed merged skill: $skillName"
+        }
+        if (Test-Path $staleFile) {
+            Remove-Item $staleFile -Force
+            Write-Host "    Removed merged skill file: $skillName.md"
+        }
+    }
+}
+
 function Copy-LotusSkills {
     param (
         [string]$TargetDir,
@@ -267,6 +294,8 @@ function Copy-LotusSkills {
     if (-not (Test-Path $TargetDir)) {
         New-Item -ItemType Directory -Path $TargetDir -Force | Out-Null
     }
+
+    Remove-ObsoleteLotusSkills -TargetDir $TargetDir
 
     Get-ChildItem (Join-Path $SkillsDir "*.md") | ForEach-Object {
         $baseName = [System.IO.Path]::GetFileNameWithoutExtension($_.Name)
@@ -598,6 +627,8 @@ if ($Global) {
 
     $CodexSkills = Join-Path $CodexDir "skills"
     if (-not (Test-Path $CodexSkills)) { New-Item -ItemType Directory -Path $CodexSkills -Force | Out-Null }
+
+    Remove-ObsoleteLotusSkills -TargetDir $CodexSkills
 
     foreach ($excluded in $CodexExcludedSkills) {
         $excludedDir = Join-Path $CodexSkills $excluded

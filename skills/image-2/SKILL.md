@@ -1,6 +1,6 @@
 ---
 name: image-2
-description: GPT Image 2 生图改图入口；用于图片生成、图片编辑、风格迁移、换背景、透明素材和批量视觉资产。触发后优先调用 Codex 内置 `image_gen` / `image_generation`；如果宿主没有暴露原生工具，则使用本 skill 的本机 newapi fallback 调用 `gpt-image-2`。
+description: 生成或编辑 GPT Image 2 图片，支持换背景、透明素材和批量资产。
 ---
 
 # Image 2

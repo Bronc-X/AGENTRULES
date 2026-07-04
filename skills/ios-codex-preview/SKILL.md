@@ -1,6 +1,6 @@
 ---
 name: ios-codex-preview
-description: Set up and verify Codex-assisted iOS app development with a live iOS Simulator view in the Codex in-app Browser. Use when the user wants Codex to build, run, inspect, and iterate on an iOS/Xcode/SwiftUI app with right-side Browser preview, automatic rebuild/relaunch after Swift changes, Intel Mac compatibility when serve-sim is unavailable, health checks, or reusable setup for future iOS app projects.
+description: 搭建 iOS 模拟器预览，让 Codex 构建、运行、检查 SwiftUI 应用。
 ---
 
 # iOS Codex Preview Intel

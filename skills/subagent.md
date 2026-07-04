@@ -1,6 +1,6 @@
 ---
 name: subagent
-description: 任务可并行时编排子Agent
+description: 把可并行任务拆给子 Agent 并汇总结论或补丁。
 ---
 
 # Subagent 子 Agent 管理 (@subagent)

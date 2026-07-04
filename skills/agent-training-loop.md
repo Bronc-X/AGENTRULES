@@ -1,6 +1,6 @@
 ---
 name: agent-training-loop
-description: 修Bug时循环复现定位修复验证
+description: 修 Bug 时循环复现、定位、修复和验证直到通过。
 risk: medium
 source: lotus
 date_added: "2026-05-11"

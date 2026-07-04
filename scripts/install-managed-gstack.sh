@@ -13,11 +13,8 @@ CORE_EXPOSED_GSTACK_SKILLS=(
   "gstack-plan-ceo-review"
   "gstack-plan-design-review"
   "gstack-plan-eng-review"
-  "gstack-design-review"
-  "gstack-review"
   "gstack-investigate"
   "gstack-browse"
-  "gstack-qa"
   "gstack-ship"
 )
 
@@ -142,11 +139,10 @@ should_sync_generated_skill_for_host() {
     return 1
   fi
 
-  # Codex already exposes the official runtime subskill at gstack/browse.
   # Extra browser-adjacent top-level skills crowd the menu with near-duplicates.
   if [ "$host_name" = "Codex" ]; then
     case "$skill_name" in
-      gstack-browse|gstack-open-gstack-browser|gstack-setup-browser-cookies)
+      gstack-open-gstack-browser|gstack-setup-browser-cookies)
         return 1
         ;;
     esac

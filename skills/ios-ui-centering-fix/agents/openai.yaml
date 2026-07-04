@@ -1,4 +1,4 @@
 interface:
   display_name: "iOS UI Centering Fix"
-  short_description: "Centering fixes + ScienceFeed i18n polish"
-  default_prompt: "Audit SwiftUI screens for off-center headers/spinners, fix alignment, and ensure ScienceFeed cards show localized title/summary/why/action with expandable text."
+  short_description: "修复 SwiftUI 中心轴偏移"
+  default_prompt: "使用 $ios-ui-centering-fix 检查并修复 SwiftUI header、loading、tab 等中心轴偏移问题。"

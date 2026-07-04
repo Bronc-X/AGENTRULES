@@ -1,6 +1,6 @@
 ---
 name: polanyi-tacit
-description: 读复杂代码时分析隐性约束
+description: 阅读复杂代码时识别隐性约束、惯例和不可见风险。
 ---
 
 # 迈克尔·波兰尼默会机制 (Polanyi's Tacit Knowledge) 专项技能

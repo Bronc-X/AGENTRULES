@@ -1,6 +1,6 @@
 ---
 name: test-driven-development
-description: 写功能修Bug前先写失败测试
+description: 新增功能或修 Bug 前先写失败测试再实现。
 risk: unknown
 source: community
 date_added: "2026-02-27"

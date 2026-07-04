@@ -1,11 +1,6 @@
 ---
 name: codebase-memory-mcp
-description: >
-  Use when a task needs codebase memory, repository indexing, code graph
-  search, architecture tracing, dependency/call-path discovery, cross-file
-  impact analysis, or durable project code intelligence through
-  DeusData/codebase-memory-mcp. Prefer exact text/file lookup with rg; use
-  this skill for structural discovery and repository memory.
+description: 用代码图谱索引仓库并查询架构、调用链、依赖和影响面。
 metadata:
   homepage: https://github.com/DeusData/codebase-memory-mcp
 ---

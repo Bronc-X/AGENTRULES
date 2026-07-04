@@ -1,6 +1,6 @@
 ---
 name: ai-progress-workspace
-description: 用事件流展示AI真实进度
+description: 用事件流记录和展示 AI 任务的真实进度。
 risk: unknown
 source: community
 date_added: "2026-05-18"

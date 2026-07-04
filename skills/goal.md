@@ -1,6 +1,6 @@
 ---
 name: goal
-description: 长期任务时管理Codex目标
+description: 管理长期目标、当前阶段、阻塞点和下一步行动。
 risk: medium
 source: lotus
 date_added: "2026-05-23"

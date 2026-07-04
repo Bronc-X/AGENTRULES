@@ -1,6 +1,6 @@
 ---
 name: baseline-packager
-description: 防回归时固化已验证行为
+description: 把已验证行为固化为基线，防止后续改动回归。
 risk: medium
 source: lotus
 date_added: "2026-05-11"

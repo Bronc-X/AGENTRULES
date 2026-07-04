@@ -1,6 +1,6 @@
 ---
 name: mini-investigate
-description: 查小Bug时做最小修复
+description: 修小 Bug 时按复现、定位、最小补丁和回归验证闭环。
 risk: medium
 source: lotus
 date_added: "2026-06-02"

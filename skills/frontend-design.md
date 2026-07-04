@@ -1,6 +1,6 @@
 ---
 name: frontend-design
-description: 做前端页时提升布局视觉交互
+description: 做功能型前端页面时提升布局、视觉层级、响应式和交互状态。
 risk: unknown
 source: community
 date_added: "2026-02-27"

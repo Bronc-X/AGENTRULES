@@ -1,6 +1,6 @@
 ---
 name: ios-ui-centering-fix
-description: Fix SwiftUI center-axis alignment issues in Antianxiety iOS with structural centering (not guess offsets). Use when headers, loading blocks, or tab reference axis look shifted.
+description: 修复 SwiftUI 中 header、loading、tab 等中心轴偏移问题。
 ---
 
 # iOS UI Centering Fix

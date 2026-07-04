@@ -1,6 +1,6 @@
 ---
 name: security-auditor
-description: 审安全时查权限依赖合规风险
+description: 审查权限、依赖、密钥、配置和常见安全风险。
 risk: unknown
 source: community
 date_added: '2026-02-27'

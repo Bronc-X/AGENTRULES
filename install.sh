@@ -10,17 +10,38 @@ MANAGED_GSTACK_INSTALLER="$REPO_ROOT/scripts/install-managed-gstack.sh"
 # These skills work via AGENTS.md rule-level recognition instead.
 CODEX_EXCLUDED_SKILLS=("btw" "loop")
 MANAGED_OFFICIAL_SKILLS=("gstack")
+OBSOLETE_LOTUS_SKILLS=(
+    "auto-build"
+    "conversion-copywriter"
+    "debugging-strategies"
+    "design-taste-frontend-v1"
+    "gpt-taste"
+    "gsap-core"
+    "gsap-frameworks"
+    "gsap-performance"
+    "gsap-plugins"
+    "gsap-react"
+    "gsap-scrolltrigger"
+    "gsap-timeline"
+    "gsap-utils"
+    "high-end-visual-design"
+    "image-to-code"
+    "industrial-brutalist-ui"
+    "minimalist-ui"
+    "mobile-agent-bridge"
+    "powerup"
+    "redesign-existing-projects"
+    "stitch-design-taste"
+    "web-to-design-md"
+)
 CORE_EXPOSED_GSTACK_SKILLS=(
     "gstack"
     "gstack-office-hours"
     "gstack-plan-ceo-review"
     "gstack-plan-design-review"
     "gstack-plan-eng-review"
-    "gstack-design-review"
-    "gstack-review"
     "gstack-investigate"
     "gstack-browse"
-    "gstack-qa"
     "gstack-ship"
 )
 
@@ -118,18 +139,9 @@ verify_managed_gstack_install() {
     require_skill_file missing "Claude plan-design-review skill (~/.claude/skills/gstack-plan-design-review or plan-design-review)" \
         "$HOME/.claude/skills/gstack-plan-design-review/SKILL.md" \
         "$HOME/.claude/skills/plan-design-review/SKILL.md"
-    require_skill_file missing "Claude design-review skill (~/.claude/skills/gstack-design-review or design-review)" \
-        "$HOME/.claude/skills/gstack-design-review/SKILL.md" \
-        "$HOME/.claude/skills/design-review/SKILL.md"
     require_skill_file missing "Claude browse skill (~/.claude/skills/gstack-browse or browse)" \
         "$HOME/.claude/skills/gstack-browse/SKILL.md" \
         "$HOME/.claude/skills/browse/SKILL.md"
-    require_skill_file missing "Claude qa skill (~/.claude/skills/gstack-qa or qa)" \
-        "$HOME/.claude/skills/gstack-qa/SKILL.md" \
-        "$HOME/.claude/skills/qa/SKILL.md"
-    require_skill_file missing "Claude review skill (~/.claude/skills/gstack-review or review)" \
-        "$HOME/.claude/skills/gstack-review/SKILL.md" \
-        "$HOME/.claude/skills/review/SKILL.md"
     require_skill_file missing "Claude ship skill (~/.claude/skills/gstack-ship or ship)" \
         "$HOME/.claude/skills/gstack-ship/SKILL.md" \
         "$HOME/.claude/skills/ship/SKILL.md"
@@ -146,14 +158,9 @@ verify_managed_gstack_install() {
         "$HOME/.codex/skills/gstack-plan-ceo-review/SKILL.md"
     require_skill_file missing "Codex plan-design-review skill (~/.codex/skills/gstack-plan-design-review/SKILL.md)" \
         "$HOME/.codex/skills/gstack-plan-design-review/SKILL.md"
-    require_skill_file missing "Codex design-review skill (~/.codex/skills/gstack-design-review/SKILL.md)" \
-        "$HOME/.codex/skills/gstack-design-review/SKILL.md"
-    require_skill_file missing "Codex browse skill (~/.codex/skills/gstack/browse/SKILL.md)" \
+    require_skill_file missing "Codex browse skill (~/.codex/skills/gstack-browse/SKILL.md or gstack/browse/SKILL.md)" \
+        "$HOME/.codex/skills/gstack-browse/SKILL.md" \
         "$HOME/.codex/skills/gstack/browse/SKILL.md"
-    require_skill_file missing "Codex qa skill (~/.codex/skills/gstack-qa/SKILL.md)" \
-        "$HOME/.codex/skills/gstack-qa/SKILL.md"
-    require_skill_file missing "Codex review skill (~/.codex/skills/gstack-review/SKILL.md)" \
-        "$HOME/.codex/skills/gstack-review/SKILL.md"
     require_skill_file missing "Codex ship skill (~/.codex/skills/gstack-ship/SKILL.md)" \
         "$HOME/.codex/skills/gstack-ship/SKILL.md"
 
@@ -288,10 +295,29 @@ copy_lotus_skill_packages() {
     done
 }
 
+remove_obsolete_lotus_skills() {
+    local target_dir="$1"
+
+    [ -d "$target_dir" ] || return 0
+
+    for skill_name in "${OBSOLETE_LOTUS_SKILLS[@]}"; do
+        if [ -d "$target_dir/$skill_name" ]; then
+            rm -rf "$target_dir/$skill_name"
+            echo "    Removed merged skill: $skill_name"
+        fi
+        if [ -f "$target_dir/$skill_name.md" ]; then
+            rm -f "$target_dir/$skill_name.md"
+            echo "    Removed merged skill file: $skill_name.md"
+        fi
+    done
+}
+
 copy_lotus_skills() {
     local target_dir="$1"
     shift
     mkdir -p "$target_dir"
+
+    remove_obsolete_lotus_skills "$target_dir"
 
     for skill_file in "$SKILLS_DIR"/*.md; do
         local skill_name
@@ -588,6 +614,8 @@ if [ "$GLOBAL" -eq 1 ]; then
     mkdir -p ~/.codex/skills
     backup_if_exists "$CODEX_RULE_FILE"
     cp "$CORE_AGENTS" "$CODEX_RULE_FILE"
+
+    remove_obsolete_lotus_skills ~/.codex/skills
 
     for excluded in "${CODEX_EXCLUDED_SKILLS[@]}"; do
         if [ -d "$HOME/.codex/skills/$excluded" ]; then

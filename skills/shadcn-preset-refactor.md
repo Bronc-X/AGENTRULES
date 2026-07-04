@@ -1,7 +1,6 @@
 ---
 name: shadcn-preset-refactor
-description: |
-  Safely apply a shadcn/create preset code to an existing frontend project for visual redesign, UI refresh, design-system migration, or shadcn-based frontend refactor. Use when the user gives a shadcn preset code and asks to apply it, retrofit an app with shadcn, redesign a frontend with shadcn, switch themes, preserve existing business behavior, or do a non-destructive/no-loss shadcn preset migration.
+description: 安全应用 shadcn preset，迁移视觉系统且保留业务行为。
 allowed-tools:
   - Bash
   - Read

@@ -1,6 +1,6 @@
 ---
 name: feynman
-description: 讲概念时用白话解释本质
+description: 用白话和例子解释复杂概念，帮助用户真正听懂。
 ---
 
 # 费曼学习法 (Feynman Technique) 专项技能

@@ -1,6 +1,6 @@
 ---
 name: taste-skill
-description: Anti-slop frontend skill for landing pages, portfolios, and redesigns. The agent reads the brief, infers the right design direction, and ships interfaces that do not look templated. Real design systems when applicable, audit-first on redesigns, strict pre-flight check.
+description: 做官网、作品集和重设计时生成不模板化的高质前端界面。
 allowed-tools:
   - Read
   - Write
@@ -15,6 +15,8 @@ allowed-tools:
 
 > Landing pages, portfolios, and redesigns. Not dashboards, not data tables, not multi-step product UI.
 > Every rule below is **contextual**. None of it fires automatically. First read the brief, then pull only what fits.
+
+Merged scope: this is now the single top-level entry for the old `design-taste-frontend-v1`, `gpt-taste`, `high-end-visual-design`, `minimalist-ui`, `industrial-brutalist-ui`, and `redesign-existing-projects` entries. Use the brief to select the right visual mode instead of invoking separate aesthetic micro-skills.
 
 ---
 
