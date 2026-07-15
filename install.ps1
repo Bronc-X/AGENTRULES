@@ -16,6 +16,26 @@ $ManagedGstackInstaller = Join-Path $RepoRoot "scripts\install-managed-gstack.sh
 # These skills work via AGENTS.md rule-level recognition instead.
 $CodexExcludedSkills = @("btw", "loop")
 $ManagedOfficialSkills = @("gstack")
+$HiddenTopLevelSkills = @(
+    "brandkit",
+    "full-output-enforcement",
+    "gstack-plan-ceo-review",
+    "gstack-plan-design-review",
+    "gstack-plan-eng-review",
+    "imagegen-frontend-mobile",
+    "imagegen-frontend-web",
+    "imagegen",
+    "openai-docs",
+    "plugin-creator",
+    "skill-creator",
+    "ios-ui-centering-fix",
+    "skill-installer"
+)
+$HiddenClaudeGstackAliases = @(
+    "plan-ceo-review",
+    "plan-design-review",
+    "plan-eng-review"
+)
 $ObsoleteLotusSkills = @(
     "auto-build",
     "conversion-copywriter",
@@ -45,9 +65,6 @@ $GstackBootstrapInstalled = $false
 $CoreExposedGstackSkills = @(
     "gstack",
     "gstack-office-hours",
-    "gstack-plan-ceo-review",
-    "gstack-plan-design-review",
-    "gstack-plan-eng-review",
     "gstack-investigate",
     "gstack-browse",
     "gstack-ship"
@@ -109,18 +126,6 @@ function Assert-ManagedGstackInstall {
         (Join-Path $HOME ".claude\skills\gstack-investigate\SKILL.md"),
         (Join-Path $HOME ".claude\skills\investigate\SKILL.md")
     )
-    Add-MissingSkillIfAbsent $missing "Claude plan-eng-review skill (~/.claude/skills/gstack-plan-eng-review or plan-eng-review)" @(
-        (Join-Path $HOME ".claude\skills\gstack-plan-eng-review\SKILL.md"),
-        (Join-Path $HOME ".claude\skills\plan-eng-review\SKILL.md")
-    )
-    Add-MissingSkillIfAbsent $missing "Claude plan-ceo-review skill (~/.claude/skills/gstack-plan-ceo-review or plan-ceo-review)" @(
-        (Join-Path $HOME ".claude\skills\gstack-plan-ceo-review\SKILL.md"),
-        (Join-Path $HOME ".claude\skills\plan-ceo-review\SKILL.md")
-    )
-    Add-MissingSkillIfAbsent $missing "Claude plan-design-review skill (~/.claude/skills/gstack-plan-design-review or plan-design-review)" @(
-        (Join-Path $HOME ".claude\skills\gstack-plan-design-review\SKILL.md"),
-        (Join-Path $HOME ".claude\skills\plan-design-review\SKILL.md")
-    )
     Add-MissingSkillIfAbsent $missing "Claude browse skill (~/.claude/skills/gstack-browse or browse)" @(
         (Join-Path $HOME ".claude\skills\gstack-browse\SKILL.md"),
         (Join-Path $HOME ".claude\skills\browse\SKILL.md")
@@ -138,15 +143,6 @@ function Assert-ManagedGstackInstall {
     )
     Add-MissingSkillIfAbsent $missing "Codex investigate skill (~/.codex/skills/gstack-investigate/SKILL.md)" @(
         (Join-Path $HOME ".codex\skills\gstack-investigate\SKILL.md")
-    )
-    Add-MissingSkillIfAbsent $missing "Codex plan-eng-review skill (~/.codex/skills/gstack-plan-eng-review/SKILL.md)" @(
-        (Join-Path $HOME ".codex\skills\gstack-plan-eng-review\SKILL.md")
-    )
-    Add-MissingSkillIfAbsent $missing "Codex plan-ceo-review skill (~/.codex/skills/gstack-plan-ceo-review/SKILL.md)" @(
-        (Join-Path $HOME ".codex\skills\gstack-plan-ceo-review\SKILL.md")
-    )
-    Add-MissingSkillIfAbsent $missing "Codex plan-design-review skill (~/.codex/skills/gstack-plan-design-review/SKILL.md)" @(
-        (Join-Path $HOME ".codex\skills\gstack-plan-design-review\SKILL.md")
     )
     Add-MissingSkillIfAbsent $missing "Codex browse skill (~/.codex/skills/gstack-browse/SKILL.md or gstack/browse/SKILL.md)" @(
         (Join-Path $HOME ".codex\skills\gstack-browse\SKILL.md"),
@@ -198,6 +194,53 @@ function Test-SkillExcluded {
     )
 
     return ($ExcludedSkills -contains $SkillName)
+}
+
+function Move-SkillToLotusHidden {
+    param (
+        [string]$SourcePath,
+        [string]$HostGroup
+    )
+
+    if (-not (Test-Path $SourcePath)) {
+        return
+    }
+
+    $hiddenDir = Join-Path $HOME ".codex\hidden-skills\lotus\$HostGroup"
+    New-Item -ItemType Directory -Path $hiddenDir -Force | Out-Null
+    $destination = Join-Path $hiddenDir ([System.IO.Path]::GetFileName($SourcePath))
+    if (Test-Path $destination) {
+        Remove-Item $destination -Recurse -Force
+    }
+    Move-Item $SourcePath $destination -Force
+    Write-Host "    Hidden top-level skill: $SourcePath -> $destination"
+}
+
+function Hide-TopLevelSkills {
+    param (
+        [string]$TargetDir,
+        [string]$HostGroup,
+        [switch]$IncludeCodexSystem
+    )
+
+    foreach ($skillName in $HiddenTopLevelSkills) {
+        Move-SkillToLotusHidden -SourcePath (Join-Path $TargetDir $skillName) -HostGroup $HostGroup
+        Move-SkillToLotusHidden -SourcePath (Join-Path $TargetDir "$skillName.md") -HostGroup $HostGroup
+    }
+
+    if ($HostGroup -eq "claude") {
+        foreach ($skillName in $HiddenClaudeGstackAliases) {
+            Move-SkillToLotusHidden -SourcePath (Join-Path $TargetDir $skillName) -HostGroup $HostGroup
+            Move-SkillToLotusHidden -SourcePath (Join-Path $TargetDir "$skillName.md") -HostGroup $HostGroup
+        }
+    }
+
+    if ($IncludeCodexSystem) {
+        $systemSkills = Join-Path $TargetDir ".system"
+        foreach ($skillName in $HiddenTopLevelSkills) {
+            Move-SkillToLotusHidden -SourcePath (Join-Path $systemSkills $skillName) -HostGroup "codex-system"
+        }
+    }
 }
 
 function Write-AnySearchRuntimeConf {
@@ -596,7 +639,7 @@ function Install-GstackBootstrapSkills {
         }
     }
 
-    Write-Host "  Installed bootstrap entries for the 11 official gstack top-level skills ($written written, $preserved preserved)"
+    Write-Host "  Installed bootstrap entries for the curated official gstack top-level skills ($written written, $preserved preserved)"
 }
 
 if ($Global) {
@@ -617,7 +660,8 @@ if ($Global) {
 
     $ClaudeSkills = Join-Path $ClaudeDir "skills"
     if (-not (Test-Path $ClaudeSkills)) { New-Item -ItemType Directory -Path $ClaudeSkills -Force | Out-Null }
-    Copy-LotusSkills -TargetDir $ClaudeSkills -ExcludedSkills $ManagedOfficialSkills
+    Copy-LotusSkills -TargetDir $ClaudeSkills -ExcludedSkills ($ManagedOfficialSkills + $HiddenTopLevelSkills)
+    Hide-TopLevelSkills -TargetDir $ClaudeSkills -HostGroup "claude"
     Write-Host "  Claude Code configured"
 
     $CodexDir = Join-Path $HOME ".codex"
@@ -640,14 +684,14 @@ if ($Global) {
 
     Get-ChildItem (Join-Path $SkillsDir "*.md") | ForEach-Object {
         $baseName = [System.IO.Path]::GetFileNameWithoutExtension($_.Name)
-        if (($CodexExcludedSkills + $ManagedOfficialSkills) -contains $baseName) {
+        if (($CodexExcludedSkills + $ManagedOfficialSkills + $HiddenTopLevelSkills) -contains $baseName) {
             Write-Host "    Skipped (managed elsewhere or in-context only): $baseName"
         } else {
             Convert-ToCodexSkill -SourceFile $_.FullName -TargetDir $CodexSkills
             Write-Host "    Converted skill: $baseName"
         }
     }
-    Copy-LotusSkillPackages -TargetDir $CodexSkills -ExcludedSkills ($CodexExcludedSkills + $ManagedOfficialSkills)
+    Copy-LotusSkillPackages -TargetDir $CodexSkills -ExcludedSkills ($CodexExcludedSkills + $ManagedOfficialSkills + $HiddenTopLevelSkills)
     Write-Host "  Codex CLI configured (rules + Lotus-only compatible skills)"
 
     Write-Host "  Installing official gstack upstream..."
@@ -685,6 +729,9 @@ if ($Global) {
         }
     }
 
+    Hide-TopLevelSkills -TargetDir $ClaudeSkills -HostGroup "claude"
+    Hide-TopLevelSkills -TargetDir $CodexSkills -HostGroup "codex" -IncludeCodexSystem
+
     Write-Host ""
     Write-Host "Global installation completed successfully!" -ForegroundColor Green
     Write-Host "If any existing configs were overwritten, .bak backups have been created." -ForegroundColor Yellow
@@ -696,10 +743,11 @@ if ($Global) {
     if ($OfficialGstackInstalled) {
         Write-Host "  - Official gstack is managed at $HOME\.gstack\repos\gstack and kept auto-updatable."
     } elseif ($GstackBootstrapInstalled) {
-        Write-Host "  - The 11 official gstack top-level skill entries were installed as bootstrap skills."
+        Write-Host "  - The curated official gstack top-level skill entries were installed as bootstrap skills."
         Write-Host "  - Install Git for Windows, then re-run install.ps1 -Global to install the full official gstack runtime."
     }
     Write-Host "  - Official gstack top-level exposure profile: $GstackProfile"
+    Write-Host "  - Lotus keeps 13 low-frequency skills out of the top-level menu under ~/.codex/hidden-skills/lotus."
     Write-Host "  - Hidden official gstack skills stay in ~/.gstack/repos/gstack/.agents/skills and can still be routed by AGENTS.md."
     Write-Host "  - Slash skills live in the managed global skills folders ~/.claude/skills and ~/.codex/skills."
 }

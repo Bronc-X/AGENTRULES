@@ -10,12 +10,15 @@ GSTACK_PROFILE="$(printf '%s' "${LOTUS_GSTACK_PROFILE:-core}" | tr '[:upper:]' '
 CORE_EXPOSED_GSTACK_SKILLS=(
   "gstack"
   "gstack-office-hours"
-  "gstack-plan-ceo-review"
-  "gstack-plan-design-review"
-  "gstack-plan-eng-review"
   "gstack-investigate"
   "gstack-browse"
   "gstack-ship"
+)
+
+HIDDEN_GSTACK_SKILLS=(
+  "gstack-plan-ceo-review"
+  "gstack-plan-design-review"
+  "gstack-plan-eng-review"
 )
 
 DESIGN_PROFILE_EXTRAS=(
@@ -110,6 +113,10 @@ skill_in_list() {
 should_expose_generated_skill() {
   local skill_name="$1"
   local allowed_skills=("${CORE_EXPOSED_GSTACK_SKILLS[@]}")
+
+  if skill_in_list "$skill_name" "${HIDDEN_GSTACK_SKILLS[@]}"; then
+    return 1
+  fi
 
   case "$GSTACK_PROFILE" in
     core)

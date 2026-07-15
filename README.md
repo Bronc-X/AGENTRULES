@@ -1,5 +1,30 @@
 # Lotus
 
+## 让 AI 自己安装
+
+如果你不想亲自碰命令行，把这段交给 AI 编码助手：
+
+```text
+请在本机安装最新版 Lotus，并验证全局规则、顶层 skills 和 Lotus 插件组合已经对当前宿主生效。
+
+1. 记录当前目录的绝对路径。
+2. 将 https://github.com/Bronc-X/Lotus.git 克隆到一个长期保存目录。
+3. 判断当前操作系统。
+4. 运行全局安装：
+   - Windows PowerShell: install.ps1 -Global -Force
+   - macOS/Linux: bash install.sh --global --yes
+5. 验证全局规则和 skills 已写入：
+   - Codex: ~/.codex/AGENTS.md 和 ~/.codex/skills
+   - Claude Code: ~/.claude/CLAUDE.md 和 ~/.claude/skills
+6. 确认 Lotus 自带 skills 和默认 gstack 顶层 skills 存在，并确认 Lotus 隐藏清单中的 13 个低频 skills 不在顶层菜单。
+7. 如果当前宿主是 Codex，添加仓库根目录为 Lotus marketplace，并安装需要的插件：
+   - lotus-daloopa@lotus
+   - build-ios-apps@lotus（仅在需要 iOS 工作流时安装）
+8. 验证 Daloopa 只出现一个顶层入口 `daloopa`，其内部仍能路由九个金融分析工作流。
+9. 告诉我是否需要重启宿主或开启新会话。
+10. 如果失败，给出失败命令、错误原文、已写入的 fallback/bootstrap 入口和下一步修复建议。
+```
+
 Lotus 是一套给 AI 编码助手安装规矩、技能和一点良心的全局工程协议。它不会让模型突然变成圣人，但会让它在动手前先说清目标，在 debug 时先找根因，在交付时拿证据说话。若一个 agent 声称“我大概懂了”，Lotus 会递给它一张契约，让它把“大概”兑换成可验证结果。
 
 它做三件事：
@@ -111,27 +136,6 @@ C:\Dev\Lotus\install.ps1 -Global -Force
 
 如果已存在全局规则文件，安装器会先创建 `.bak` 备份，再覆盖。旧会话通常不会自动加载新规则，请重启宿主或打开新会话。
 
-## 让 AI 自己安装
-
-如果你不想亲自碰命令行，把这段交给 AI 编码助手：
-
-```text
-请在本机安装 Lotus，并验证它已经对当前宿主生效。
-
-1. 记录当前目录的绝对路径。
-2. 将 https://github.com/Bronc-X/Lotus.git 克隆到一个长期保存目录。
-3. 判断当前操作系统。
-4. 运行全局安装：
-   - Windows PowerShell: install.ps1 -Global -Force
-   - macOS/Linux: bash install.sh --global --yes
-5. 验证全局规则和 skills 已写入：
-   - Codex: ~/.codex/AGENTS.md 和 ~/.codex/skills
-   - Claude Code: ~/.claude/CLAUDE.md 和 ~/.claude/skills
-6. 确认 Lotus 自带 skills 和默认 gstack 顶层 skills 存在。
-7. 告诉我是否需要重启宿主或开启新会话。
-8. 如果失败，给出失败命令、错误原文、已写入的 fallback/bootstrap 入口和下一步修复建议。
-```
-
 ## 项目模板安装
 
 全局安装不会在每个项目目录自动生成 `AGENTS.md`。Codex 会自动继承 `~/.codex/AGENTS.md`，Claude Code 会自动继承 `~/.claude/CLAUDE.md`。项目级模板是额外叠加层，只在你主动运行 `-Project` / `--project` 时写入当前项目。
@@ -158,29 +162,25 @@ cd ~/Projects/MyNewApp
 
 ## gstack profiles
 
-默认 `core` profile 会暴露 11 个顶层 gstack skills：
+默认 `core` profile 会暴露 5 个顶层 gstack skills：
 
 - `gstack`
 - `gstack-office-hours`
-- `gstack-plan-ceo-review`
-- `gstack-plan-design-review`
-- `gstack-plan-eng-review`
-- `gstack-design-review`
-- `gstack-review`
 - `gstack-investigate`
 - `browse`
-- `gstack-qa`
 - `gstack-ship`
+
+`gstack-plan-ceo-review`、`gstack-plan-design-review` 和 `gstack-plan-eng-review` 保留在官方 gstack runtime 中供内部路由，但 Lotus 不再把它们放进顶层菜单；这一规则对 `full` profile 也生效。
 
 可选 profile：
 
 | Profile | 暴露内容 |
 |---|---|
-| `core` | 默认 11 个顶层 skills |
+| `core` | 默认 5 个顶层 skills |
 | `design` | `core` 加设计相关 skills |
 | `review` | `core` 加 QA / review / health 相关 skills |
 | `deploy` | `core` 加发布部署相关 skills |
-| `full` | 暴露当前官方 gstack 全量顶层 skills |
+| `full` | 暴露当前官方 gstack 全量顶层 skills，但仍隐藏 3 个 plan-review 入口 |
 
 切换 profile：
 
@@ -204,35 +204,17 @@ C:\Dev\Lotus\install.ps1 -Global -GstackProfile design
 | `test-driven-development` | 严格红绿重构，先写失败测试再写实现 |
 | `frontend-design` | 前端审美与交互质量约束 |
 | `taste-skill` | 前端审美与实现质量约束，强化布局、字体、动效、间距和组件完成度 |
-| `gpt-taste` | 面向 GPT / Codex 的更严格 Taste Skill 变体 |
-| `image-to-code` | 图像优先的网站设计到代码流程 |
-| `redesign-existing-projects` | 既有项目 UI 改版流程 |
-| `imagegen-frontend-web` | 生成网站视觉参考图 |
-| `imagegen-frontend-mobile` | 生成移动端界面和流程参考图 |
-| `brandkit` | 生成品牌板、Logo 方向、配色、字体和身份应用参考 |
-| `high-end-visual-design` | 柔和、克制、高级感视觉设计方向 |
-| `minimalist-ui` | 极简、编辑感产品 UI 方向 |
-| `industrial-brutalist-ui` | 工业粗野主义、强对比、机械感界面方向 |
-| `stitch-design-taste` | Google Stitch 兼容的 Taste Skill 规则 |
-| `full-output-enforcement` | 防止模型半成品输出，要求完整可运行交付 |
-| `mobile-agent-bridge` | 手机连接本机 Agent 的 daemon / runtime 两层架构调试与验证 |
 | `ios-codex-preview` | 为 iOS / SwiftUI 项目安装并验证 Codex 侧边浏览器实时预览 |
-| `ios-ui-centering-fix` | 修复 SwiftUI 中标题、加载块和 tab 参考轴的结构性居中偏移 |
 | `shadcn-preset-refactor` | 用 shadcn/create preset 做无损视觉改造 |
 | `image-2` | GPT Image 2 生图与改图入口 |
 | `gsap` | GreenSock 官方 GSAP 动画 skill 聚合入口，路由到 React、ScrollTrigger、Timeline、Plugins 等官方子 skill |
 | `ai-progress-workspace` | 搭建带真实 AI 工具进度和结构化 artifact 的 Agent 产品 |
-| `web-to-design-md` | 从参考网页、品牌资料、需求文档生成结构化 `design.md` |
-| `debugging-strategies` | 系统性排错，先定位根因再修复 |
 | `mini-investigate` | 小型 Bug 的最小根因定位、修复与验证 |
 | `security-auditor` | 安全审查，覆盖鉴权、注入、依赖风险等 |
 | `feynman` | 用费曼学习法解释复杂机制 |
 | `polanyi-tacit` | 分析代码背后的隐性业务和组织约束 |
-| `auto-build` | 自动执行依赖安装与构建验证 |
 | `agent-training-loop` | 持续执行复现、检测、执行、检查直到收敛 |
 | `baseline-packager` | 将已通过行为封装为 baseline / golden master 回归保护 |
-| `conversion-copywriter` | 官网、落地页、产品页和 CTA 的高转化营销文案 |
-| `powerup` | AI 编程能力速成练习 |
 | `insights` | 使用习惯回顾与优化建议 |
 | `subagent` | 子 Agent 管理与并行任务编排 |
 | `goal` | 长期任务目标管理，优先路由到宿主原生 Goal 能力 |
@@ -254,7 +236,7 @@ C:\Dev\Lotus\install.ps1 -Global -GstackProfile design
    - 手术式修改
    - 目标驱动闭环
 4. 确认文件包含 Agentic Coding 契约、Debug 规则和代码语言优先。
-5. 检查当前宿主的全局 skills 目录，并确认默认 11 个 gstack 顶层 skills 存在。
+5. 检查当前宿主的全局 skills 目录，并确认默认 5 个 gstack 顶层 skills 存在。
 6. 告诉我当前会话是否已经加载这些全局规则和 skills。
 7. 如果没有加载，告诉我是否需要完全重启宿主或开启新会话。
 8. 如果有缺失，请给出缺失路径、缺失项名称、复现依据和应重新运行的安装命令。
@@ -292,7 +274,7 @@ C:\Dev\Lotus\install.ps1 -Global -GstackProfile design
 
 Windows 上的 `bash` 通常来自 [Git for Windows](https://git-scm.com/download/win)。
 
-如果机器没有 Git Bash，或官方 gstack runtime 安装失败，`install.ps1 -Global` 仍会安装默认 11 个顶层 gstack bootstrap skills，保证 `/gstack-*` 菜单入口不缺失。安装 Git for Windows 并补齐依赖后，重新运行：
+如果机器没有 Git Bash，或官方 gstack runtime 安装失败，`install.ps1 -Global` 仍会安装默认 5 个顶层 gstack bootstrap skills，保证核心 `/gstack-*` 菜单入口不缺失。安装 Git for Windows 并补齐依赖后，重新运行：
 
 ```powershell
 C:\Dev\Lotus\install.ps1 -Global
@@ -317,7 +299,7 @@ brew install coreutils
 
 ## Lotus 可选 Codex 插件
 
-Lotus 也可以托管 Codex 插件市场文件。当前仓库内置一个可选 marketplace：
+Lotus 也可以托管 Codex 插件市场文件。当前仓库内置统一的 Lotus marketplace：
 
 - `.agents/plugins/marketplace.json`
 
@@ -325,7 +307,22 @@ Lotus 也可以托管 Codex 插件市场文件。当前仓库内置一个可选 
 
 | Plugin | 用途 |
 |---|---|
+| `lotus-daloopa` | 单一 `daloopa` 顶层入口，内部路由 9 个 Daloopa 金融分析工作流 |
 | `build-ios-apps` | iOS / SwiftUI / Xcode / Simulator 调试与预览工作流，位于 `plugins/build-ios-apps` |
+
+安装：
+
+```powershell
+codex plugin marketplace add C:\Dev\Lotus
+codex plugin add lotus-daloopa@lotus
+```
+
+```bash
+codex plugin marketplace add ~/Dev/Lotus
+codex plugin add lotus-daloopa@lotus
+```
+
+需要 iOS 工作流时再安装 `build-ios-apps@lotus`。Daloopa 插件内部保留 `setup`、`build-model`、`bull-bear`、`capital-allocation`、`earnings-flash`、`earnings-prep`、`ib-deck`、`precedent-transactions` 和 `research-note`，但它们不会分别占用顶层菜单。
 
 `codex-security` 是 Codex 官方专有插件，不把插件运行时代码复制进 Lotus。安全审查的 Lotus 自带顶层入口仍是 `/security-auditor`；更完整的官方扫描工作流请在 Codex App 中安装或启用 Codex Security 插件。
 

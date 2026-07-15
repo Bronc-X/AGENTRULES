@@ -10,6 +10,26 @@ MANAGED_GSTACK_INSTALLER="$REPO_ROOT/scripts/install-managed-gstack.sh"
 # These skills work via AGENTS.md rule-level recognition instead.
 CODEX_EXCLUDED_SKILLS=("btw" "loop")
 MANAGED_OFFICIAL_SKILLS=("gstack")
+HIDDEN_TOP_LEVEL_SKILLS=(
+    "brandkit"
+    "full-output-enforcement"
+    "gstack-plan-ceo-review"
+    "gstack-plan-design-review"
+    "gstack-plan-eng-review"
+    "imagegen-frontend-mobile"
+    "imagegen-frontend-web"
+    "imagegen"
+    "openai-docs"
+    "plugin-creator"
+    "skill-creator"
+    "ios-ui-centering-fix"
+    "skill-installer"
+)
+HIDDEN_CLAUDE_GSTACK_ALIASES=(
+    "plan-ceo-review"
+    "plan-design-review"
+    "plan-eng-review"
+)
 OBSOLETE_LOTUS_SKILLS=(
     "auto-build"
     "conversion-copywriter"
@@ -37,9 +57,6 @@ OBSOLETE_LOTUS_SKILLS=(
 CORE_EXPOSED_GSTACK_SKILLS=(
     "gstack"
     "gstack-office-hours"
-    "gstack-plan-ceo-review"
-    "gstack-plan-design-review"
-    "gstack-plan-eng-review"
     "gstack-investigate"
     "gstack-browse"
     "gstack-ship"
@@ -130,15 +147,6 @@ verify_managed_gstack_install() {
     require_skill_file missing "Claude investigate skill (~/.claude/skills/gstack-investigate or investigate)" \
         "$HOME/.claude/skills/gstack-investigate/SKILL.md" \
         "$HOME/.claude/skills/investigate/SKILL.md"
-    require_skill_file missing "Claude plan-eng-review skill (~/.claude/skills/gstack-plan-eng-review or plan-eng-review)" \
-        "$HOME/.claude/skills/gstack-plan-eng-review/SKILL.md" \
-        "$HOME/.claude/skills/plan-eng-review/SKILL.md"
-    require_skill_file missing "Claude plan-ceo-review skill (~/.claude/skills/gstack-plan-ceo-review or plan-ceo-review)" \
-        "$HOME/.claude/skills/gstack-plan-ceo-review/SKILL.md" \
-        "$HOME/.claude/skills/plan-ceo-review/SKILL.md"
-    require_skill_file missing "Claude plan-design-review skill (~/.claude/skills/gstack-plan-design-review or plan-design-review)" \
-        "$HOME/.claude/skills/gstack-plan-design-review/SKILL.md" \
-        "$HOME/.claude/skills/plan-design-review/SKILL.md"
     require_skill_file missing "Claude browse skill (~/.claude/skills/gstack-browse or browse)" \
         "$HOME/.claude/skills/gstack-browse/SKILL.md" \
         "$HOME/.claude/skills/browse/SKILL.md"
@@ -152,12 +160,6 @@ verify_managed_gstack_install() {
         "$HOME/.codex/skills/gstack-office-hours/SKILL.md"
     require_skill_file missing "Codex investigate skill (~/.codex/skills/gstack-investigate/SKILL.md)" \
         "$HOME/.codex/skills/gstack-investigate/SKILL.md"
-    require_skill_file missing "Codex plan-eng-review skill (~/.codex/skills/gstack-plan-eng-review/SKILL.md)" \
-        "$HOME/.codex/skills/gstack-plan-eng-review/SKILL.md"
-    require_skill_file missing "Codex plan-ceo-review skill (~/.codex/skills/gstack-plan-ceo-review/SKILL.md)" \
-        "$HOME/.codex/skills/gstack-plan-ceo-review/SKILL.md"
-    require_skill_file missing "Codex plan-design-review skill (~/.codex/skills/gstack-plan-design-review/SKILL.md)" \
-        "$HOME/.codex/skills/gstack-plan-design-review/SKILL.md"
     require_skill_file missing "Codex browse skill (~/.codex/skills/gstack-browse/SKILL.md or gstack/browse/SKILL.md)" \
         "$HOME/.codex/skills/gstack-browse/SKILL.md" \
         "$HOME/.codex/skills/gstack/browse/SKILL.md"
@@ -225,6 +227,45 @@ is_skill_excluded() {
         fi
     done
     return 1
+}
+
+move_skill_to_lotus_hidden() {
+    local source_path="$1"
+    local host_group="$2"
+    local hidden_dir="$HOME/.codex/hidden-skills/lotus/$host_group"
+    local destination
+
+    [ -e "$source_path" ] || return 0
+    mkdir -p "$hidden_dir"
+    destination="$hidden_dir/$(basename "$source_path")"
+    rm -rf "$destination"
+    mv "$source_path" "$destination"
+    echo "    Hidden top-level skill: $source_path -> $destination"
+}
+
+hide_top_level_skills() {
+    local target_dir="$1"
+    local host_group="$2"
+    local include_codex_system="${3:-0}"
+    local skill_name
+
+    for skill_name in "${HIDDEN_TOP_LEVEL_SKILLS[@]}"; do
+        move_skill_to_lotus_hidden "$target_dir/$skill_name" "$host_group"
+        move_skill_to_lotus_hidden "$target_dir/$skill_name.md" "$host_group"
+    done
+
+    if [ "$host_group" = "claude" ]; then
+        for skill_name in "${HIDDEN_CLAUDE_GSTACK_ALIASES[@]}"; do
+            move_skill_to_lotus_hidden "$target_dir/$skill_name" "$host_group"
+            move_skill_to_lotus_hidden "$target_dir/$skill_name.md" "$host_group"
+        done
+    fi
+
+    if [ "$include_codex_system" -eq 1 ]; then
+        for skill_name in "${HIDDEN_TOP_LEVEL_SKILLS[@]}"; do
+            move_skill_to_lotus_hidden "$target_dir/.system/$skill_name" "codex-system"
+        done
+    fi
 }
 
 write_anysearch_runtime_conf() {
@@ -475,7 +516,7 @@ install_gstack_bootstrap_skills() {
         fi
     done
 
-    echo "  Installed bootstrap entries for the 11 official gstack top-level skills ($written written, $preserved preserved)"
+    echo "  Installed bootstrap entries for the curated official gstack top-level skills ($written written, $preserved preserved)"
 }
 
 # Convert a Lotus skill .md file into a Codex-compatible SKILL.md directory.
@@ -608,7 +649,8 @@ if [ "$GLOBAL" -eq 1 ]; then
     mkdir -p ~/.claude/skills
     backup_if_exists "$CLAUDE_RULE_FILE"
     cp "$CORE_AGENTS" "$CLAUDE_RULE_FILE"
-    copy_lotus_skills ~/.claude/skills "${MANAGED_OFFICIAL_SKILLS[@]}"
+    copy_lotus_skills ~/.claude/skills "${MANAGED_OFFICIAL_SKILLS[@]}" "${HIDDEN_TOP_LEVEL_SKILLS[@]}"
+    hide_top_level_skills ~/.claude/skills "claude"
     echo "  Claude Code configured"
 
     mkdir -p ~/.codex/skills
@@ -627,7 +669,7 @@ if [ "$GLOBAL" -eq 1 ]; then
     for skill_file in "$SKILLS_DIR"/*.md; do
         skill_name=$(basename "$skill_file" .md)
         is_excluded=false
-        for excluded in "${CODEX_EXCLUDED_SKILLS[@]}" "${MANAGED_OFFICIAL_SKILLS[@]}"; do
+        for excluded in "${CODEX_EXCLUDED_SKILLS[@]}" "${MANAGED_OFFICIAL_SKILLS[@]}" "${HIDDEN_TOP_LEVEL_SKILLS[@]}"; do
             if [ "$skill_name" = "$excluded" ]; then
                 is_excluded=true
                 break
@@ -639,7 +681,7 @@ if [ "$GLOBAL" -eq 1 ]; then
             convert_to_codex_skill "$skill_file" ~/.codex/skills
         fi
     done
-    copy_lotus_skill_packages ~/.codex/skills "${CODEX_EXCLUDED_SKILLS[@]}" "${MANAGED_OFFICIAL_SKILLS[@]}"
+    copy_lotus_skill_packages ~/.codex/skills "${CODEX_EXCLUDED_SKILLS[@]}" "${MANAGED_OFFICIAL_SKILLS[@]}" "${HIDDEN_TOP_LEVEL_SKILLS[@]}"
     echo "  Codex CLI configured (rules + Lotus-only compatible skills)"
 
     echo "  Installing official gstack upstream..."
@@ -652,6 +694,9 @@ if [ "$GLOBAL" -eq 1 ]; then
         GSTACK_BOOTSTRAP_INSTALLED=1
     fi
 
+    hide_top_level_skills ~/.claude/skills "claude"
+    hide_top_level_skills ~/.codex/skills "codex" 1
+
     echo ""
     echo -e "\033[0;32mGlobal installation completed successfully!\033[0m"
     echo -e "\033[0;33mIf any existing configs were overwritten, .bak backups have been created.\033[0m"
@@ -663,10 +708,11 @@ if [ "$GLOBAL" -eq 1 ]; then
     if [ "$OFFICIAL_GSTACK_INSTALLED" -eq 1 ]; then
         echo "  - Official gstack is managed at ~/.gstack/repos/gstack and kept auto-updatable."
     elif [ "$GSTACK_BOOTSTRAP_INSTALLED" -eq 1 ]; then
-        echo "  - The 11 official gstack top-level skill entries were installed as bootstrap skills."
+        echo "  - The curated official gstack top-level skill entries were installed as bootstrap skills."
         echo "  - Install Git, bash, and bun, then re-run ./install.sh --global to install the full official gstack runtime."
     fi
     echo "  - Official gstack top-level exposure profile: $GSTACK_PROFILE"
+    echo "  - Lotus keeps 13 low-frequency skills out of the top-level menu under ~/.codex/hidden-skills/lotus."
     echo "  - Hidden official gstack skills stay in ~/.gstack/repos/gstack/.agents/skills and can still be routed by AGENTS.md."
     echo "  - Slash skills live in the managed global skills folders ~/.claude/skills and ~/.codex/skills."
 fi

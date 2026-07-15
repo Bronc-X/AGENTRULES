@@ -6,28 +6,32 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CORE_GSTACK_SKILLS=(
   "gstack"
   "gstack-office-hours"
-  "gstack-plan-ceo-review"
-  "gstack-plan-design-review"
-  "gstack-plan-eng-review"
-  "gstack-design-review"
-  "gstack-review"
   "gstack-investigate"
-  "gstack-qa"
   "gstack-ship"
 )
 
 CLAUDE_GSTACK_SKILLS=(
   "gstack"
   "office-hours"
-  "plan-ceo-review"
-  "plan-design-review"
-  "plan-eng-review"
-  "design-review"
-  "review"
   "investigate"
   "browse"
-  "qa"
   "ship"
+)
+
+HIDDEN_TOP_LEVEL_SKILLS=(
+  "brandkit"
+  "full-output-enforcement"
+  "gstack-plan-ceo-review"
+  "gstack-plan-design-review"
+  "gstack-plan-eng-review"
+  "imagegen-frontend-mobile"
+  "imagegen-frontend-web"
+  "imagegen"
+  "openai-docs"
+  "plugin-creator"
+  "skill-creator"
+  "ios-ui-centering-fix"
+  "skill-installer"
 )
 
 fail() {
@@ -64,26 +68,14 @@ set -euo pipefail
 core_skills=(
   "gstack"
   "gstack-office-hours"
-  "gstack-plan-ceo-review"
-  "gstack-plan-design-review"
-  "gstack-plan-eng-review"
-  "gstack-design-review"
-  "gstack-review"
   "gstack-investigate"
-  "gstack-qa"
   "gstack-ship"
 )
 claude_skills=(
   "gstack"
   "office-hours"
-  "plan-ceo-review"
-  "plan-design-review"
-  "plan-eng-review"
-  "design-review"
-  "review"
   "investigate"
   "browse"
-  "qa"
   "ship"
 )
 
@@ -142,6 +134,14 @@ test_codex_conversion_with_stubbed_gstack() {
   copy_repo_fixture "$tmp/lotus"
   write_success_gstack_stub "$tmp/lotus/scripts/install-managed-gstack.sh"
 
+  mkdir -p \
+    "$tmp/home/.codex/skills/brandkit" \
+    "$tmp/home/.codex/skills/.system/openai-docs" \
+    "$tmp/home/.claude/skills/plan-ceo-review"
+  printf 'stale\n' > "$tmp/home/.codex/skills/brandkit/SKILL.md"
+  printf 'system\n' > "$tmp/home/.codex/skills/.system/openai-docs/SKILL.md"
+  printf 'stale\n' > "$tmp/home/.claude/skills/plan-ceo-review/SKILL.md"
+
   HOME="$tmp/home" bash "$tmp/lotus/install.sh" --global --yes >/dev/null
 
   assert_file_contains "$tmp/home/.codex/skills/image-2/SKILL.md" "# Image 2"
@@ -160,7 +160,6 @@ test_codex_conversion_with_stubbed_gstack() {
   assert_file_contains "$tmp/home/.codex/skills/agent-training-loop/SKILL.md" "  - Bash"
   assert_file_contains "$tmp/home/.codex/skills/baseline-packager/SKILL.md" "# Baseline Packager"
   assert_file_contains "$tmp/home/.codex/skills/baseline-packager/SKILL.md" "Do not default to Playwright"
-  assert_file_contains "$tmp/home/.codex/skills/conversion-copywriter/SKILL.md" "# Conversion Copywriter"
   assert_file_contains "$tmp/home/.codex/skills/mini-investigate/SKILL.md" "# Minimal Bug Fix"
   assert_file_contains "$tmp/home/.codex/skills/test-driven-development/SKILL.md" "# Test-Driven Development"
   assert_file_contains "$tmp/home/.codex/skills/anysearch/SKILL.md" "## Overview"
@@ -171,12 +170,19 @@ test_codex_conversion_with_stubbed_gstack() {
   assert_file_contains "$tmp/home/.claude/skills/anysearch/runtime.conf" "scripts/anysearch_cli"
   [ -f "$tmp/home/.claude/skills/anysearch/scripts/anysearch_cli.py" ] || fail "missing Claude anysearch CLI"
   [ ! -e "$tmp/home/.claude/skills/anysearch/.env" ] || fail "Claude anysearch .env should not be installed"
-  assert_file_contains "$tmp/home/.claude/skills/gsap/SKILL.md" "# GSAP Skill Router"
+  assert_file_contains "$tmp/home/.claude/skills/gsap/SKILL.md" "# GSAP"
   [ ! -e "$tmp/home/.claude/skills/gsap.md" ] || fail "Claude should not keep legacy flat gsap.md"
-  assert_file_contains "$tmp/home/.claude/skills/gsap-react/SKILL.md" "# GSAP with React"
 
   [ ! -e "$tmp/home/.codex/skills/btw" ] || fail "Codex in-context skill should not be installed as slash skill: btw"
   [ ! -e "$tmp/home/.codex/skills/loop" ] || fail "Codex in-context skill should not be installed as slash skill: loop"
+
+  for skill in "${HIDDEN_TOP_LEVEL_SKILLS[@]}"; do
+    [ ! -e "$tmp/home/.codex/skills/$skill" ] || fail "hidden Codex skill should not be top-level: $skill"
+    [ ! -e "$tmp/home/.claude/skills/$skill" ] || fail "hidden Claude skill should not be top-level: $skill"
+  done
+  [ -f "$tmp/home/.codex/hidden-skills/lotus/codex/brandkit/SKILL.md" ] || fail "Codex hidden skill backup missing"
+  [ -f "$tmp/home/.codex/hidden-skills/lotus/codex-system/openai-docs/SKILL.md" ] || fail "Codex system hidden skill backup missing"
+  [ -f "$tmp/home/.codex/hidden-skills/lotus/claude/plan-ceo-review/SKILL.md" ] || fail "Claude hidden skill backup missing"
 
   for skill in "${CORE_GSTACK_SKILLS[@]}"; do
     [ -f "$tmp/home/.codex/skills/$skill/SKILL.md" ] || fail "missing Codex gstack skill: $skill"
@@ -203,8 +209,8 @@ test_failed_gstack_install_preserves_existing_codex_runtime_and_succeeds() {
   HOME="$tmp/home" bash "$tmp/lotus/install.sh" --global --yes >/dev/null 2>"$tmp/stderr"
 
   assert_file_contains "$tmp/home/.codex/skills/gstack/SKILL.md" "sentinel"
-  assert_file_contains "$tmp/home/.codex/skills/gstack-qa/SKILL.md" "gstack bootstrap"
-  assert_file_contains "$tmp/home/.claude/skills/qa/SKILL.md" "gstack bootstrap"
+  assert_file_contains "$tmp/home/.codex/skills/gstack-investigate/SKILL.md" "gstack bootstrap"
+  assert_file_contains "$tmp/home/.claude/skills/investigate/SKILL.md" "gstack bootstrap"
 }
 
 test_incomplete_gstack_install_falls_back_to_bootstrap() {
@@ -219,8 +225,8 @@ test_incomplete_gstack_install_falls_back_to_bootstrap() {
 
   assert_file_contains "$tmp/stderr" "Official gstack installation or verification failed"
   assert_file_contains "$tmp/home/.codex/skills/gstack/SKILL.md" "partial stub"
-  assert_file_contains "$tmp/home/.codex/skills/gstack-qa/SKILL.md" "gstack bootstrap"
-  assert_file_contains "$tmp/home/.claude/skills/qa/SKILL.md" "gstack bootstrap"
+  assert_file_contains "$tmp/home/.codex/skills/gstack-investigate/SKILL.md" "gstack bootstrap"
+  assert_file_contains "$tmp/home/.claude/skills/investigate/SKILL.md" "gstack bootstrap"
 }
 
 test_shell_syntax

@@ -17,6 +17,18 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [1.1.15] - 2026-07-15
+
+### Added
+
+- Added the unified `lotus` Codex marketplace and a `lotus-daloopa` plugin that routes nine selected Daloopa workflows through one top-level `daloopa` skill.
+- Added a reversible hidden-skill policy under `~/.codex/hidden-skills/lotus` for 13 low-frequency Lotus, gstack, iOS, and OpenAI system skills.
+
+### Changed
+
+- Reduced the default gstack top-level menu to `gstack`, `office-hours`, `investigate`, `browse`, and `ship`; the three plan-review workflows remain available inside the official runtime for background routing.
+- Moved the README's AI-driven installation prompt directly below the Lotus title and expanded it to verify the Lotus plugin bundle and single Daloopa entry.
+
 ## [1.1.14] - 2026-07-03
 
 ### Added
