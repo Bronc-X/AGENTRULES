@@ -6,6 +6,7 @@ import io
 import json
 import os
 import sys
+import time
 from urllib.parse import urlparse
 import requests
 
@@ -15,6 +16,8 @@ if sys.stderr.encoding != "utf-8":
     sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
 
 ENDPOINT = "https://api.anysearch.com/mcp"
+API_MAX_ATTEMPTS = 3
+API_RETRY_BACKOFF_SECONDS = 0.4
 
 def _load_env():
     """Load API keys from .env files near the skill.
@@ -68,23 +71,32 @@ def _call_api(tool_name: str, arguments: dict, api_key: str) -> str:
         "method": "tools/call",
         "params": {"name": tool_name, "arguments": arguments},
     }
-    try:
-        resp = requests.post(ENDPOINT, json=payload, headers=_build_headers(api_key), timeout=30)
-        resp.raise_for_status()
-    except requests.exceptions.HTTPError as e:
-        print(f"HTTP Error: {e}", file=sys.stderr)
+    for attempt in range(1, API_MAX_ATTEMPTS + 1):
         try:
-            detail = resp.json()
-            print(f"Response: {json.dumps(detail, ensure_ascii=False)}", file=sys.stderr)
-        except Exception:
-            print(f"Response body: {resp.text[:500]}", file=sys.stderr)
-        sys.exit(1)
-    except requests.exceptions.ConnectionError:
-        print("Connection Error: Unable to reach the API endpoint.", file=sys.stderr)
-        sys.exit(1)
-    except requests.exceptions.Timeout:
-        print("Timeout: The API request timed out.", file=sys.stderr)
-        sys.exit(1)
+            resp = requests.post(ENDPOINT, json=payload, headers=_build_headers(api_key), timeout=30)
+            resp.raise_for_status()
+            break
+        except requests.exceptions.HTTPError as e:
+            print(f"HTTP Error: {e}", file=sys.stderr)
+            try:
+                detail = resp.json()
+                print(f"Response: {json.dumps(detail, ensure_ascii=False)}", file=sys.stderr)
+            except Exception:
+                print(f"Response body: {resp.text[:500]}", file=sys.stderr)
+            sys.exit(1)
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
+            if attempt == API_MAX_ATTEMPTS:
+                if isinstance(e, requests.exceptions.Timeout):
+                    message = "Timeout: The API request timed out."
+                else:
+                    message = "Connection Error: Unable to reach the API endpoint."
+                print(
+                    f"{message} after {attempt} attempts. "
+                    f"({type(e).__name__}: {e})",
+                    file=sys.stderr,
+                )
+                sys.exit(1)
+            time.sleep(API_RETRY_BACKOFF_SECONDS * (2 ** (attempt - 1)))
 
     data = resp.json()
     if "error" in data:
