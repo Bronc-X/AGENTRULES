@@ -14,4 +14,4 @@ Included internal workflows:
 - `precedent-transactions`
 - `research-note`
 
-The router lives at `skills/daloopa/SKILL.md`. The workflow packages, shared data-access rules, design system, app connector, icon, and upstream Apache-2.0 license are bundled with it.
+The router lives at `skills/daloopa/SKILL.md`. The workflow references under `skills/daloopa/references/`, shared data-access rules, design system, app connector, icon, and upstream Apache-2.0 license are bundled with it.

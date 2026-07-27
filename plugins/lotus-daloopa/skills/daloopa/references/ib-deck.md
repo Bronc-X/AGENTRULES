@@ -5,7 +5,7 @@ description: Generate an institutional-grade investment banking pitch deck (HTML
 
 Build an institutional-grade pitch deck for the company named in the user's request. If no ticker or company is provided, ask for one before proceeding.
 
-**Before starting, read `../design-system.md` for formatting conventions and `../data-access.md` for data access methods.** Also read the reference files in this skill's `references/` directory for slide templates and components.
+**Before starting, read `../design-system.md` for formatting conventions and `../data-access.md` for data access methods.** Also read `ib-deck-slide-templates.md`, `ib-deck-financial-components.md`, and `ib-deck-advisory-patterns.md`.
 
 This skill generates a self-contained HTML presentation that can be opened in a browser and printed to PDF if needed.
 
@@ -67,7 +67,7 @@ Run the core analyses needed for the deck:
 
 ## Phase 4 — Build Presentation
 
-Generate a self-contained HTML file following the templates in `references/slide-templates.md`. Use components from `references/financial-components.md`.
+Generate a self-contained HTML file following the templates in `ib-deck-slide-templates.md`. Use components from `ib-deck-financial-components.md`.
 
 **Slide structure** (default 14-slide deck — adapt based on purpose):
 
@@ -95,11 +95,11 @@ Generate a self-contained HTML file following the templates in `references/slide
 - Each slide is a `<div class="slide">` with `page-break-after: always`
 - All data displayed in tables (no chart generation)
 
-See `references/ib-advisory-patterns.md` for valuation methodology templates.
+See `ib-deck-advisory-patterns.md` for valuation methodology templates.
 
 ## Phase 5 — Output
 
-Save the complete HTML deck as a local file and summarize the output. Use the HTML Report Template structure from `../design-system.md` with slide-specific CSS from `references/slide-templates.md`.
+Save the complete HTML deck as a local file and summarize the output. Use the HTML Report Template structure from `../design-system.md` with slide-specific CSS from `ib-deck-slide-templates.md`.
 
 Tell the user:
 - The deck is ready to view — open in any browser

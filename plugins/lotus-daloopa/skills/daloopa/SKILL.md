@@ -14,24 +14,24 @@ Choose exactly one primary workflow from the user's request:
 
 | Intent | Internal workflow |
 |---|---|
-| Verify the Daloopa connection or inspect available capabilities | `setup/SKILL.md` |
-| Build a multi-tab Excel financial model | `build-model/SKILL.md` |
-| Build bull, base, and bear scenarios | `bull-bear/SKILL.md` |
-| Analyze buybacks, dividends, reinvestment, and shareholder yield | `capital-allocation/SKILL.md` |
-| Produce a rapid first-read earnings flash | `earnings-flash/SKILL.md` |
-| Prepare for an upcoming earnings report | `earnings-prep/SKILL.md` |
-| Generate an investment-banking-style pitch deck | `ib-deck/SKILL.md` |
-| Analyze precedent M&A transactions and deal multiples | `precedent-transactions/SKILL.md` |
-| Produce a full professional research note | `research-note/SKILL.md` |
+| Verify the Daloopa connection or inspect available capabilities | `references/setup.md` |
+| Build a multi-tab Excel financial model | `references/build-model.md` |
+| Build bull, base, and bear scenarios | `references/bull-bear.md` |
+| Analyze buybacks, dividends, reinvestment, and shareholder yield | `references/capital-allocation.md` |
+| Produce a rapid first-read earnings flash | `references/earnings-flash.md` |
+| Prepare for an upcoming earnings report | `references/earnings-prep.md` |
+| Generate an investment-banking-style pitch deck | `references/ib-deck.md` |
+| Analyze precedent M&A transactions and deal multiples | `references/precedent-transactions.md` |
+| Produce a full professional research note | `references/research-note.md` |
 
 If the request genuinely spans multiple deliverables, select the smallest set of workflows that covers it and execute them in dependency order.
 
 ## Execution Contract
 
-1. Read the selected internal `SKILL.md` completely before taking task actions.
-2. Follow every direct reference named by that workflow, resolving paths relative to the selected workflow directory.
+1. Read the selected workflow reference completely before taking task actions.
+2. Follow every direct reference named by that workflow, resolving paths relative to the `references/` directory.
 3. Use the Daloopa app/MCP tools when available. If they are unavailable, run the setup workflow or explain the exact missing connection.
 4. Preserve Daloopa citation requirements and the shared `data-access.md` and `design-system.md` conventions.
 5. Keep the internal workflow names out of the top-level skill menu; they are implementation details behind this router.
 
-The nine internal workflows are vendored from the Daloopa plugin and retain their original licenses and attribution.
+The nine workflow references are vendored from the Daloopa plugin and retain their original licenses and attribution.

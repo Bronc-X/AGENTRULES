@@ -126,6 +126,38 @@ test_shell_syntax() {
   bash -n "$ROOT/install.sh" "$ROOT/scripts/install-managed-gstack.sh" "$ROOT/scripts/test-installers.sh"
 }
 
+test_daloopa_plugin_has_single_discoverable_skill() {
+  local plugin="$ROOT/plugins/lotus-daloopa"
+  local skill_count
+  local workflows=(
+    "setup"
+    "build-model"
+    "bull-bear"
+    "capital-allocation"
+    "earnings-flash"
+    "earnings-prep"
+    "ib-deck"
+    "precedent-transactions"
+    "research-note"
+  )
+
+  skill_count="$(find "$plugin/skills" -type f -name SKILL.md | wc -l | tr -d '[:space:]')"
+  [ "$skill_count" = "1" ] || fail "Daloopa should expose one discoverable SKILL.md, found $skill_count"
+
+  for workflow in "${workflows[@]}"; do
+    [ -f "$plugin/skills/daloopa/references/$workflow.md" ] ||
+      fail "missing Daloopa workflow reference: $workflow"
+    assert_file_contains "$plugin/skills/daloopa/SKILL.md" "references/$workflow.md"
+  done
+
+  [ -f "$plugin/skills/daloopa/references/ib-deck-slide-templates.md" ] ||
+    fail "missing flattened IB deck slide templates"
+  [ -f "$plugin/skills/daloopa/references/ib-deck-financial-components.md" ] ||
+    fail "missing flattened IB deck financial components"
+  [ -f "$plugin/skills/daloopa/references/ib-deck-advisory-patterns.md" ] ||
+    fail "missing flattened IB deck advisory patterns"
+}
+
 test_codex_conversion_with_stubbed_gstack() {
   local tmp
   tmp="$(mktemp -d)"
@@ -166,10 +198,16 @@ test_codex_conversion_with_stubbed_gstack() {
   assert_file_contains "$tmp/home/.codex/skills/anysearch/runtime.conf" "scripts/anysearch_cli"
   [ -f "$tmp/home/.codex/skills/anysearch/scripts/anysearch_cli.py" ] || fail "missing Codex anysearch CLI"
   [ ! -e "$tmp/home/.codex/skills/anysearch/.env" ] || fail "Codex anysearch .env should not be installed"
+  assert_file_contains "$tmp/home/.codex/skills/agent-reach/SKILL.md" "purpose-built skill, MCP, connector, or app tool"
   assert_file_contains "$tmp/home/.claude/skills/anysearch/SKILL.md" "## Overview"
   assert_file_contains "$tmp/home/.claude/skills/anysearch/runtime.conf" "scripts/anysearch_cli"
   [ -f "$tmp/home/.claude/skills/anysearch/scripts/anysearch_cli.py" ] || fail "missing Claude anysearch CLI"
   [ ! -e "$tmp/home/.claude/skills/anysearch/.env" ] || fail "Claude anysearch .env should not be installed"
+  assert_file_contains "$tmp/home/.codex/AGENTS.md" "版本：v1.4"
+  assert_file_contains "$tmp/home/.codex/AGENTS.md" "先想清楚，再写代码"
+  assert_file_contains "$tmp/home/.codex/AGENTS.md" "简单优先"
+  assert_file_contains "$tmp/home/.codex/AGENTS.md" "手术式修改"
+  assert_file_contains "$tmp/home/.codex/AGENTS.md" "目标驱动闭环"
   assert_file_contains "$tmp/home/.claude/skills/gsap/SKILL.md" "# GSAP"
   [ ! -e "$tmp/home/.claude/skills/gsap.md" ] || fail "Claude should not keep legacy flat gsap.md"
 
@@ -230,6 +268,7 @@ test_incomplete_gstack_install_falls_back_to_bootstrap() {
 }
 
 test_shell_syntax
+test_daloopa_plugin_has_single_discoverable_skill
 test_codex_conversion_with_stubbed_gstack
 test_failed_gstack_install_preserves_existing_codex_runtime_and_succeeds
 test_incomplete_gstack_install_falls_back_to_bootstrap
