@@ -6,6 +6,8 @@
     [string]$GstackProfile = "core"
 )
 
+$ErrorActionPreference = "Stop"
+
 $RepoRoot = $PSScriptRoot
 $CoreAgents = Join-Path $RepoRoot "core\AGENTS.md"
 $SkillsDir = Join-Path $RepoRoot "skills"
@@ -76,6 +78,44 @@ function Backup-IfExists {
         $BackupPath = "$FilePath.bak"
         Copy-Item $FilePath $BackupPath -Force
         Write-Host "    Backed up existing: $FilePath -> $BackupPath" -ForegroundColor Yellow
+    }
+}
+
+function Ensure-DirectoryPath {
+    param ([string]$Path)
+
+    $item = Get-Item -LiteralPath $Path -Force -ErrorAction SilentlyContinue
+    if ($null -ne $item -and ($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint)) {
+        $targets = @(@($item.Target) | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
+        if ($targets.Count -ne 1) {
+            throw "Directory path is a broken reparse point with no single repairable target: $Path"
+        }
+
+        $target = [Environment]::ExpandEnvironmentVariables([string]$targets[0])
+        if (-not [System.IO.Path]::IsPathRooted($target)) {
+            $target = Join-Path ([System.IO.Path]::GetDirectoryName($Path)) $target
+        }
+
+        if (Test-Path -LiteralPath $target -PathType Container) {
+            return
+        }
+
+        New-Item -ItemType Directory -Path $target -Force | Out-Null
+        if (Test-Path -LiteralPath $Path -PathType Container) {
+            Write-Host "    Repaired broken directory junction target: $Path -> $target" -ForegroundColor Yellow
+            return
+        }
+
+        throw "Failed to repair broken directory junction: $Path -> $target"
+    }
+
+    if (Test-Path -LiteralPath $Path -PathType Container) {
+        return
+    }
+
+    New-Item -ItemType Directory -Path $Path -Force | Out-Null
+    if (-not (Test-Path -LiteralPath $Path -PathType Container)) {
+        throw "Failed to create directory: $Path"
     }
 }
 
@@ -654,23 +694,23 @@ if ($Global) {
     )
 
     $ClaudeDir = Join-Path $HOME ".claude"
-    if (-not (Test-Path $ClaudeDir)) { New-Item -ItemType Directory -Path $ClaudeDir -Force | Out-Null }
+    Ensure-DirectoryPath $ClaudeDir
     Backup-IfExists $ClaudeRuleFile
     Copy-Item $CoreAgents $ClaudeRuleFile -Force
 
     $ClaudeSkills = Join-Path $ClaudeDir "skills"
-    if (-not (Test-Path $ClaudeSkills)) { New-Item -ItemType Directory -Path $ClaudeSkills -Force | Out-Null }
+    Ensure-DirectoryPath $ClaudeSkills
     Copy-LotusSkills -TargetDir $ClaudeSkills -ExcludedSkills ($ManagedOfficialSkills + $HiddenTopLevelSkills)
     Hide-TopLevelSkills -TargetDir $ClaudeSkills -HostGroup "claude"
     Write-Host "  Claude Code configured"
 
     $CodexDir = Join-Path $HOME ".codex"
-    if (-not (Test-Path $CodexDir)) { New-Item -ItemType Directory -Path $CodexDir -Force | Out-Null }
+    Ensure-DirectoryPath $CodexDir
     Backup-IfExists $CodexRuleFile
     Copy-Item $CoreAgents $CodexRuleFile -Force
 
     $CodexSkills = Join-Path $CodexDir "skills"
-    if (-not (Test-Path $CodexSkills)) { New-Item -ItemType Directory -Path $CodexSkills -Force | Out-Null }
+    Ensure-DirectoryPath $CodexSkills
 
     Remove-ObsoleteLotusSkills -TargetDir $CodexSkills
 
@@ -695,7 +735,8 @@ if ($Global) {
     Write-Host "  Codex CLI configured (rules + Lotus-only compatible skills)"
 
     Write-Host "  Installing official gstack upstream..."
-    if (-not (Get-Command bash -ErrorAction SilentlyContinue)) {
+    $gitBash = if ($env:ProgramFiles) { Join-Path $env:ProgramFiles "Git\bin\bash.exe" } else { $null }
+    if ([string]::IsNullOrWhiteSpace($gitBash) -or -not (Test-Path -LiteralPath $gitBash)) {
         Write-Warning "Git Bash was not found. Installing bootstrap entries for the official gstack top-level skills."
         Install-GstackBootstrapSkills -ClaudeSkills $ClaudeSkills -CodexSkills $CodexSkills
         $GstackBootstrapInstalled = $true
@@ -705,7 +746,7 @@ if ($Global) {
         $previousGstackProfile = $env:LOTUS_GSTACK_PROFILE
         $env:LOTUS_GSTACK_PROFILE = $GstackProfile
         try {
-            & bash $BashManagedGstackInstaller
+            & $gitBash $BashManagedGstackInstaller
             if ($LASTEXITCODE -ne 0) {
                 throw "Official gstack installation failed. Lotus rules were written, but slash skills were not fully installed."
             }

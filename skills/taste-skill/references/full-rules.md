@@ -1,16 +1,3 @@
----
-name: taste-skill
-description: 做官网、作品集和重设计时生成不模板化的高质前端界面。
-allowed-tools:
-  - Read
-  - Write
-  - Edit
-  - Grep
-  - Glob
-  - Bash
-  - AskUserQuestion
----
-
 # tasteskill: Anti-Slop Frontend Skill
 
 > Landing pages, portfolios, and redesigns. Not dashboards, not data tables, not multi-step product UI.

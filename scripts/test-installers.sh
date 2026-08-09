@@ -124,6 +124,13 @@ STUB
 
 test_shell_syntax() {
   bash -n "$ROOT/install.sh" "$ROOT/scripts/install-managed-gstack.sh" "$ROOT/scripts/test-installers.sh"
+  assert_file_contains "$ROOT/install.ps1" '$ErrorActionPreference = "Stop"'
+  assert_file_contains "$ROOT/install.ps1" "function Ensure-DirectoryPath"
+  assert_file_contains "$ROOT/install.ps1" '$gitBash'
+  assert_file_contains "$ROOT/install.ps1" 'bash.exe'
+  if grep -q '& bash \$BashManagedGstackInstaller' "$ROOT/install.ps1"; then
+    fail "Windows installer must invoke managed gstack with Git for Windows bash.exe"
+  fi
 }
 
 test_daloopa_plugin_has_single_discoverable_skill() {
@@ -186,7 +193,14 @@ test_codex_conversion_with_stubbed_gstack() {
   [ ! -e "$tmp/home/.codex/skills/image-2/runtime.local.json" ] || fail "image-2 local runtime should not be installed from repo"
   assert_file_contains "$tmp/home/.codex/skills/ai-progress-workspace/SKILL.md" "# AI Progress Workspace"
   assert_file_contains "$tmp/home/.codex/skills/ai-progress-workspace/SKILL.md" "  - WebSearch"
-  assert_file_contains "$tmp/home/.codex/skills/taste-skill/SKILL.md" "# tasteskill: Anti-Slop Frontend Skill"
+  assert_file_contains "$tmp/home/.codex/skills/taste-skill/SKILL.md" "# Taste Skill: Codex Visual Frontend Entry Point"
+  assert_file_contains "$tmp/home/.codex/skills/taste-skill/SKILL.md" "references/full-rules.md"
+  [ -f "$tmp/home/.codex/skills/taste-skill/references/full-rules.md" ] ||
+    fail "taste-skill full rules reference missing"
+  [ -f "$tmp/home/.codex/skills/taste-skill/references/image-first-workflow.md" ] ||
+    fail "taste-skill image-first reference missing"
+  [ ! -e "$tmp/home/.codex/skills/taste-skill.md" ] ||
+    fail "taste-skill should be installed as a package, not a flat legacy file"
   assert_file_contains "$tmp/home/.codex/skills/agent-training-loop/SKILL.md" "# Agent Training Loop"
   assert_file_contains "$tmp/home/.codex/skills/agent-training-loop/SKILL.md" "Use only when the user explicitly invokes"
   assert_file_contains "$tmp/home/.codex/skills/agent-training-loop/SKILL.md" "  - Bash"
