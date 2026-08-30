@@ -1,35 +1,50 @@
 ---
 name: anysearch
-description: 用本地多后端搜索网页、垂直站点、批量查询并抽取 URL 内容。
-version: 2.1.0
-authors:
-  - AnySearch Team
-credentials:
-  - name: ANYSEARCH_API_KEY
-    required: false
-    description: "API key for higher rate limits. Anonymous access available with lower rate limits."
-    storage: ".env file, environment variable, or --api_key CLI flag"
+description: Quota-conscious real-time web and structured vertical search with zone/language controls, optional batch execution, and page extraction. Use as the single primary search skill for routine current facts/news and typed identifiers such as Stock, CVE, DOI, IATA, or patents. Do not co-invoke with agent-reach for the same information need; defer platform-native content, supplied URLs, GitHub-native retrieval, transcripts, RSS, and high-value Exa technical semantic discovery to agent-reach.
+metadata:
+  version: 2.1.0
+  authors:
+    - AnySearch Team
+  credentials:
+    - name: ANYSEARCH_API_KEY
+      required: false
+      description: "API key for higher rate limits. Anonymous access available with lower rate limits."
+      storage: ".env file, environment variable, or --api_key CLI flag"
 ---
 
 ## Overview
 
 AnySearch is a unified real-time search service supporting general web search, vertical domain search, parallel batch search, and full-page content extraction. It exposes a single JSON-RPC 2.0 endpoint and requires no MCP server installation. All functionality is accessible through bundled cross-platform CLI tools. Use the configured runtime directly for routine `search`, `batch_search`, `extract`, and `get_sub_domains` calls; run the `doc` command only when the CLI interface is unknown or recovery information is needed (see Recommended Entry Point).
 
-## Trigger
+## Trigger and Exclusive Routing
 
-This skill SHOULD be activated when the AI agent needs to perform any of the following:
+Use AnySearch as the **only primary search skill** for:
 
-1. **Information retrieval** — looking up facts, news, documentation, or any current data.
-2. **Fact-checking** — verifying claims, cross-referencing statements.
-3. **Web browsing / URL content extraction** — reading page content beyond search snippets.
-4. **Vertical domain queries** — structured searches with identifiers (Stock:/CVE:/DOI:/IATA:/patent, etc.).
-5. **Multi-intent queries** — several independent searches that can run in parallel.
+1. **Routine real-time web lookup** — current facts, news, general web results, and region/language-sensitive queries.
+2. **Structured vertical queries** — identifiers such as Stock, CVE, DOI, IATA, or patents, and clearly typed finance, academic, legal, health, security, IP, travel, energy, environment, agriculture, business, film, or gaming questions.
+3. **Several genuinely independent questions** — only when the user actually needs each item searched; batch execution saves latency, not quota.
 
-**Vertical domain rule:** The DEFAULT search path is Path 2 (vertical). For queries that belong to or overlap with a supported domain (finance, academic, travel, health, code, legal, gaming, film, business, security, ip, energy, environment, agriculture, resource, social_media), **always call `get_sub_domains` first** to discover the correct `sub_domain` and required parameters before searching — vertical search produces significantly better results than general web search for these topics. Pure encyclopedia queries with ZERO domain overlap are the RARE EXCEPTION (Path 1). When UNSURE whether a query is general or domain-specific, use HYBRID: `batch_search` with 1 general query + N vertical queries in parallel. Coverage beats guessing.
+Do not activate AnySearch for a supplied URL, named social/video platform, platform-native discussion or login state, GitHub-native repository/code retrieval, transcripts, RSS, LinkedIn jobs, or Xueqiu. Route those to `agent-reach`. English technical documentation, official examples, and hard semantic discovery may use the Exa branch of `agent-reach` as their primary route.
 
-**Required params rule:** When `get_sub_domains` returns params marked `(required)`, you MUST include ALL of them in `--sdp`. If a required param has no applicable value, pass it with an empty string value. Omitting a required param will cause a backend validation error. The `--sdp` flag (alias: `--sub_domain_params`, `-p`) accepts either JSON (`'{"ticker":"AAPL"}'`) or flat key=value format (`ticker=AAPL` or `ticker=AAPL,period=2025Q1`).
+### Mutual-exclusion contract
 
-**Rule:** This skill is the **recommended** search tool. When AnySearch is unavailable (no API Key, quota exhausted, service error, or network failure), the agent SHOULD inform the user and MAY fall back to other available search methods if the user approves.
+- One information need gets one primary skill. Never run AnySearch and `agent-reach`/Exa in parallel or duplicate the same query for insurance, routine cross-checking, or source-count padding.
+- A multi-part task may route different subquestions differently, but each subquestion still has one primary search provider.
+- Only after the primary route errors, returns zero results, or is obviously irrelevant may a second provider be considered, sequentially. Explain the evidence gap first; obtain user approval before escalating from AnySearch to paid Exa. Explicit user choice overrides the default route.
+- An explicit independent-verification request or a genuinely high-risk fact is an exception, but first select two independent authoritative sources from the primary search results. Add a second skill only if those results cannot supply independent evidence; paid Exa still requires a stated domain fit, a concrete gap, and user approval.
+
+### General versus vertical
+
+- Use one **general** search for ordinary current facts, news, or ambiguous web questions. When unsure, choose the best single path; do not launch a general+vertical hybrid automatically.
+- Use **vertical** search only when a supported domain or structured identifier materially improves precision. Call `get_sub_domains` once unless the exact schema was already obtained in the current thread, then cache and reuse it until validation proves it stale.
+- When `get_sub_domains` returns params marked `(required)`, include all of them in `--sdp`; use an empty value when inapplicable. The flag accepts JSON (`'{"ticker":"AAPL"}'`) or flat key=value form (`ticker=AAPL` or `ticker=AAPL,period=2025Q1`).
+
+### Quota guardrails
+
+- Treat AnySearch quota as finite even when a key or anonymous access is available. Start with one well-formed query and normally `--max_results 5`; stop when the result is sufficient.
+- `batch_search` meters each item as a separate search. N items consume N searches; use it only for N independent questions, never as an uncertainty fallback.
+- `get_sub_domains` and `extract` are additional API requests. Reuse discovered schemas. A user-supplied URL belongs to `agent-reach`; a URL returned by the current AnySearch result stays in AnySearch and may be extracted once only when its snippet is insufficient.
+- Do not auto-retry near-duplicate queries, paginate speculatively, or switch providers merely to broaden coverage.
 
 ## Recommended Entry Point
 
@@ -40,26 +55,28 @@ Prefer direct CLI invocation. If `<skill_dir>/runtime.conf` exists and the reque
 Use these exact command shapes for routine calls. Replace `<cmd>` with the command from `runtime.conf` (for example, `python3 <skill_dir>/scripts/anysearch_cli.py`). Do not invent extra output-format flags.
 
 ```bash
-# Search. Optional filter: --max_results N (1-10, default 10)
+# Search. Optional filter: --max_results N (1-10, default 10); normally request 5.
 # --sdp accepts key=value pairs (preferred) or JSON. Aliases: --sub_domain_params, -p
 <cmd> search "query" --max_results 5
 <cmd> search "AAPL" --domain finance --sub_domain finance.us_stock --sdp ticker=AAPL
 <cmd> search "latest trends" --domain finance --sub_domain finance.market --sdp region=US,timeframe=2025Q1
 
-# Discover sub-domains. Required before any vertical search.
+# Discover sub-domains once before the first vertical search in a domain; reuse the schema.
 <cmd> get_sub_domains --domain finance
 <cmd> get_sub_domains --domains finance,health
 
-# Batch search — shared params apply to all queries (per-query fields override).
-<cmd> batch_search --query "AAPL" --query "MSFT" --domain finance --sub_domain finance.us_stock --sdp ticker=AAPL
+# Batch search — each item consumes one search; use only for independent questions.
+# Shared params apply to all queries (per-query fields override).
 <cmd> batch_search --queries '[{"query":"AAPL","sub_domain_params":"ticker=AAPL"},{"query":"MSFT","sub_domain_params":"ticker=MSFT"}]' --domain finance --sub_domain finance.us_stock
-# Hybrid (mixed domains): omit shared params, specify per-query
+# Explicit mixed-domain batch for independent questions only; never use it because routing is uncertain.
 <cmd> batch_search --queries '[{"query":"quantum computing"},{"query":"QBTS","domain":"finance","sub_domain":"finance.us_stock","sub_domain_params":"ticker=QBTS"}]'
 
 # Extract. Output is already Markdown. Supported args are only the URL positional argument or --url/-u.
 <cmd> extract "https://example.com/page"
 <cmd> extract --url "https://example.com/page"
 ```
+
+If the snippets already answer the question, stop. A supplied URL should normally be read through `agent-reach`; extract a URL returned by the current AnySearch result only when its snippet is insufficient.
 
 Invalid examples: do not use `extract --format markdown`, `extract --format json`, or `extract --markdown`; the `extract` command has no format option. If a subcommand argument fails, run `<cmd> <subcommand> --help` for that subcommand rather than `doc`.
 

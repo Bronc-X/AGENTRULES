@@ -1,33 +1,43 @@
-# 搜索工具
+# Exa 搜索：高价值语义检索储备
 
-Exa AI 搜索引擎。
+Exa 使用付费账户余额，因此不是普通网页查询的默认入口。它的独特优势是英文技术内容、
+官方文档和示例，以及关键词不明确时的高质量语义发现。
 
-## Exa AI 搜索
+## 什么时候使用 Exa
 
-高质量 AI 搜索引擎，擅长技术和代码搜索。
+- 查找英文技术文档、官方 API 示例、库或框架的权威资料。
+- 问题很冷门或关键词难以确定，需要语义相似度发现相关网页。
+- 用户明确指定 Exa。
+- AnySearch 已经报错、零结果或结果明显不相关，并且用户同意消耗 Exa 额度升级。
+
+精确 GitHub 仓库或代码内容优先使用 [dev.md](dev.md) 中的 GitHub 搜索，不要花 Exa
+额度重复检索。用户已经给出 URL 时直接按 [web.md](web.md) 读取，不先搜索。
+
+## 什么时候使用 AnySearch
+
+- 普通实时网页、新闻和一般事实查询。
+- 需要中文、地区或语言偏好的搜索。
+- Stock、CVE、DOI、IATA、patent 等结构化标识符。
+- finance、academic、legal、health、security、travel 等明确垂直领域。
+- 用户确实提出多个独立查询，需要按项执行搜索。
+
+## 额度与互斥契约
+
+1. 同一信息需求只选 Exa 或 AnySearch 之一，禁止并行双搜，也禁止为“保险”、凑来源或普通
+   交叉验证复制同一查询。
+2. Exa 首轮只发一个经过整理的精确查询，默认 `numResults=5`；复用返回内容和 URL，不做
+   探测性改写、分页或近义词连发。
+3. 首轮足以回答就停止。只有报错、零结果或明显偏题时才考虑第二渠道；从 AnySearch 升级
+   到 Exa 前说明具体缺口并征得用户同意。
+4. 用户明确要求独立核验或事实风险很高时，先从主搜索结果中选择两个独立权威来源。只有
+   首轮无法提供独立证据时才考虑第二渠道；顺序执行、不复制同一 query。若第二渠道是 Exa，
+   还必须确实适合该领域，并先说明证据缺口、取得用户同意。
+5. 多部分任务可按子问题分别路由，但每个子问题仍只有一个主搜索渠道。
+
+## 调用
 
 ```bash
-mcporter call 'exa.web_search_exa(query: "query", numResults: 5)'
-mcporter call 'exa.get_code_context_exa(query: "code question", tokensNum: 3000)'
+mcporter call 'exa.web_search_exa(query: "precise query", numResults: 5)'
 ```
 
-### 使用场景
-
-| 场景 | 参数 |
-|-----|------|
-| 网页搜索 | `web_search_exa(query: "...", numResults: 5)` |
-| 代码搜索 | `get_code_context_exa(query: "...", tokensNum: 3000)` |
-
-### 特点
-
-- 擅长英文内容和技术文档
-- 支持代码上下文搜索
-- 结果质量高
-
-## 与其他搜索工具对比
-
-| 工具 | 来源 | 适用场景 |
-|-----|------|---------|
-| Exa | agent-reach | 英文/技术/代码搜索 |
-| 智谱搜索 | my-mcp-tools | 中文搜索 |
-| GitHub 搜索 | agent-reach (dev.md) | 仓库/代码搜索 |
+代码仓库内的精确搜索使用 GitHub CLI；只有需要从公开网页中做语义发现时才使用 Exa。

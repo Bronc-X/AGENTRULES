@@ -37,7 +37,8 @@ Returns a Markdown table grouped by domain. Each sub_domain entry shows: sub_dom
 IMPORTANT: Cache get_sub_domains results per domain within a session. Do NOT call repeatedly.
 
 ### 3. batch_search — Execute 2-5 search queries in parallel
-Single failure does not block others; results are merged.
+Single failure does not block others; results are merged. Each query item is metered as
+one search, so N items consume N searches. Batch execution saves latency, not quota.
 
 | Option | Type | Required | Description |
 |--------|------|----------|-------------|
@@ -61,41 +62,42 @@ Truncated at 50,000 chars. HTML pages only.
 
 ## Decision Flow
 
-Search has two paths. Path 1 is a narrow exception for pure encyclopedia only. Path 2 (the DEFAULT) requires `get_sub_domains` before search.
+Choose exactly one path for each information need. Never run general and vertical
+searches together merely because routing is uncertain.
 
-### Path 1 — General query (RARE EXCEPTION)
-ONLY for pure encyclopedia / common knowledge with ZERO domain overlap.
-"How high is Mount Everest?", "Who wrote Hamlet?", "What is gravity?"
+### Path 1 — General query (routine default)
+Use one general search for ordinary current facts, news, general web discovery, or an
+ambiguous question without a structured identifier.
 
-→ {{LANG_INVOKE}} search "query" --max_results 10
+→ {{LANG_INVOKE}} search "query" --max_results 5
 
-### Path 2 — Vertical query (THE DEFAULT)
-EVERYTHING that is NOT pure encyclopedia. Structured data, domain-specific topics,
-specialized info, real-time data, locations, or ANY ambiguity.
+### Path 2 — Vertical query (clear structured/domain intent)
+Use vertical search only when a supported domain or typed identifier such as Stock,
+CVE, DOI, IATA, or patent materially improves precision.
 
 Step 1: {{LANG_INVOKE}} get_sub_domains --domains domain1,domain2,...
-Step 2: {{LANG_INVOKE}} search "query" --domain X --sub_domain Y [--sdp key=value]
-Step 3 (optional): {{LANG_INVOKE}} extract "url"
+Step 2: {{LANG_INVOKE}} search "query" --domain X --sub_domain Y [--sdp key=value] --max_results 5
+Step 3 (optional, only if snippets are insufficient): {{LANG_INVOKE}} extract "url"
 
-**CRITICAL: When UNSURE, use hybrid via batch_search:**
-{{LANG_INVOKE}} batch_search --queries '[{"query":"..."},{"query":"...","domain":"X","sub_domain":"Y","sub_domain_params":"key=val"}]'
-This fires 1 general query + N vertical queries in parallel. Coverage beats guessing.
+Call `get_sub_domains` once unless the exact schema was already obtained in the current
+thread, then cache it until validation proves it stale. If unsure which path applies,
+make one general query first; do not launch a hybrid batch.
 
-**Multi-domain intersection:** When a SINGLE topic crosses multiple domains,
-`get_sub_domains` with ALL intersecting domains, then `batch_search` —
-rephrase the SAME core question per domain perspective.
+`batch_search` is only for 2-5 independent questions the user actually needs answered.
+It saves latency, but N items consume N searches. Do not rephrase the same core question
+across domains for coverage.
 
 ```
 User query
   |
-  +-- PURE encyclopedia / common knowledge with ZERO domain overlap?
-  |     YES → Path 1: search "query" (no domain)
+  +-- Clearly structured identifier or domain-specific dataset?
+  |     YES → Path 2: get_sub_domains once → one vertical search
   |
-  +-- UNSURE / could benefit from domain sources?
-  |     YES → HYBRID: batch_search (1 general + N vertical)
+  +-- Several independent questions explicitly requested?
+  |     YES → batch_search, knowing N items consume N searches
   |
-  +-- Clearly domain-specific / has structured identifiers?
-        YES → Path 2: get_sub_domains → search (or batch_search for multi-domain)
+  +-- Otherwise / unsure
+        YES → Path 1: one general search
 ```
 
 ---
@@ -181,19 +183,13 @@ Step 2: Search with the correct sub_domain:
 
 ### Scenario 6: Batch search — multiple independent queries in one call
 
-CLI shorthand with shared domain (`--query` repeatable + shared params):
-
-```bash
-{{LANG_INVOKE}} batch_search --query "AAPL stock price" --query "TSLA earnings 2025" --query "GOOG market cap" --domain finance --sub_domain finance.us_stock
-```
-
-With per-item sub_domain_params as key=value strings:
+Use per-item sub_domain_params so each independent identifier is routed correctly:
 
 ```bash
 {{LANG_INVOKE}} batch_search --queries '[{"query":"AAPL","sub_domain_params":"ticker=AAPL"},{"query":"MSFT","sub_domain_params":"ticker=MSFT"}]' --domain finance --sub_domain finance.us_stock
 ```
 
-Hybrid (mixed domains — no shared params, specify per-query):
+Explicit mixed-domain batch for independent questions (not an uncertainty fallback):
 
 ```bash
 {{LANG_INVOKE}} batch_search --queries '[{"query":"quantum computing"},{"query":"QBTS","domain":"finance","sub_domain":"finance.us_stock","sub_domain_params":"ticker=QBTS"}]'

@@ -26,6 +26,7 @@
 ## 路由
 
 - 用户点名或语义命中 skill 时，完整读取该 `SKILL.md`，只继续读取它明确需要的 references。
+- 联网检索遵循“一个信息需求、一个主 skill”：常规实时网页、新闻、事实和结构化标识符用 `anysearch`；平台原生内容、用户给定 URL、GitHub、字幕、RSS，以及高价值英文技术语义发现用 `agent-reach`（其中 Exa 是付费储备）。同一需求不默认双搜；只有主渠道报错、零结果或明显偏题才顺序考虑第二渠道，从 AnySearch 升级到 Exa 前先说明证据缺口并取得用户同意。
 - 小型 Bug 默认使用 `mini-investigate`；复杂根因使用 `investigate`；安全、权限和合规问题使用 `security-auditor`。
 - 前端任务按需使用 `frontend-design` 或 `taste-skill`，完成后检查关键视口和交互。
 - 项目命令、业务规则和特殊验收标准必须下沉到项目级规则，不回填本文件。
