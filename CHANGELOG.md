@@ -17,6 +17,13 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [1.1.16] - 2026-08-30
+
+### Added
+
+- Added the `recording` top-level Skill package for turning recording evidence into traceable content libraries and reusable podcast, article, video, social, knowledge-base, and commercial assets.
+- Added the `workflow` top-level Skill package for distilling completed projects into evidence-bound, versioned workflows with independent validation and separately verified optimization claims.
+
 ## [1.1.15] - 2026-07-15
 
 ### Added

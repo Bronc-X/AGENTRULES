@@ -217,6 +217,18 @@ test_codex_conversion_with_stubbed_gstack() {
   assert_file_contains "$tmp/home/.claude/skills/anysearch/runtime.conf" "scripts/anysearch_cli"
   [ -f "$tmp/home/.claude/skills/anysearch/scripts/anysearch_cli.py" ] || fail "missing Claude anysearch CLI"
   [ ! -e "$tmp/home/.claude/skills/anysearch/.env" ] || fail "Claude anysearch .env should not be installed"
+  for host in .codex .claude; do
+    for relative_path in \
+      "recording/SKILL.md" \
+      "recording/scripts/qa_recording_project.ps1" \
+      "recording/assets/templates/brand-profile.json" \
+      "workflow/SKILL.md" \
+      "workflow/scripts/self_test.py" \
+      "workflow/assets/workflow-pack/WORKFLOW_SPEC.json.template"; do
+      [ -f "$tmp/home/$host/skills/$relative_path" ] ||
+        fail "missing $host Skill package file: $relative_path"
+    done
+  done
   assert_file_contains "$tmp/home/.codex/AGENTS.md" "版本：v1.4"
   assert_file_contains "$tmp/home/.codex/AGENTS.md" "先想清楚，再写代码"
   assert_file_contains "$tmp/home/.codex/AGENTS.md" "简单优先"

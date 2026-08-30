@@ -1,0 +1,55 @@
+# {{TITLE}}
+
+状态：`DRAFT`
+
+版本：`0.1.0`
+
+来源项目 ID：`{{SOURCE_PROJECT_ID}}`
+
+<!-- workflow:status=DRAFT -->
+<!-- workflow:optimization-claim=UNASSESSED -->
+
+<!-- workflow:short-path -->
+## 用户可见短路径
+
+`__UNRESOLVED__`
+
+<!-- workflow:success-contract -->
+## 成功标准
+
+`__UNRESOLVED__`
+
+<!-- workflow:scope -->
+## 适用范围与未验证条件
+
+`__UNRESOLVED__`
+
+<!-- workflow:io -->
+## 输入与输出
+
+`__UNRESOLVED__`
+
+<!-- workflow:execution -->
+## 完整执行路径
+
+`__UNRESOLVED__`
+
+<!-- workflow:gates -->
+## 必要门禁
+
+`__UNRESOLVED__`
+
+<!-- workflow:branches -->
+## 条件分支
+
+`__UNRESOLVED__`
+
+<!-- workflow:stop-recovery -->
+## 停止与恢复
+
+`__UNRESOLVED__`
+
+<!-- workflow:validation -->
+## 验证与最短性声明
+
+`__UNRESOLVED__`

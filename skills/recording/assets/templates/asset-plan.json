@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "project_id": "PROJECT-ID",
+  "updated_at": null,
+  "library_status": "PENDING",
+  "branches": {
+    "podcast": {
+      "status": "OPTIONAL",
+      "editorial_model": "ORIGINAL_AUDIO_LED",
+      "narration_policy": "INTRO_AND_MINIMAL_TRANSITIONS_ONLY",
+      "preferred_episode_minutes": {"min": 30, "max": 60, "hard_cap": null},
+      "original_audio_share": {"target": 0.95, "floor": 0.90},
+      "edit_plan_path": "branches/podcast/PODCAST_EDIT_PLAN.json",
+      "audience": null,
+      "deliverables": [],
+      "dependencies": [],
+      "output_paths": [],
+      "qa_status": "PENDING"
+    },
+    "article": {"status": "OPTIONAL", "audience": null, "deliverables": [], "dependencies": [], "output_paths": [], "qa_status": "PENDING"},
+    "video": {"status": "OPTIONAL", "audience": null, "deliverables": [], "dependencies": [], "output_paths": [], "qa_status": "PENDING"},
+    "social": {"status": "OPTIONAL", "audience": null, "deliverables": [], "dependencies": [], "output_paths": [], "qa_status": "PENDING"},
+    "knowledge": {"status": "OPTIONAL", "audience": null, "deliverables": [], "dependencies": [], "output_paths": [], "qa_status": "PENDING"},
+    "commercial": {"status": "OPTIONAL", "audience": null, "deliverables": [], "dependencies": [], "output_paths": [], "qa_status": "PENDING"}
+  },
+  "explicit_exclusions": [],
+  "completion_contract": []
+}

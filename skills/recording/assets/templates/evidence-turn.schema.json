@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Recording evidence turn",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["turn_id", "source_id", "source_sha256", "track", "source_time", "scope", "editorial_policy"],
+  "properties": {
+    "turn_id": {"type": "string"},
+    "source_id": {"type": "string"},
+    "source_sha256": {"type": "string", "pattern": "^[A-Fa-f0-9]{64}$"},
+    "track": {"type": ["string", "null"]},
+    "source_time": {"$ref": "#/$defs/timeRange"},
+    "session_time": {"anyOf": [{"$ref": "#/$defs/timeRange"}, {"type": "null"}]},
+    "formal_time": {"anyOf": [{"$ref": "#/$defs/timeRange"}, {"type": "null"}]},
+    "absolute_time": {"type": ["string", "null"]},
+    "machine_speaker_id": {"type": ["string", "null"]},
+    "stable_speaker_id": {"type": ["string", "null"]},
+    "raw_text": {"type": "string"},
+    "normalized_text": {"type": ["string", "null"]},
+    "confidence": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+    "overlap_group_id": {"type": ["string", "null"]},
+    "restriction_reason": {"type": ["string", "null"]},
+    "scope": {"enum": ["FORMAL", "PRE_ROLL", "EXCLUDED", "RESTRICTED"]},
+    "editorial_policy": {"enum": ["ALLOWED", "EVIDENCE_ONLY", "EXISTENCE_ONLY"]}
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {"editorial_policy": {"const": "EXISTENCE_ONLY"}},
+        "required": ["editorial_policy"]
+      },
+      "then": {
+        "properties": {
+          "raw_text": false,
+          "normalized_text": false,
+          "machine_speaker_id": false,
+          "stable_speaker_id": false
+        }
+      },
+      "else": {
+        "required": ["raw_text"]
+      }
+    }
+  ],
+  "$defs": {
+    "timeRange": {
+      "type": "object",
+      "required": ["start", "end"],
+      "properties": {
+        "start": {"type": "string"},
+        "end": {"type": "string"}
+      }
+    }
+  }
+}

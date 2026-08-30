@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "project_id": "PROJECT-ID",
+  "release_id": null,
+  "status": "DRAFT",
+  "created_at": null,
+  "immutable": true,
+  "platform": null,
+  "account": null,
+  "operation": null,
+  "artifacts": [],
+  "public_metadata": {
+    "relative_path": null,
+    "sha256": null
+  },
+  "input_bindings": {
+    "source_manifest_sha256": null,
+    "formal_scope_sha256": null,
+    "speaker_registry_sha256": null,
+    "content_library_sha256": null,
+    "asset_plan_sha256": null,
+    "branch_qa_sha256": null,
+    "pre_release_rights_ledger_sha256": null
+  },
+  "identity_bindings": {
+    "public_speaker_ids": [],
+    "original_audio_speaker_ids": [],
+    "synthetic_voice_speaker_ids": [],
+    "digital_likeness_speaker_ids": []
+  },
+  "previewed_at": null
+}

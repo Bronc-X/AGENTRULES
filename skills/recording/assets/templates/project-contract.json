@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "project_id": "PROJECT-ID",
+  "title": "PROJECT TITLE",
+  "created_at": null,
+  "timezone": "Asia/Shanghai",
+  "source_policy": {
+    "immutable_after_freeze": true,
+    "analyze_active_partial_files": false,
+    "working_derivatives_directory": "work"
+  },
+  "privacy_defaults": {
+    "personal_contact_information": "ANONYMIZE_IN_DERIVATIVES",
+    "unconfirmed_people": "EVIDENCE_ONLY",
+    "external_writes": "REQUIRE_SEPARATE_APPROVAL"
+  },
+  "paths": {
+    "audio_inputs": "inputs/audio",
+    "evidence": "evidence",
+    "decisions": "decisions",
+    "library": "library",
+    "plans": "plans",
+    "branches": "branches",
+    "audit": "audit",
+    "releases": "releases"
+  }
+}

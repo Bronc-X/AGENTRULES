@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Recording authorization grant",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "grant_id",
+    "domain",
+    "subject_id",
+    "status",
+    "scope",
+    "confirmation_text",
+    "approved_at",
+    "approval_event_id",
+    "bound_artifacts",
+    "does_not_grant"
+  ],
+  "properties": {
+    "grant_id": {"type": "string", "minLength": 1},
+    "domain": {
+      "enum": [
+        "DISPLAY_NAME",
+        "PUBLIC_IDENTITY",
+        "ORIGINAL_AUDIO_USE",
+        "VOICE_ENROLLMENT",
+        "VOICE_TRIAL",
+        "BATCH_SYNTHESIS",
+        "DIGITAL_LIKENESS",
+        "EXTERNAL_KNOWLEDGE_WRITE",
+        "DRAFT_UPLOAD",
+        "PUBLIC_RELEASE"
+      ]
+    },
+    "subject_id": {"type": "string", "minLength": 1},
+    "status": {"enum": ["PENDING", "APPROVED", "DENIED", "REVOKED", "EXPIRED"]},
+    "scope": {"type": "object"},
+    "confirmation_text": {"type": ["string", "null"]},
+    "approved_at": {"type": ["string", "null"]},
+    "approval_event_id": {"type": ["string", "null"]},
+    "bound_artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["relative_path", "sha256"],
+        "properties": {
+          "relative_path": {"type": "string"},
+          "sha256": {"type": "string", "pattern": "^[A-Fa-f0-9]{64}$"}
+        }
+      }
+    },
+    "does_not_grant": {"type": "array", "items": {"type": "string"}}
+  }
+}

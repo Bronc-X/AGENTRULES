@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "project_id": "PROJECT-ID",
+  "profile_id": "DEEPEVOLUTIONS_PODCAST",
+  "applies_to": "DeepEvolutions podcast branch only",
+  "host_display_name": "Toni",
+  "program_name": "DeepEvolutions",
+  "fixed_intro": {
+    "user_original_text": "大家好，我是Toni，这是Deepevolutions的一档关于企业和ai真实故事的播客节目，我们base在大湾区服务企业ai赋能，，欢迎大家收听",
+    "user_original_text_sha256": "60A0BFBFF776CFAFD7B66426520E2A556DA323F2CC8313E8DA0E770E4E3DDC34",
+    "normalized_tts_text": "大家好，我是 Toni。这是 DeepEvolutions 的一档关于企业和 AI 真实故事的播客节目。我们 base 在大湾区，服务企业 AI 赋能。欢迎大家收听。",
+    "normalized_tts_text_sha256": "6CAADB92F8C42FE0AA73FB749CD33AC9B4BB1BD8CAF7DC4F4993E59DE553CEC9",
+    "required_per_episode": 1,
+    "required_position": 1,
+    "segment_type": "INTRO",
+    "role": "OWNER",
+    "delivery_style": "WARM_IDENT"
+  }
+}

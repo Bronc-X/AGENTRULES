@@ -201,6 +201,8 @@ C:\Dev\Lotus\install.ps1 -Global -GstackProfile design
 | `anysearch` | 实时搜索、垂直领域检索、批量搜索和 URL 内容提取 |
 | `agent-reach` | 互联网能力路由器，覆盖网页、搜索、YouTube、RSS、V2EX、B站和需登录态的社交平台 |
 | `codebase-memory-mcp` | 代码库记忆与图谱检索，支持索引、结构搜索、调用路径和架构追踪 |
+| `recording` | 将录音整理为可追溯内容母库，并生产播客、文章、视频、社交、知识库和商业资产 |
+| `workflow` | 把已跑通项目蒸馏成有证据、可版本化、可复用的工作流或 Skill |
 | `test-driven-development` | 严格红绿重构，先写失败测试再写实现 |
 | `frontend-design` | 前端审美与交互质量约束 |
 | `taste-skill` | 前端审美与实现质量约束，强化布局、字体、动效、间距和组件完成度 |

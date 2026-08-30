@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "project_id": "PROJECT-ID",
+  "unknown_policy": "EVIDENCE_ONLY",
+  "speakers": [],
+  "decision": {
+    "status": "PENDING",
+    "approved_at": null,
+    "approval_source": null
+  }
+}

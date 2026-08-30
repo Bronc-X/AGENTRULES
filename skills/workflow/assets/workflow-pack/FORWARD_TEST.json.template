@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "workflow_id": "{{WORKFLOW_ID}}",
+  "workflow_version": "0.1.0",
+  "status": "__UNRESOLVED__",
+  "independent_executor": "__UNRESOLVED__",
+  "input_summary_sha256": "__UNRESOLVED__",
+  "workflow_definition_sha256": "__UNRESOLVED__",
+  "started_at": "__UNRESOLVED__",
+  "completed_at": "__UNRESOLVED__",
+  "result_summary": "__UNRESOLVED__"
+}

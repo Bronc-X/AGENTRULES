@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.1",
+  "workflow_id": "{{WORKFLOW_ID}}",
+  "case_id": "golden-001",
+  "status": "__UNRESOLVED__",
+  "input_summary": "__UNRESOLVED__",
+  "expected_outcome": "__UNRESOLVED__",
+  "evidence": [],
+  "protected_invariants": []
+}

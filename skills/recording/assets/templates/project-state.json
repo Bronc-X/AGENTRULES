@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "project_id": "PROJECT-ID",
+  "revision": 1,
+  "current_state": "S00_INIT",
+  "last_safe_state": "S00_INIT",
+  "updated_at": null,
+  "blocked": null,
+  "active_worker": null,
+  "current_release_candidate": null
+}

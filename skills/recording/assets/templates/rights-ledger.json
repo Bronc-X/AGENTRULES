@@ -1,0 +1,17 @@
+{
+  "schema_version": 2,
+  "project_id": "PROJECT-ID",
+  "required_domains": [
+    "DISPLAY_NAME",
+    "PUBLIC_IDENTITY",
+    "ORIGINAL_AUDIO_USE",
+    "VOICE_ENROLLMENT",
+    "VOICE_TRIAL",
+    "BATCH_SYNTHESIS",
+    "DIGITAL_LIKENESS",
+    "EXTERNAL_KNOWLEDGE_WRITE",
+    "DRAFT_UPLOAD",
+    "PUBLIC_RELEASE"
+  ],
+  "grants": []
+}

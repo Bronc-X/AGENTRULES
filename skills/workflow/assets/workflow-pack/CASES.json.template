@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.1",
+  "workflow_id": "{{WORKFLOW_ID}}",
+  "cases": [
+    {
+      "case_id": "golden-001",
+      "kind": "GOLDEN",
+      "status": "__UNRESOLVED__",
+      "request": "__UNRESOLVED__",
+      "expected": "__UNRESOLVED__",
+      "covers_step_ids": [],
+      "covers_gate_ids": [],
+      "covers_branch_ids": [],
+      "actual_evidence": []
+    },
+    {
+      "case_id": "negative-001",
+      "kind": "NEGATIVE",
+      "status": "__UNRESOLVED__",
+      "request": "__UNRESOLVED__",
+      "expected": "__UNRESOLVED__",
+      "covers_step_ids": [],
+      "covers_gate_ids": [],
+      "covers_branch_ids": [],
+      "actual_evidence": []
+    },
+    {
+      "case_id": "boundary-001",
+      "kind": "BOUNDARY",
+      "status": "__UNRESOLVED__",
+      "request": "__UNRESOLVED__",
+      "expected": "__UNRESOLVED__",
+      "covers_step_ids": [],
+      "covers_gate_ids": [],
+      "covers_branch_ids": [],
+      "actual_evidence": []
+    },
+    {
+      "case_id": "ablation-001",
+      "kind": "ABLATION",
+      "status": "OPTIONAL",
+      "request": "Populate when claiming path irreducibility.",
+      "expected": "Removing the bound step breaks a protected invariant.",
+      "covers_step_ids": [],
+      "covers_gate_ids": [],
+      "covers_branch_ids": [],
+      "actual_evidence": []
+    }
+  ]
+}

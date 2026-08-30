@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "project_id": "PROJECT-ID",
+  "status": "DRAFT",
+  "editorial_model": "ORIGINAL_AUDIO_LED",
+  "narration_policy": "INTRO_AND_MINIMAL_TRANSITIONS_ONLY",
+  "allowed_narration_types": ["INTRO", "NECESSARY_TRANSITION"],
+  "formal_episode_asset_kind": "FORMAL_LONGFORM_PODCAST",
+  "forbidden_episode_asset_kinds": ["SHORT_AUDIO_SUMMARY", "NARRATED_DIGEST"],
+  "episode_count_rationale": null,
+  "preferred_episode_minutes": {
+    "min": 30,
+    "max": 60,
+    "hard_cap": null
+  },
+  "original_audio_share": {
+    "target": 0.95,
+    "floor": 0.9
+  },
+  "episodes": []
+}

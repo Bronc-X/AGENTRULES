@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "project_id": "PROJECT-ID",
+  "status": "COLLECTING",
+  "frozen_at": null,
+  "files": [],
+  "summary": {
+    "file_count": 0,
+    "total_bytes": 0,
+    "partial_file_count": 0,
+    "hash_verified_count": 0
+  }
+}

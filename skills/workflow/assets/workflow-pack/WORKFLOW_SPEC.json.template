@@ -1,0 +1,64 @@
+{
+  "schema_version": "1.1",
+  "workflow_id": "{{WORKFLOW_ID}}",
+  "title": "{{TITLE}}",
+  "version": "0.1.0",
+  "status": "DRAFT",
+  "created_at": "{{CREATED_AT}}",
+  "source_project_id": "{{SOURCE_PROJECT_ID}}",
+  "source_run": {
+    "status": "__UNRESOLVED__",
+    "evidence": [],
+    "artifact_hashes": []
+  },
+  "success_contract": {
+    "observable_outcome": "__UNRESOLVED__",
+    "scope_in": [],
+    "scope_out": [],
+    "acceptance_evidence": []
+  },
+  "validated_scope": {
+    "input_types": [],
+    "environments": [],
+    "scale_bounds": [],
+    "risk_levels": [],
+    "unverified_conditions": []
+  },
+  "optimization": {
+    "hard_constraints": [
+      "outcome_correctness",
+      "authorization_and_safety",
+      "traceability_and_repeatability"
+    ],
+    "secondary_objectives": [],
+    "claim": "UNASSESSED",
+    "comparison_metric": null,
+    "selected_candidate_id": null,
+    "candidate_paths": [],
+    "ablation_case_ids": []
+  },
+  "inputs": [],
+  "outputs": [],
+  "steps": [],
+  "gates": [],
+  "conditional_branches": [],
+  "stop_conditions": [],
+  "detours_removed": [],
+  "skill_export": {
+    "requested": false,
+    "artifact_root": null,
+    "artifact_manifest": null,
+    "source_workflows": [],
+    "rules": []
+  },
+  "validation": {
+    "golden_case_ids": [],
+    "negative_case_ids": [],
+    "boundary_case_ids": [],
+    "independent_forward_test": {
+      "status": "__UNRESOLVED__",
+      "evidence_path": "evidence/FORWARD_TEST.json"
+    },
+    "commands": []
+  }
+}
